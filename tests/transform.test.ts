@@ -5,8 +5,9 @@ import { test_schema_generation } from "./utils";
 const transform_schemas = {
     "doubled number": z.number().transform((n) => n * 2),
     "doubled string": z.string().transform((s) => s + s),
+    "chained transforms": z.string().transform((s) => s + s).transform((s) => s + s),
 } as const;
 
-describe.skip("Transform generation", () => {
+describe("Transform generation", () => {
     test_schema_generation(transform_schemas);
 });

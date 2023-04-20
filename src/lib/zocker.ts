@@ -1,7 +1,10 @@
 import { z } from "zod";
 import { GenerationContext, generate } from "./generate.js";
 
-export type ZockerOptions<Z extends z.ZodTypeAny> = {};
+export type ZockerOptions<Z extends z.ZodTypeAny> = {
+	generators?: Map<z.ZodTypeAny, () => any>;
+};
+
 export type ZockerGeneratorOptions<Z extends z.ZodTypeAny> = {};
 export type Zocker<Z extends z.ZodTypeAny> = (
 	options?: ZockerGeneratorOptions<Z>
@@ -17,7 +20,9 @@ export function zocker<Z extends z.ZodSchema>(
 	schema_options: ZockerOptions<Z> = {}
 ): Zocker<Z> {
 	return (generation_options = {}) => {
-		const generation_context: GenerationContext<Z> = {}
+		const generation_context: GenerationContext<Z> = {
+			generators: schema_options.generators || new Map(),
+		}
 		return generate(schema, generation_context);
 	};
 }
