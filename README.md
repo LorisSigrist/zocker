@@ -10,11 +10,11 @@ I just started this project, so there is a lot of work to be done. Feel free to 
 
 A list of features that I think are required to make this a releasable package.
 
-- [ ] Generate data for all the Zod-primitives, except preprocess and refinements
-- [ ] Allow developers to override generation functions for specific types
-- [ ] Allow developers to override generation functions for specific paths
-- [ ] Allow refinements and preprocess to be used, if there is a custom generator for them. Enforce that there are custom generators using TypeScript.
-- [ ] Define an API that gives developers control over the generation process. Eg force edge-cases
+- [ ] Generate data for all the Zod-primitives, except effects
+- [ ] Provide escape hatches for developers to define custom generators for specific types - Including ones that `zocker` can't support itself
+- [ ] Force Developers to provide custom generators for types that `zocker` can't support, ideally using just TypeScript.
+- [ ] Define an API that gives developers control over the generation process. Eg force edge-cases to happen in specific tests, and avoid them in others.
+- [ ] Make tests repeatable, so that developers can reproduce bugs.
 
 ## Thoughts on the API
 
