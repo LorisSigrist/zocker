@@ -3,6 +3,7 @@ import { z } from "zod";
 import { generate_number } from "./datatypes/numbers.js";
 import { generate_string } from "./datatypes/string.js";
 import { generate_bigint } from "./datatypes/bigint.js";
+import { generate_date } from "./datatypes/dates.js";
 
 export type ZockerOptions<Z extends z.ZodTypeAny> = {};
 export type ZockerGeneratorOptions<Z extends z.ZodTypeAny> = {};
@@ -33,7 +34,7 @@ export function zocker<Z extends z.ZodTypeAny>(
 		}
 
 		if (schema instanceof z.ZodDate) {
-			return faker.datatype.datetime();
+			return generate_date(schema, generation_options);
 		}
 
 		if (schema instanceof z.ZodBigInt) {
