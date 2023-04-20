@@ -14,6 +14,8 @@ const string_schemas = {
     "regex": z.string().regex(/<([a-z]\w{0,20})>foo<\1>/),
     "regex with flags": z.string().regex(new RegExp("(sun|mon|tue|wednes|thurs|fri|satur)day", "i")),
     "email": z.string().email(),
+    "ISO datetime": z.string().datetime(),
+    
 } as const;
 
 describe("String generation", () => {

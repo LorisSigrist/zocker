@@ -57,9 +57,30 @@ export function zocker<Z extends z.ZodTypeAny>(
 			return schema._def.value;
 		}
 
+		if(schema instanceof z.ZodUnknown) {
+			return undefined;
+		}
+
+		if(schema instanceof z.ZodAny) {
+			return undefined;
+		}
+
+		if(schema instanceof z.ZodNaN) {
+			return NaN;
+		}
+
+		if(schema instanceof z.ZodSymbol) {
+			return Symbol();
+		}
+
 		if (schema instanceof z.ZodEffects) {
 			throw new Error("We currently don't support ZodEffects.");
 		}
+
+		if (schema instanceof z.ZodNever) {
+			throw new Error("We currently don't support ZodNever.");
+		}
+
 
 		if (schema instanceof z.ZodObject) {
 			const generate_object = <T extends z.ZodRawShape>(
@@ -123,6 +144,6 @@ export function zocker<Z extends z.ZodTypeAny>(
 			return generate_array(schema);
 		}
 
-		throw new Error("Not implemented");
+		throw new Error("Unknown Zod-Type - Not implemented.");
 	};
 }

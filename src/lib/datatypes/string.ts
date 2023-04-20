@@ -7,6 +7,9 @@ export function generate_string<Z extends z.ZodString>(
 	string_schema: Z,
 	generation_options: ZockerGeneratorOptions<Z> = {}
 ) {
+	const datetime = get_string_check(string_schema, "datetime");
+	if (datetime) return faker.date.recent().toISOString();
+
 	const uuid = get_string_check(string_schema, "uuid");
 	if (uuid) return faker.datatype.uuid();
 
