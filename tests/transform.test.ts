@@ -1,16 +1,21 @@
-import { describe } from "vitest";
+import { describe, expect, it } from "vitest";
+import { zocker } from "../src";
 import { z } from "zod";
-import { test_schema_generation } from "./utils";
 
-const transform_schemas = {
-	"doubled number": z.number().transform((n) => n * 2),
-	"doubled string": z.string().transform((s) => s + s),
-	"chained transforms": z
-		.string()
-		.transform((s) => s + s)
-		.transform((s) => s + s)
-} as const;
 
 describe("Transform generation", () => {
-	test_schema_generation(transform_schemas);
+
+	it("Generates valid data for strings with transforms", () => {
+		const chained_schema = z.string().length(2).transform((s) => s + s);
+		const result_schema = z.string().length(4);
+		const result = zocker(chained_schema)();
+		expect(() => result_schema.parse(result)).not.toThrow();
+	});
+
+	it("Generates valid data for numbers with transforms", () => {
+		const chained_schema = z.number().negative().transform((s) => s * s);
+		const result_schema = z.number().positive();
+		const result = zocker(chained_schema)();
+		expect(() => result_schema.parse(result)).not.toThrow();
+	});
 });
