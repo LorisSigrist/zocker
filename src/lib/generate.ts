@@ -138,5 +138,9 @@ export function generate<Z extends z.ZodSchema>(
 		return generate_tuple(schema, generation_context);
 	}
 
+    if(schema instanceof z.ZodPromise) {
+        return Promise.resolve(generate(schema._def.type, generation_context));
+    }
+
 	throw new Error("Unknown Zod-Type - Not implemented.");
 }
