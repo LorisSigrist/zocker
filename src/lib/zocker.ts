@@ -5,7 +5,10 @@ export type ZockerOptions<Z extends z.ZodTypeAny> = {
 	generators?: Map<z.ZodTypeAny, () => any>;
 };
 
-export type ZockerGeneratorOptions<Z extends z.ZodTypeAny> = {};
+export type ZockerGeneratorOptions<Z extends z.ZodTypeAny> = {
+	null_chance?: number;
+	undefined_chance?: number;
+};
 export type Zocker<Z extends z.ZodTypeAny> = (
 	options?: ZockerGeneratorOptions<Z>
 ) => z.infer<Z>;
@@ -22,6 +25,8 @@ export function zocker<Z extends z.ZodSchema>(
 	return (generation_options = {}) => {
 		const generation_context: GenerationContext<Z> = {
 			generators: schema_options.generators || new Map(),
+			null_chance: generation_options.null_chance || 0.1,
+			undefined_chance: generation_options.undefined_chance || 0.1,
 		}
 		return generate(schema, generation_context);
 	};

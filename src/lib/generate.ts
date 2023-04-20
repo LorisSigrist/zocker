@@ -14,9 +14,13 @@ import { generate_effects } from "./datatypes/effects.js";
  */
 export type GenerationContext<Z extends z.ZodSchema> = {
     generators: Map<z.ZodSchema, () => any>;
+    /** How likely is it that a nullable value will be null */
+    null_chance: number;
+    /** How likely is it that an optional value will be undefined */
+    undefined_chance: number;
 };
 
-export function generate<Z extends z.ZodSchema>(schema: Z, generation_context: GenerationContext<Z>) {
+export function generate<Z extends z.ZodSchema>(schema: Z, generation_context: GenerationContext<Z>) : z.infer<Z> {
 
     //Check if there is a custom generator for this schema and use it if there is.
     const custom_generator = generation_context.generators.get(schema);
@@ -89,6 +93,22 @@ export function generate<Z extends z.ZodSchema>(schema: Z, generation_context: G
 
     if (schema instanceof z.ZodArray) {
         return generate_array(schema,generation_context);
+    }
+
+    if(schema instanceof z.ZodNullable) {
+        if(Math.random() < generation_context.null_chance) {
+            return null;
+        }
+
+        return generate(schema._def.innerType, generation_context);
+    }
+
+    if(schema instanceof z.ZodOptional) {
+        if(Math.random() < generation_context.undefined_chance) {
+            return undefined;
+        }
+
+        return generate(schema._def.innerType, generation_context);
     }
 
     throw new Error("Unknown Zod-Type - Not implemented.");
