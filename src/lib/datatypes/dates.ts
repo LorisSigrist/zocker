@@ -1,11 +1,11 @@
 import { faker } from "@faker-js/faker";
-import { ZockerGeneratorOptions } from "lib/zocker.js";
+import { GenerationContext } from "lib/generate.js";
 import { z } from "zod";
 
 
 export function generate_date<Z extends z.ZodDate>(
     date_schema: Z,
-    options: ZockerGeneratorOptions<Z>
+    options: GenerationContext<Z>
 ): Date {
     const min = get_date_check(date_schema, "min")?.value ?? new Date("1970-01-01").getTime();
     const max = get_date_check(date_schema, "max")?.value ?? new Date(min + 1000_000).getTime();

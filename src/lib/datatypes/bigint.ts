@@ -1,10 +1,10 @@
 import { faker } from "@faker-js/faker";
-import { ZockerGeneratorOptions } from "lib/zocker.js";
+import { GenerationContext } from "lib/generate.js";
 import { z } from "zod";
 
 export function generate_bigint<Z extends z.ZodBigInt>(
     bigint_schema: Z,
-    options: ZockerGeneratorOptions<Z>
+    options: GenerationContext<Z>
 ): bigint {
     const multiple_of = get_bigint_check(bigint_schema, "multipleOf")?.value ?? 1n;
 

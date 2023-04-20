@@ -1,10 +1,10 @@
 import { z } from "zod";
 import { faker } from "@faker-js/faker";
-import type { ZockerGeneratorOptions } from "../zocker.js";
+import { GenerationContext } from "lib/generate.js";
 
 export function generate_number<Z extends z.ZodNumber>(
 	number_schema: Z,
-	options: ZockerGeneratorOptions<Z>
+	options: GenerationContext<Z>
 ): number {
 	let min =
 		get_number_check(number_schema, "min")?.value ??

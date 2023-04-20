@@ -1,11 +1,11 @@
 import { faker } from "@faker-js/faker";
 import { z } from "zod";
-import { ZockerGeneratorOptions } from "../zocker.js";
 import Randexp from "randexp";
+import { GenerationContext } from "lib/generate.js";
 
 export function generate_string<Z extends z.ZodString>(
 	string_schema: Z,
-	generation_options: ZockerGeneratorOptions<Z> = {}
+	generation_options: GenerationContext<Z>
 ) {
 	const datetime = get_string_check(string_schema, "datetime");
 	if (datetime) return faker.date.recent().toISOString();
