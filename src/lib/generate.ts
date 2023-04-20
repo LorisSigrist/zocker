@@ -111,5 +111,27 @@ export function generate<Z extends z.ZodSchema>(schema: Z, generation_context: G
         return generate(schema._def.innerType, generation_context);
     }
 
+    if(schema instanceof z.ZodUnion) {
+        const schemas = schema._def.options;
+
+        //Pick a random schema from the union
+        const random_schema = schemas[Math.floor(Math.random() * schemas.length)];
+
+        return generate(random_schema, generation_context);
+    }
+
+    if(schema instanceof z.ZodEnum) {
+        const values = schema._def.values;
+        const random_value = values[Math.floor(Math.random() * values.length)];
+        return random_value;
+    }
+
+    if(schema instanceof z.ZodNativeEnum) {
+        console.log(schema);
+        const values = Object.values(schema._def.values);
+        const random_value = values[Math.floor(Math.random() * values.length)];
+        return random_value;
+    }
+
     throw new Error("Unknown Zod-Type - Not implemented.");
 }
