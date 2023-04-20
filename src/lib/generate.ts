@@ -15,12 +15,25 @@ import { generate_tuple } from "./datatypes/tuple.js";
  */
 export type GenerationContext<Z extends z.ZodSchema> = {
 	generators: Map<z.ZodSchema, () => any>;
+
+	/** A factory function for generating values for z.instanceof */
+	instanceof_factories: Map<any, () => any>;
+
 	/** How likely is it that a nullable value will be null */
 	null_chance: number;
 	/** How likely is it that an optional value will be undefined */
 	undefined_chance: number;
 };
 
+
+/**
+ * Generate a random value that matches the given schema.
+ * This get's called recursively until schema generation is done.
+ * 
+ * @param schema - The schema to generate a value for.
+ * @param generation_context - The context and configuration for the generation process.
+ * @returns - A random value that matches the given schema.
+ */
 export function generate<Z extends z.ZodSchema>(
 	schema: Z,
 	generation_context: GenerationContext<Z>
@@ -142,5 +155,13 @@ export function generate<Z extends z.ZodSchema>(
         return Promise.resolve(generate(schema._def.type, generation_context));
     }
 
-	throw new Error("Unknown Zod-Type - Not implemented.");
+	if(schema instanceof z.ZodPipeline) {
+		throw new Error("ZodPipeline is not supported yet. You can provide a custom generator in the options to generate values anyway.");
+	}
+
+	if(schema instanceof z.ZodBranded) {
+		return generate(schema._def.type, generation_context);
+	}
+	
+	throw new Error("Unknown Schema Type - No generator implemented. You can provide a custom generator in the options.");
 }
