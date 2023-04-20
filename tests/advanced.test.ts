@@ -34,11 +34,12 @@ const schemas = {
 		})
 	),
 
-	"array of objects with non-empty arrays of strings with regex pattern": z.array(
-		z.object({
-			a: z.array(z.string().regex(/^[0-9]+$/)).nonempty()
-		})
-	),
+	"array of objects with non-empty arrays of strings with regex pattern":
+		z.array(
+			z.object({
+				a: z.array(z.string().regex(/^[0-9]+$/)).nonempty()
+			})
+		),
 
 	"array with exactly 10 elements": z.array(z.number()).length(10)
 } as const;

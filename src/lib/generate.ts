@@ -136,9 +136,9 @@ export function generate<Z extends z.ZodSchema>(
 		return generate(random_schema, generation_context);
 	}
 
-	if(schema instanceof z.ZodDiscriminatedUnion) {
-		
+	if (schema instanceof z.ZodDiscriminatedUnion) {
 		const schemas = schema._def.options;
+
 		//Pick a random schema from the union
 		const random_schema = schemas[Math.floor(Math.random() * schemas.length)];
 
@@ -175,16 +175,18 @@ export function generate<Z extends z.ZodSchema>(
 		return generate(schema._def.type, generation_context);
 	}
 
-	if(schema instanceof z.ZodMap) {
+	if (schema instanceof z.ZodMap) {
 		return generate_map(schema, generation_context);
 	}
 
-	if(schema instanceof z.ZodRecord) {
+	if (schema instanceof z.ZodRecord) {
 		return generate_record(schema, generation_context);
 	}
 
-	if(schema instanceof z.ZodFunction) {
-		throw new Error("ZodFunction is not supported yet. You can provide a custom generator in the options to generate values anyway.");
+	if (schema instanceof z.ZodFunction) {
+		throw new Error(
+			"ZodFunction is not supported yet. You can provide a custom generator in the options to generate values anyway."
+		);
 	}
 
 	throw new Error(
