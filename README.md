@@ -11,6 +11,7 @@ I just started this project, so there is a lot of work to be done. Feel free to 
 A list of features that I think are required to make this a releasable package.
 
 - [ ] Generate data for all the Zod-primitives, except effects
+- [ ] Generate cyclic data structures safely
 - [ ] Provide escape hatches for developers to define custom generators for specific types - Including ones that `zocker` can't support itself
 - [ ] Force Developers to provide custom generators for types that `zocker` can't support, ideally using just TypeScript.
 - [ ] Define an API that gives developers control over the generation process. Eg force edge-cases to happen in specific tests, and avoid them in others.
