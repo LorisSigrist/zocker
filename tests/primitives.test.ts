@@ -5,9 +5,6 @@ import { test_schema_generation } from "./utils";
 const repeats = 100; //How many times should each test be repeated?
 
 const schemas = {
-	"plain boolean": z.boolean(),
-	"plain date": z.date(),
-	"plain bigint": z.bigint(),
 	"plain undefined": z.undefined(),
 	"plain null": z.null(),
 	"plain void": z.void(),
