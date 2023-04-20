@@ -26,8 +26,8 @@ export function zocker<Z extends z.ZodSchema>(
 		const generation_context: GenerationContext<Z> = {
 			generators: schema_options.generators || new Map(),
 			null_chance: generation_options.null_chance || 0.1,
-			undefined_chance: generation_options.undefined_chance || 0.1,
-		}
+			undefined_chance: generation_options.undefined_chance || 0.1
+		};
 		return generate(schema, generation_context);
 	};
 }

@@ -38,5 +38,5 @@ const schemas = {
 } as const;
 
 describe("Primitive Schema", () => {
-	test_schema_generation(schemas, repeats)
+	test_schema_generation(schemas, repeats);
 });
