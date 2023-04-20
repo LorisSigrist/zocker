@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { faker } from "@faker-js/faker";
-import type { ZockerGeneratorOptions } from "./zocker.js";
+import type { ZockerGeneratorOptions } from "../zocker.js";
 
 export function generate_number<Z extends z.ZodNumber>(
 	number_schema: Z,

@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker";
 import { z } from "zod";
-import { ZockerGeneratorOptions } from "./zocker.js";
+import { ZockerGeneratorOptions } from "../zocker.js";
 import Randexp from "randexp";
 
 export function generate_string<Z extends z.ZodString>(

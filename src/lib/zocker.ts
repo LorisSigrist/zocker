@@ -1,7 +1,8 @@
 import { faker } from "@faker-js/faker";
 import { z } from "zod";
-import { generate_number } from "./numbers.js";
-import { generate_string } from "./string.js";
+import { generate_number } from "./datatypes/numbers.js";
+import { generate_string } from "./datatypes/string.js";
+import { generate_bigint } from "./datatypes/bigint.js";
 
 export type ZockerOptions<Z extends z.ZodTypeAny> = {};
 export type ZockerGeneratorOptions<Z extends z.ZodTypeAny> = {};
@@ -36,7 +37,7 @@ export function zocker<Z extends z.ZodTypeAny>(
 		}
 
 		if (schema instanceof z.ZodBigInt) {
-			return faker.datatype.bigInt();
+			return generate_bigint(schema, generation_options);
 		}
 
 		if (schema instanceof z.ZodUndefined) {
