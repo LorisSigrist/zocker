@@ -128,7 +128,6 @@ export function generate<Z extends z.ZodSchema>(schema: Z, generation_context: G
     }
 
     if(schema instanceof z.ZodNativeEnum) {
-        console.log(schema);
         const values = Object.values(schema._def.values);
         const random_value = values[Math.floor(Math.random() * values.length)];
         return random_value;
