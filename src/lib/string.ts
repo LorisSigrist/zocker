@@ -8,28 +8,27 @@ export function generate_string<Z extends z.ZodString>(
 	generation_options: ZockerGeneratorOptions<Z> = {}
 ) {
 	const uuid = get_string_check(string_schema, "uuid");
-	if(uuid) return faker.datatype.uuid();
+	if (uuid) return faker.datatype.uuid();
 
-	const ip = get_string_check(string_schema, "ip")
-	if(ip) {
+	const ip = get_string_check(string_schema, "ip");
+	if (ip) {
 		const ip_v4 = ip.version === "v4" ?? false;
 		const ip_v6 = ip.version === "v6" ?? false;
 
-		if(ip_v4) return faker.internet.ipv4();
-		if(ip_v6) return faker.internet.ipv6();
+		if (ip_v4) return faker.internet.ipv4();
+		if (ip_v6) return faker.internet.ipv6();
 
 		return Math.random() > 0.5 ? faker.internet.ipv4() : faker.internet.ipv6();
 	}
 
 	const email = get_string_check(string_schema, "email");
-	if(email) return faker.internet.email();
+	if (email) return faker.internet.email();
 
 	const url = get_string_check(string_schema, "url");
-	if(url) return faker.internet.url();
-
+	if (url) return faker.internet.url();
 
 	const regex = get_string_check(string_schema, "regex");
-	if(regex) {
+	if (regex) {
 		const randexp = new Randexp(regex.regex);
 		randexp.max = 10;
 		return randexp.gen();
@@ -41,8 +40,10 @@ export function generate_string<Z extends z.ZodString>(
 	const max_length =
 		get_string_check(string_schema, "max")?.value ?? min_length + 10000;
 
-
-	if(min_length > max_length) throw new Error("min length is greater than max length - The Schema never matches");
+	if (min_length > max_length)
+		throw new Error(
+			"min length is greater than max length - The Schema never matches"
+		);
 
 	return exact_length
 		? faker.datatype.string(exact_length)
