@@ -8,6 +8,8 @@ const promise_schemas = {
     "promise of boolean": z.promise(z.boolean()),
     "promise of date": z.promise(z.date()),
     "promise of bigint": z.promise(z.bigint()),
+    "promise of undefined": z.promise(z.undefined()),
+    "promise of null": z.promise(z.null()),
 } as const;
 
 const schema_keys = Object.keys(promise_schemas) as any as readonly (keyof typeof promise_schemas)[];
@@ -17,6 +19,6 @@ describe("Promise generation", () => {
         const schema = promise_schemas[key];
         const generate = zocker(schema);
         const data = generate();
-        await expect(schema.parseAsync(data)).resolves.toBeDefined();
+        await expect(schema.parseAsync(data)).resolves.toEqual(await data);
     });
 });
