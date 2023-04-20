@@ -12,6 +12,7 @@ const promise_schemas = {
     "promise of bigint": z.promise(z.bigint()),
     "promise of undefined": z.promise(z.undefined()),
     "promise of null": z.promise(z.null()),
+    "promise of a promise of a promise of a number": z.promise(z.promise(z.promise(z.number()))),
 } as const;
 
 const schema_keys = Object.keys(promise_schemas) as any as readonly (keyof typeof promise_schemas)[];
