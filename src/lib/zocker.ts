@@ -53,6 +53,10 @@ export function zocker<Z extends z.ZodTypeAny>(
 			return;
 		}
 
+		if(schema instanceof z.ZodLiteral) {
+			return schema._def.value;
+		}
+
 		if (schema instanceof z.ZodEffects) {
 			throw new Error("We currently don't support ZodEffects.");
 		}
