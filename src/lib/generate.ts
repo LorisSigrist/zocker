@@ -10,6 +10,7 @@ import { generate_array } from "./datatypes/array.js";
 import { generate_effects } from "./datatypes/effects.js";
 import { generate_tuple } from "./datatypes/tuple.js";
 import { generate_map } from "./datatypes/map.js";
+import { generate_record } from "./datatypes/record.js";
 
 /**
  * Contains all the necessary configuration to generate a value for a given schema.
@@ -166,8 +167,11 @@ export function generate<Z extends z.ZodSchema>(
 	}
 
 	if(schema instanceof z.ZodMap) {
-		const map = generate_map(schema, generation_context);
-		return map;
+		return generate_map(schema, generation_context);
+	}
+
+	if(schema instanceof z.ZodRecord) {
+		return generate_record(schema, generation_context);
 	}
 
 	throw new Error(
