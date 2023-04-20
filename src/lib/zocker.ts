@@ -1,6 +1,7 @@
 import { faker } from "@faker-js/faker";
 import { z } from "zod";
 import { generate_number } from "./numbers.js";
+import { generate_string } from "./string.js";
 
 export type ZockerOptions<Z extends z.ZodTypeAny> = {};
 export type ZockerGeneratorOptions<Z extends z.ZodTypeAny> = {};
@@ -15,14 +16,15 @@ export type Zocker<Z extends z.ZodTypeAny> = (
  */
 export function zocker<Z extends z.ZodTypeAny>(
 	schema: Z,
-	zocker_options: ZockerOptions<Z> = {}
+	schema_options: ZockerOptions<Z> = {}
 ): Zocker<Z> {
 	return function generate(generation_options = {}) {
 		if (schema instanceof z.ZodNumber)
 			return generate_number(schema, generation_options);
 
 		if (schema instanceof z.ZodString) {
-			return faker.datatype.string();
+			const str = generate_string(schema, generation_options);
+			return str;
 		}
 
 		if (schema instanceof z.ZodBoolean) {
@@ -49,6 +51,10 @@ export function zocker<Z extends z.ZodTypeAny>(
 			return;
 		}
 
+		if (schema instanceof z.ZodEffects) {
+			throw new Error("We currently don't support ZodEffects.");
+		}
+
 		if (schema instanceof z.ZodObject) {
 			const generate_object = <T extends z.ZodRawShape>(
 				object_schema: z.ZodObject<T>
@@ -66,7 +72,7 @@ export function zocker<Z extends z.ZodTypeAny>(
 
 					const generated_value = zocker(
 						property_schema,
-						zocker_options
+						schema_options
 					)(generation_options);
 
 					mock_entries.push([key, generated_value]);
@@ -81,18 +87,29 @@ export function zocker<Z extends z.ZodTypeAny>(
 			const generate_array = <T extends z.ZodTypeAny>(
 				array_schema: z.ZodArray<T>
 			) => {
-				const length = faker.datatype.number({
-					min: 0,
-					max: 10
-				});
+				const exact_length = array_schema._def.exactLength?.value ?? null;
+
+				const min = array_schema._def.minLength
+					? array_schema._def.minLength.value
+					: 0;
+				const max = array_schema._def.maxLength
+					? array_schema._def.maxLength.value
+					: min + 10;
+
+				const length =
+					exact_length !== null
+						? exact_length
+						: faker.datatype.number({ min, max });
 
 				const generated_array = [] as z.infer<T>[];
 
 				for (let i = 0; i < length; i++) {
 					const generated_value = zocker(
 						array_schema.element,
-						zocker_options
+						schema_options
 					)(generation_options);
+
+					generated_array.push(generated_value);
 				}
 
 				return generated_array;
