@@ -8,6 +8,7 @@ import { generate_bigint } from "./datatypes/bigint.js";
 import { generate_object } from "./datatypes/object.js";
 import { generate_array } from "./datatypes/array.js";
 import { generate_effects } from "./datatypes/effects.js";
+import { generate_tuple } from "./datatypes/tuple.js";
 
 /**
  * Contains all the necessary configuration to generate a value for a given schema.
@@ -131,6 +132,10 @@ export function generate<Z extends z.ZodSchema>(schema: Z, generation_context: G
         const values = Object.values(schema._def.values);
         const random_value = values[Math.floor(Math.random() * values.length)];
         return random_value;
+    }
+
+    if(schema instanceof z.ZodTuple) {
+        return generate_tuple(schema, generation_context);
     }
 
     throw new Error("Unknown Zod-Type - Not implemented.");
