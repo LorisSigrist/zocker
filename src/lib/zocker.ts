@@ -36,7 +36,8 @@ export function zocker<Z extends z.ZodSchema>(
 			undefined_chance: generation_options.undefined_chance ?? 0.1,
 			path: [],
 			semantic_context: [],
-			parent_schemas: new Set(),
+			parent_schemas: new Map(),
+			recursion_limit: 3,
 			seed
 		};
 

@@ -36,6 +36,9 @@ export type GenerationContext<Z extends z.ZodSchema> = {
 
 	/** How likely is it that an optional value will be undefined */
 	undefined_chance: number;
+	
+
+	recursion_limit: number;
 
 	/**
 	 * The path to the value that is currently being generated (including the value)
@@ -59,7 +62,7 @@ export type GenerationContext<Z extends z.ZodSchema> = {
 	 * Keep track of all the parent schemas of the current schema.
 	 * This is used to detect circular references.
 	 */
-	parent_schemas: Set<z.ZodSchema>;
+	parent_schemas: Map<z.ZodSchema, number>;
 
 	/**
 	 * The seed to use for generating random values.
@@ -83,13 +86,14 @@ export function generate<Z extends z.ZodSchema>(
 	prev_generation_context: GenerationContext<Z>
 ): z.infer<Z> {
 	const previous_parent_schemas = prev_generation_context.parent_schemas;
+	const current_recursion_depth = previous_parent_schemas.get(schema) ?? 0;
 
-	if (previous_parent_schemas.has(schema)) {
-		throw new RecursionLimitReachedException();
+	if(current_recursion_depth >= prev_generation_context.recursion_limit) {
+		throw new RecursionLimitReachedException("Recursion limit reached");
 	}
 
-	const parent_schemas = new Set(previous_parent_schemas);
-	parent_schemas.add(schema);
+	const parent_schemas = new Map(previous_parent_schemas);
+	parent_schemas.set(schema, current_recursion_depth + 1);
 
 	//Create a new generation context for this schema
 	const generation_context: GenerationContext<Z> = {
