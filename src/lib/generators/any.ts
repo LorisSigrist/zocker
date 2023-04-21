@@ -16,8 +16,7 @@ const potential_schemas = [
 	z.unknown(),
 	z.nan(),
 	z.record(z.any()), //`z.object` is just a subset of this - no need for a separate case.
-	z.array(z.any()),
-	z.tuple([z.any(), z.any()]).optional(), //Tuples must be nullable, so that we can escape infinite recursion.
+	z.array(z.any()), //Tuples are just a subset of this - no need for a separate case.
 	z.map(z.any(), z.any()),
 	z.set(z.any())
 ];

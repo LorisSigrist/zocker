@@ -121,7 +121,9 @@ export function generate<Z extends z.ZodSchema>(
 
 		if (schema instanceof z.ZodLiteral) return schema._def.value;
 
-		if (schema instanceof z.ZodUnknown) return undefined;
+		if (schema instanceof z.ZodUnknown)
+			//Value wise unknown is the same as any - so we don't care about the difference during generation.
+			return generate_any(schema as any as z.ZodAny, generation_context);
 
 		if (schema instanceof z.ZodAny)
 			return generate_any(schema, generation_context);
