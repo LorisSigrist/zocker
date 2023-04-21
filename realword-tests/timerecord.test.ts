@@ -48,7 +48,6 @@ describe("Realworld TimerecordCreateData Schema", () => {
     it("reliably generates valid timerecords", () => {
         for (let i = 0; i < repeats; i++) {
             const data = generate();
-            console.log(data);
             expect(() => TimerecordCreateData.parse(data)).not.toThrow();
         }
     });
