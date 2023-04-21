@@ -46,7 +46,8 @@ export function zocker<Z extends z.ZodSchema>(
 			instanceof_factories: new Map(),
 
 			null_chance: generation_options.probabilities?.null_chance ?? 0.3,
-			undefined_chance: generation_options.probabilities?.undefined_chance ?? 0.3,
+			undefined_chance:
+				generation_options.probabilities?.undefined_chance ?? 0.3,
 			default_chance: generation_options.probabilities?.default_chance ?? 0.3,
 			recursion_limit: generation_options.recursion_limit ?? 3,
 

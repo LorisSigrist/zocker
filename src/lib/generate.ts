@@ -123,7 +123,7 @@ export function generate<Z extends z.ZodSchema>(
 
 		if (schema instanceof z.ZodUnknown) return undefined;
 
-		if (schema instanceof z.ZodAny) 
+		if (schema instanceof z.ZodAny)
 			return generate_any(schema, generation_context);
 
 		if (schema instanceof z.ZodNaN) return NaN;

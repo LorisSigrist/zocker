@@ -15,9 +15,9 @@ export function generate_set<Z extends z.ZodSet<any>>(
 		for (let i = 0; i < size; i++) {
 			const value = generate(schema._def.valueType, generation_context);
 			set.add(value);
-		}	
+		}
 	} catch (error) {
-		if(error instanceof RecursionLimitReachedException) {
+		if (error instanceof RecursionLimitReachedException) {
 			return set;
 		}
 		throw error;

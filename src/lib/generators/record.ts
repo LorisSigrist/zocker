@@ -15,9 +15,6 @@ export function generate_record<Z extends z.ZodRecord>(
 	>;
 
 	try {
-
-
-
 		for (let i = 0; i < size; i++) {
 			const key = generate(schema._def.keyType, generation_context) as z.infer<
 				Z["_def"]["keyType"]
@@ -28,7 +25,6 @@ export function generate_record<Z extends z.ZodRecord>(
 			) as z.infer<Z["_def"]["valueType"]>;
 			record[key] = value;
 		}
-
 	} catch (error) {
 		if (error instanceof RecursionLimitReachedException) return record;
 		throw error;
