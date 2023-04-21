@@ -21,6 +21,7 @@ const string_schemas = {
 	cuid2: z.string().cuid2(),
 	ulid: z.string().ulid(),
 	emoji: z.string().emoji(),
+	"emoji with min-length": z.string().emoji().min(5),
 } as const;
 
 describe("String generation", () => {

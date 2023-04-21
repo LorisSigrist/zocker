@@ -47,9 +47,6 @@ export function generate_string<Z extends z.ZodString>(
 	const ulid = get_string_check(string_schema, "ulid");
 	if (ulid) regex = /[0-9A-HJKMNP-TV-Z]{26}/;
 
-	const emoji = get_string_check(string_schema, "emoji");
-	if (emoji) return faker.internet.emoji();
-
 	if (regex) {
 		const randexp = new Randexp(regex);
 		randexp.randInt = (min, max) =>
@@ -68,11 +65,22 @@ export function generate_string<Z extends z.ZodString>(
 			"min length is greater than max length - The Schema never matches"
 		);
 
+	const emoji = get_string_check(string_schema, "emoji");
+	if (emoji) {
+		const length = exact_length ?? faker.datatype.number({ min: min_length, max: max_length });
+		let emojis = "";
+		for (let i = 0; i < length; i++) {
+			emojis += faker.internet.emoji()
+		}
+		return emojis;
+	}
+
+
 	return exact_length
 		? faker.datatype.string(exact_length)
 		: faker.datatype.string(
-				faker.datatype.number({ min: min_length, max: max_length })
-		  );
+			faker.datatype.number({ min: min_length, max: max_length })
+		);
 }
 
 //Get a check from a ZodString schema in a type-safe way
