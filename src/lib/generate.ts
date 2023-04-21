@@ -11,6 +11,7 @@ import { generate_effects } from "./datatypes/effects.js";
 import { generate_tuple } from "./datatypes/tuple.js";
 import { generate_map } from "./datatypes/map.js";
 import { generate_record } from "./datatypes/record.js";
+import { generate_set } from "./datatypes/set.js";
 
 /**
  * Contains all the necessary configuration to generate a value for a given schema.
@@ -23,8 +24,15 @@ export type GenerationContext<Z extends z.ZodSchema> = {
 
 	/** How likely is it that a nullable value will be null */
 	null_chance: number;
+
 	/** How likely is it that an optional value will be undefined */
 	undefined_chance: number;
+
+	/** The path to the value that is currently being generated (but not including that value) */
+	path: string[];
+
+	/** The semantic context of the value that is currently being generated. E.g ["address", "street"] */
+	semantic_context: [];
 };
 
 /**
@@ -179,6 +187,10 @@ export function generate<Z extends z.ZodSchema>(
 		return generate_map(schema, generation_context);
 	}
 
+	if (schema instanceof z.ZodSet) {
+		return generate_set(schema, generation_context);
+	}
+
 	if (schema instanceof z.ZodRecord) {
 		return generate_record(schema, generation_context);
 	}
@@ -190,6 +202,6 @@ export function generate<Z extends z.ZodSchema>(
 	}
 
 	throw new Error(
-		"Unknown Schema Type - No generator implemented. You can provide a custom generator in the options."
+		`The Zod Type ${schema._type} is not yet supported - You can provide a custom generator in the options.`
 	);
 }

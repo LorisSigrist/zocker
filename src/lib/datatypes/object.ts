@@ -15,7 +15,6 @@ export const generate_object = <T extends z.ZodRawShape>(
 
 		const key = entry[0] as Key;
 		const property_schema = entry[1] as Value;
-
 		const generated_value = generate(property_schema, generation_context);
 
 		mock_entries.push([key, generated_value]);
