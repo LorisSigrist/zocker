@@ -150,18 +150,37 @@ export function generate<Z extends z.ZodSchema>(
 			const should_be_null = weighted_random_boolean(
 				generation_context.null_chance
 			);
-			return should_be_null
-				? null
-				: generate(schema._def.innerType, generation_context);
+
+			try {
+				return should_be_null
+					? null
+					: generate(schema._def.innerType, generation_context);
+			} catch (e) {
+				if (e instanceof RecursionLimitReachedException) {
+					return null;
+				} else {
+					throw e;
+				}
+			}
 		}
 
 		if (schema instanceof z.ZodOptional) {
 			const should_be_undefined = weighted_random_boolean(
 				generation_context.undefined_chance
 			);
-			return should_be_undefined
+
+			try {
+				return should_be_undefined
 				? undefined
 				: generate(schema._def.innerType, generation_context);
+			}catch(e) {
+				if(e instanceof RecursionLimitReachedException) {
+					return undefined;
+				}else {
+					throw e;
+				}
+			}
+			
 		}
 
 		if (schema instanceof z.ZodUnion)
