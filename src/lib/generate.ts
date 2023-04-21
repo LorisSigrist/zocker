@@ -1,5 +1,8 @@
 import { z } from "zod";
-import { RecursionLimitReachedException } from "./exceptions.js";
+import {
+	NoGeneratorException,
+	RecursionLimitReachedException
+} from "./exceptions.js";
 
 import { generate_string } from "./generators/string.js";
 import { generate_number } from "./generators/numbers.js";
@@ -79,10 +82,9 @@ export function generate<Z extends z.ZodSchema>(
 	schema: Z,
 	prev_generation_context: GenerationContext<Z>
 ): z.infer<Z> {
-
 	const previous_parent_schemas = prev_generation_context.parent_schemas;
 
-	if(previous_parent_schemas.has(schema)) {
+	if (previous_parent_schemas.has(schema)) {
 		throw new RecursionLimitReachedException();
 	}
 
@@ -92,9 +94,8 @@ export function generate<Z extends z.ZodSchema>(
 	//Create a new generation context for this schema
 	const generation_context: GenerationContext<Z> = {
 		...prev_generation_context,
-		parent_schemas,
+		parent_schemas
 	};
-
 
 	try {
 		//Check if there is a custom generator for this schema and use it if there is.
@@ -138,9 +139,8 @@ export function generate<Z extends z.ZodSchema>(
 		if (schema instanceof z.ZodObject)
 			return generate_object(schema, generation_context);
 
-		if (schema instanceof z.ZodArray) {
+		if (schema instanceof z.ZodArray)
 			return generate_array(schema, generation_context);
-		}
 
 		if (schema instanceof z.ZodNullable) {
 			const should_be_null = weighted_random_boolean(
@@ -194,20 +194,22 @@ export function generate<Z extends z.ZodSchema>(
 			return generate_record(schema, generation_context);
 
 		if (schema instanceof z.ZodPipeline)
-			throw new Error(
-				"ZodPipeline is not supported yet. You can provide a custom generator in the options to generate values anyway."
+			throw new NoGeneratorException(
+				"ZodPipeline does not yet have a generator - You can provide a custom generator in the options to generate values anyway."
 			);
 
 		if (schema instanceof z.ZodNever)
-			throw new Error("We currently don't support ZodNever.");
-
-		if (schema instanceof z.ZodFunction)
-			throw new Error(
-				"ZodFunction is not supported yet. You can provide a custom generator in the options to generate values anyway."
+			throw new NoGeneratorException(
+				"We currently don't have a generator for support ZodNever."
 			);
 
-		throw new Error(
-			`The Zod Type ${schema._type} is not yet supported - You can provide a custom generator in the options.`
+		if (schema instanceof z.ZodFunction)
+			throw new NoGeneratorException(
+				"ZodFunction does not yet have a generator -  You can provide a custom generator in the options to generate values anyway."
+			);
+
+		throw new NoGeneratorException(
+			`Zocker currently doesn't have a native generator for ${schema._type} - You can provide a custom generator in the options.`
 		);
 	} catch (error) {
 		throw error;
