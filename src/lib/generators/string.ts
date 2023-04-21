@@ -36,7 +36,8 @@ export function generate_string<Z extends z.ZodString>(
 	const regex = get_string_check(string_schema, "regex");
 	if (regex) {
 		const randexp = new Randexp(regex.regex);
-		randexp.max = 10;
+		randexp.randInt = (min, max) =>
+			faker.datatype.number({ min, max, precision: 1 });
 		return randexp.gen();
 	}
 

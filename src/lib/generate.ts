@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { RecursionLimitReachedException } from "./exceptions.js";
 
 import { generate_string } from "./generators/string.js";
 import { generate_number } from "./generators/numbers.js";
@@ -78,10 +79,22 @@ export function generate<Z extends z.ZodSchema>(
 	schema: Z,
 	prev_generation_context: GenerationContext<Z>
 ): z.infer<Z> {
+
+	const previous_parent_schemas = prev_generation_context.parent_schemas;
+
+	if(previous_parent_schemas.has(schema)) {
+		throw new RecursionLimitReachedException();
+	}
+
+	const parent_schemas = new Set(previous_parent_schemas);
+	parent_schemas.add(schema);
+
 	//Create a new generation context for this schema
 	const generation_context: GenerationContext<Z> = {
-		...prev_generation_context
+		...prev_generation_context,
+		parent_schemas,
 	};
+
 
 	try {
 		//Check if there is a custom generator for this schema and use it if there is.
@@ -118,9 +131,6 @@ export function generate<Z extends z.ZodSchema>(
 		if (schema instanceof z.ZodNaN) return NaN;
 
 		if (schema instanceof z.ZodSymbol) return Symbol();
-
-		if (schema instanceof z.ZodNever)
-			throw new Error("We currently don't support ZodNever.");
 
 		if (schema instanceof z.ZodEffects)
 			return generate_effects(schema, generation_context);
@@ -187,6 +197,9 @@ export function generate<Z extends z.ZodSchema>(
 			throw new Error(
 				"ZodPipeline is not supported yet. You can provide a custom generator in the options to generate values anyway."
 			);
+
+		if (schema instanceof z.ZodNever)
+			throw new Error("We currently don't support ZodNever.");
 
 		if (schema instanceof z.ZodFunction)
 			throw new Error(
