@@ -67,20 +67,21 @@ export function generate_string<Z extends z.ZodString>(
 
 	const emoji = get_string_check(string_schema, "emoji");
 	if (emoji) {
-		const length = exact_length ?? faker.datatype.number({ min: min_length, max: max_length });
+		const length =
+			exact_length ??
+			faker.datatype.number({ min: min_length, max: max_length });
 		let emojis = "";
 		for (let i = 0; i < length; i++) {
-			emojis += faker.internet.emoji()
+			emojis += faker.internet.emoji();
 		}
 		return emojis;
 	}
 
-
 	return exact_length
 		? faker.datatype.string(exact_length)
 		: faker.datatype.string(
-			faker.datatype.number({ min: min_length, max: max_length })
-		);
+				faker.datatype.number({ min: min_length, max: max_length })
+		  );
 }
 
 //Get a check from a ZodString schema in a type-safe way
