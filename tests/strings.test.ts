@@ -17,9 +17,9 @@ const string_schemas = {
 		.regex(new RegExp("(sun|mon|tue|wednes|thurs|fri|satur)day", "i")),
 	email: z.string().email(),
 	"ISO datetime": z.string().datetime(),
-	"cuid": z.string().cuid(),
-	"cuid2" : z.string().cuid2(),
-	"ulid": z.string().ulid(),
+	cuid: z.string().cuid(),
+	cuid2: z.string().cuid2(),
+	ulid: z.string().ulid()
 } as const;
 
 describe("String generation", () => {

@@ -36,7 +36,6 @@ export type GenerationContext<Z extends z.ZodSchema> = {
 
 	/** How likely is it that an optional value will be undefined */
 	undefined_chance: number;
-	
 
 	recursion_limit: number;
 
@@ -88,7 +87,7 @@ export function generate<Z extends z.ZodSchema>(
 	const previous_parent_schemas = prev_generation_context.parent_schemas;
 	const current_recursion_depth = previous_parent_schemas.get(schema) ?? 0;
 
-	if(current_recursion_depth >= prev_generation_context.recursion_limit) {
+	if (current_recursion_depth >= prev_generation_context.recursion_limit) {
 		throw new RecursionLimitReachedException("Recursion limit reached");
 	}
 
@@ -171,16 +170,15 @@ export function generate<Z extends z.ZodSchema>(
 
 			try {
 				return should_be_undefined
-				? undefined
-				: generate(schema._def.innerType, generation_context);
-			}catch(e) {
-				if(e instanceof RecursionLimitReachedException) {
+					? undefined
+					: generate(schema._def.innerType, generation_context);
+			} catch (e) {
+				if (e instanceof RecursionLimitReachedException) {
 					return undefined;
-				}else {
+				} else {
 					throw e;
 				}
 			}
-			
 		}
 
 		if (schema instanceof z.ZodUnion)
@@ -231,10 +229,12 @@ export function generate<Z extends z.ZodSchema>(
 				"ZodFunction does not yet have a generator -  You can provide a custom generator in the options to generate values anyway."
 			);
 
-		if(schema instanceof z.ZodDefault) {
+		if (schema instanceof z.ZodDefault) {
 			const should_use_default = weighted_random_boolean(0.1);
 			const default_value = schema._def.defaultValue;
-			return should_use_default ? default_value() : generate(schema._def.innerType, generation_context);
+			return should_use_default
+				? default_value()
+				: generate(schema._def.innerType, generation_context);
 		}
 
 		throw new NoGeneratorException(

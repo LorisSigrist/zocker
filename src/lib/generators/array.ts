@@ -22,18 +22,19 @@ export const generate_array = <T extends z.ZodTypeAny>(
 	const generated_array = [] as z.infer<T>[];
 
 	try {
-
 		for (let i = 0; i < length; i++) {
-			const generated_value = generate(array_schema.element, generation_context);
+			const generated_value = generate(
+				array_schema.element,
+				generation_context
+			);
 			generated_array.push(generated_value);
 		}
 		return generated_array;
-
 	} catch (error) {
 		//If we hit the recursion limit, and there is no minimum length, return an empty array
-		if(!(error instanceof RecursionLimitReachedException)) throw error;
-		if(min !== 0) throw error;
-		if(exact_length !== null && exact_length !== 0) throw error;
+		if (!(error instanceof RecursionLimitReachedException)) throw error;
+		if (min !== 0) throw error;
+		if (exact_length !== null && exact_length !== 0) throw error;
 		return [];
 	}
 };

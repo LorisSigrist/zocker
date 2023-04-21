@@ -8,8 +8,7 @@ export function generate_string<Z extends z.ZodString>(
 	string_schema: Z,
 	generation_options: GenerationContext<Z>
 ) {
-	let regex : RegExp | undefined = undefined;
-
+	let regex: RegExp | undefined = undefined;
 
 	const datetime = get_string_check(string_schema, "datetime");
 	if (datetime) return faker.date.recent().toISOString();
@@ -48,7 +47,7 @@ export function generate_string<Z extends z.ZodString>(
 	const ulid = get_string_check(string_schema, "ulid");
 	if (ulid) regex = /[0-9A-HJKMNP-TV-Z]{26}/;
 
-	if(regex) {
+	if (regex) {
 		const randexp = new Randexp(regex);
 		randexp.randInt = (min, max) =>
 			faker.datatype.number({ min, max, precision: 1 });
@@ -69,8 +68,8 @@ export function generate_string<Z extends z.ZodString>(
 	return exact_length
 		? faker.datatype.string(exact_length)
 		: faker.datatype.string(
-			faker.datatype.number({ min: min_length, max: max_length })
-		);
+				faker.datatype.number({ min: min_length, max: max_length })
+		  );
 }
 
 //Get a check from a ZodString schema in a type-safe way

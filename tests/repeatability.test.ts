@@ -17,7 +17,7 @@ const schema = z.object({
 	id: z.string().uuid(),
 	cuid: z.string().cuid(),
 	cuid2: z.string().cuid2(),
-	ulid: z.string().ulid(),
+	ulid: z.string().ulid()
 });
 
 const generate = zocker(schema);
