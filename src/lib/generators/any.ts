@@ -3,7 +3,7 @@ import { GenerationContext, generate } from "../generate.js";
 import { pick } from "lib/utils/random.js";
 
 //It's important to have the schemas out here, so that they have reference equality accross generations.
-//This allows us to not worry about infinite recursion, as the regular cyclic generation algo will protect us.
+//This allows us to not worry about infinite recursion, as the cyclic generation logic will protect us.
 const potential_schemas = [
     z.undefined(),
     z.null(),
