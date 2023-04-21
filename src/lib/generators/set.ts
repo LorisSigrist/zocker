@@ -3,7 +3,7 @@ import { faker } from "@faker-js/faker";
 import { generate, Generator } from "../generate.js";
 import { RecursionLimitReachedException } from "../exceptions.js";
 
-export const  generate_set : Generator<z.ZodSet<any>> = (
+export const generate_set: Generator<z.ZodSet<any>> = (
 	schema,
 	generation_context
 ) => {
@@ -24,4 +24,4 @@ export const  generate_set : Generator<z.ZodSet<any>> = (
 	}
 
 	return set;
-}
+};

@@ -9,11 +9,14 @@ const object_with_refined_string = z.object({
 });
 
 describe("Provide a generation function for a schema (by reference)", () => {
-	const generators = new Map();
-	generators.set(refined_string, () => "123456");
-
 	const generate = zocker(object_with_refined_string, {
-		generators
+		generators: [
+			{
+				schema: refined_string,
+				generator: () => "123456",
+				match: "reference"
+			}
+		]
 	});
 
 	it("should generate a valid value", () => {

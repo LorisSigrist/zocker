@@ -9,4 +9,4 @@ export const generate_tuple: Generator<z.ZodTuple<any>> = (
 		generate(item, generation_context)
 	);
 	return tuple as z.infer<typeof schema>;
-}
+};

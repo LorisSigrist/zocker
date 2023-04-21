@@ -3,7 +3,7 @@ import { Generator, generate } from "../generate.js";
 import { faker } from "@faker-js/faker";
 import { RecursionLimitReachedException } from "../exceptions.js";
 
-export const generate_union : Generator<z.ZodUnion<any>> = (
+export const generate_union: Generator<z.ZodUnion<any>> = (
 	schema,
 	generation_context
 ) => {
@@ -29,4 +29,4 @@ export const generate_union : Generator<z.ZodUnion<any>> = (
 	//If all schemas throw a RecursionLimitReachedException, then this union cannot be generated
 	//and we should throw a RecursionLimitReachedException
 	throw new RecursionLimitReachedException();
-}
+};

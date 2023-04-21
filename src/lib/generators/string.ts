@@ -5,7 +5,7 @@ import { Generator } from "../generate.js";
 import { weighted_random_boolean } from "../utils/random.js";
 import { InvalidSchemaException } from "../exceptions.js";
 
-export const generate_string : Generator<z.ZodString> = (
+export const generate_string: Generator<z.ZodString> = (
 	string_schema,
 	generation_options
 ) => {
@@ -83,7 +83,7 @@ export const generate_string : Generator<z.ZodString> = (
 		: faker.datatype.string(
 				faker.datatype.number({ min: min_length, max: max_length })
 		  );
-}
+};
 
 //Get a check from a ZodString schema in a type-safe way
 function get_string_check<Kind extends z.ZodStringCheck["kind"]>(

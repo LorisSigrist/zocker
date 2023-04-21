@@ -30,10 +30,16 @@ import { generate_symbol } from "./generators/symbol.js";
  * Contains all the necessary configuration to generate a value for a given schema.
  */
 export type GenerationContext<Z extends z.ZodSchema> = {
-	generators: Map<z.ZodSchema, () => any>;
+	instanceof_generators: {
+		types: any[];
+		generators: Generator<any>[];
+	};
 
-	/** A factory function for generating values for z.instanceof */
-	instanceof_factories: Map<any, () => any>;
+
+	reference_generators: {
+		types: any[];
+		generators: Generator<any>[];
+	};
 
 	null_chance: number;
 	undefined_chance: number;
@@ -101,8 +107,8 @@ export function generate<Z extends z.ZodSchema>(
 
 	try {
 		//Check if there is a custom generator for this schema and use it if there is.
-		const custom_generator = generation_context.generators.get(schema);
-		if (custom_generator) return custom_generator();
+		const custom_generator_index = generation_context.reference_generators.types.findIndex(val => schema === val);
+		if (custom_generator_index !== -1) return generation_context.reference_generators.generators[custom_generator_index]!(schema, generation_context);
 
 		if (schema instanceof z.ZodNumber)
 			return generate_number(schema, generation_context);

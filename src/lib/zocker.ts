@@ -1,9 +1,15 @@
 import { z } from "zod";
-import { GenerationContext, generate } from "./generate.js";
+import { GenerationContext, generate, Generator } from "./generate.js";
 import { faker } from "@faker-js/faker";
 
+export type GeneratorDefinition<Z extends z.ZodTypeAny> = {
+	schema: Z;
+	generator: Generator<Z>;
+	match: "instanceof" | "reference"
+}
+
 export type ZockerOptions<Z extends z.ZodTypeAny> = {
-	generators?: Map<z.ZodTypeAny, () => any>;
+	generators?: GeneratorDefinition<any>[];
 };
 
 export type ZockerGeneratorOptions<Z extends z.ZodTypeAny> = {
@@ -36,14 +42,29 @@ export function zocker<Z extends z.ZodSchema>(
 	schema: Z,
 	schema_options: ZockerOptions<Z> = {}
 ): Zocker<Z> {
-	return function (generation_options = {}) {
-		const seed = generation_options.seed ?? Math.random() * 10_000_000;
 
+	const instanceof_generator_definitions = schema_options.generators?.filter(def => def.match === "instanceof") ?? [];
+	const reference_generator_definitions = schema_options.generators?.filter(def => def.match === "reference") ?? [];
+
+	const instanceof_generators = {
+		types: instanceof_generator_definitions.map(def => def.schema),
+		generators: instanceof_generator_definitions.map(def => def.generator)
+	}
+
+	const reference_generators = {
+		types: reference_generator_definitions.map(def => def.schema),
+		generators: reference_generator_definitions.map(def => def.generator)
+	}
+
+	return function (generation_options = {}) {
+
+		//Set the seed for the random number generator
+		const seed = generation_options.seed ?? Math.random() * 10_000_000;
 		faker.seed(seed);
 
 		const root_generation_context: GenerationContext<Z> = {
-			generators: schema_options.generators || new Map(),
-			instanceof_factories: new Map(),
+			reference_generators,
+			instanceof_generators,
 
 			null_chance: generation_options.probabilities?.null_chance ?? 0.3,
 			undefined_chance:
