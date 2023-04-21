@@ -8,6 +8,9 @@ export function generate_string<Z extends z.ZodString>(
 	string_schema: Z,
 	generation_options: GenerationContext<Z>
 ) {
+	let regex : RegExp | undefined = undefined;
+
+
 	const datetime = get_string_check(string_schema, "datetime");
 	if (datetime) return faker.date.recent().toISOString();
 
@@ -33,9 +36,20 @@ export function generate_string<Z extends z.ZodString>(
 	const url = get_string_check(string_schema, "url");
 	if (url) return faker.internet.url();
 
-	const regex = get_string_check(string_schema, "regex");
-	if (regex) {
-		const randexp = new Randexp(regex.regex);
+	const regex_check = get_string_check(string_schema, "regex");
+	if (regex_check) regex = regex_check.regex;
+
+	const cuid = get_string_check(string_schema, "cuid");
+	if (cuid) regex = /^c[^\s-]{8,}$/i;
+
+	const cuid2 = get_string_check(string_schema, "cuid2");
+	if (cuid2) regex = /^[a-z][a-z0-9]*$/;
+
+	const ulid = get_string_check(string_schema, "ulid");
+	if (ulid) regex = /[0-9A-HJKMNP-TV-Z]{26}/;
+
+	if(regex) {
+		const randexp = new Randexp(regex);
 		randexp.randInt = (min, max) =>
 			faker.datatype.number({ min, max, precision: 1 });
 		return randexp.gen();
@@ -55,8 +69,8 @@ export function generate_string<Z extends z.ZodString>(
 	return exact_length
 		? faker.datatype.string(exact_length)
 		: faker.datatype.string(
-				faker.datatype.number({ min: min_length, max: max_length })
-		  );
+			faker.datatype.number({ min: min_length, max: max_length })
+		);
 }
 
 //Get a check from a ZodString schema in a type-safe way
