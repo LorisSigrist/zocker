@@ -18,7 +18,8 @@ const potential_schemas = [
 	z.record(z.any()), //`z.object` is just a subset of this - no need for a separate case.
 	z.array(z.any()), //Tuples are just a subset of this - no need for a separate case.
 	z.map(z.any(), z.any()),
-	z.set(z.any())
+	z.set(z.any()),
+	z.promise(z.any()),
 ];
 
 export const generate_any: Generator<z.ZodAny | z.ZodUnknown> = (

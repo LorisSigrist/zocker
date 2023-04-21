@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { GenerationContext, generate, Generator } from "./generate.js";
 import { faker } from "@faker-js/faker";
+import { default_generators } from "./default_generators.js";
 
 export type GeneratorDefinition<Z extends z.ZodTypeAny> = {
 	schema: Z;
@@ -44,6 +45,7 @@ export function zocker<Z extends z.ZodSchema>(
 ): Zocker<Z> {
 
 	const instanceof_generator_definitions = schema_options.generators?.filter(def => def.match === "instanceof") ?? [];
+	instanceof_generator_definitions.push(...default_generators); //Add the built in generators to the list
 	const reference_generator_definitions = schema_options.generators?.filter(def => def.match === "reference") ?? [];
 
 	const instanceof_generators = {
