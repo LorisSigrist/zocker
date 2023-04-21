@@ -13,10 +13,11 @@ describe("Any generation", () => {
 	test_schema_generation(any_schemas);
 
 	it("generates the same value for the same seed", () => {
-		const seed = 1234;
-		const value1 = generate({ seed });
-		const value2 = generate({ seed });
+		for (let i = 0; i < 100; i++) {
+			const value1 = generate({ seed: i });
+			const value2 = generate({ seed: i });
 
-		expect(value1).toEqual(value2);
+			expect(value1).toEqual(value2);
+		}
 	});
 });
