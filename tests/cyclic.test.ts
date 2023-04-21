@@ -25,10 +25,21 @@ const Union_Tree = z.object({
 	children: z.union([z.lazy(()=>Union_Tree), z.string()]).array().min(1)
 });
 
+
+const Discriminated_Union_Tree = z.object({
+	name: z.string(),
+	children: z.discriminatedUnion("type", [
+		z.object({type: z.literal("tree"), children: z.lazy(()=>Discriminated_Union_Tree).array().min(1)}),
+		z.object({type: z.literal("leaf"), value: z.string()})
+	])
+});
+
+
 const cyclic_schemas = {
 	"Tree": Person,
 	"Partial Tree": Partial_Tree,
-	"Union Tree": Union_Tree
+	"Union Tree": Union_Tree,
+	"Discriminated Union Tree": Discriminated_Union_Tree
 };
 
 describe("Cyclic Schemas", () => {

@@ -26,6 +26,7 @@ export function generate_union<Z extends z.ZodUnion<any>>(
 		}
 	}
 
-	//If all schemas throw a RecursionLimitReachedException, rethrow the last one
+	//If all schemas throw a RecursionLimitReachedException, then this union cannot be generated
+	//and we should throw a RecursionLimitReachedException
 	throw new RecursionLimitReachedException();
 }
