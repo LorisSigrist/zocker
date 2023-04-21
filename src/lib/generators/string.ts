@@ -47,6 +47,9 @@ export function generate_string<Z extends z.ZodString>(
 	const ulid = get_string_check(string_schema, "ulid");
 	if (ulid) regex = /[0-9A-HJKMNP-TV-Z]{26}/;
 
+	const emoji = get_string_check(string_schema, "emoji");
+	if (emoji) return faker.internet.emoji();
+
 	if (regex) {
 		const randexp = new Randexp(regex);
 		randexp.randInt = (min, max) =>
