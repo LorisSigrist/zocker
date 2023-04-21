@@ -38,7 +38,7 @@ export function zocker<Z extends z.ZodSchema>(
 			path: [],
 			semantic_context: [],
 			parent_schemas: new Map(),
-			recursion_limit: generation_options.recursion_limit ?? 5,
+			recursion_limit: generation_options.recursion_limit ?? 3,
 			seed
 		};
 
