@@ -1,13 +1,14 @@
 import { faker } from "@faker-js/faker";
 import { z } from "zod";
 import Randexp from "randexp";
-import { GenerationContext } from "lib/generate.js";
+import { Generator } from "../generate.js";
 import { weighted_random_boolean } from "../utils/random.js";
+import { InvalidSchemaException } from "../exceptions.js";
 
-export function generate_string<Z extends z.ZodString>(
-	string_schema: Z,
-	generation_options: GenerationContext<Z>
-) {
+export const generate_string : Generator<z.ZodString> = (
+	string_schema,
+	generation_options
+) => {
 	let regex: RegExp | undefined = undefined;
 
 	const datetime = get_string_check(string_schema, "datetime");
@@ -61,7 +62,7 @@ export function generate_string<Z extends z.ZodString>(
 		get_string_check(string_schema, "max")?.value ?? min_length + 10000;
 
 	if (min_length > max_length)
-		throw new Error(
+		throw new InvalidSchemaException(
 			"min length is greater than max length - The Schema never matches"
 		);
 

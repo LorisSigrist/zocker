@@ -1,12 +1,12 @@
 import { z } from "zod";
-import { GenerationContext, generate } from "../generate.js";
+import { Generator, generate } from "../generate.js";
 import { faker } from "@faker-js/faker";
 import { RecursionLimitReachedException } from "../exceptions.js";
 
-export function generate_union<Z extends z.ZodUnion<any>>(
-	schema: Z,
-	generation_context: GenerationContext<Z>
-): z.infer<Z> {
+export const generate_union : Generator<z.ZodUnion<any>> = (
+	schema,
+	generation_context
+) => {
 	const schemas = schema._def.options as z.ZodTypeAny[];
 
 	const possible_indexes = new Array(schemas.length).fill(0).map((_, i) => i);

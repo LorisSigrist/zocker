@@ -1,11 +1,11 @@
 import { z } from "zod";
-import { GenerationContext, generate } from "../generate.js";
+import { Generator, generate } from "../generate.js";
 import { faker } from "@faker-js/faker";
 import { RecursionLimitReachedException } from "../exceptions.js";
 
-export function generate_discriminated_union<
-	Z extends z.ZodDiscriminatedUnion<string, any>
->(schema: Z, generation_context: GenerationContext<Z>): z.infer<Z> {
+export const generate_discriminated_union: Generator<
+	z.ZodDiscriminatedUnion<string, any>
+> = (schema, generation_context) => {
 	const schemas = schema._def.options as z.ZodTypeAny[];
 
 	const possible_indexes = new Array(schemas.length).fill(0).map((_, i) => i);
@@ -28,4 +28,4 @@ export function generate_discriminated_union<
 	//If all schemas throw a RecursionLimitReachedException, then this schema cannot be generated
 	//and we should throw a RecursionLimitReachedException
 	throw new RecursionLimitReachedException();
-}
+};

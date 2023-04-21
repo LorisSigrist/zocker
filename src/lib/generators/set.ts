@@ -1,15 +1,15 @@
 import { z } from "zod";
 import { faker } from "@faker-js/faker";
-import { generate, GenerationContext } from "../generate.js";
+import { generate, Generator } from "../generate.js";
 import { RecursionLimitReachedException } from "../exceptions.js";
 
-export function generate_set<Z extends z.ZodSet<any>>(
-	schema: Z,
-	generation_context: GenerationContext<Z>
-): z.infer<Z> {
+export const  generate_set : Generator<z.ZodSet<any>> = (
+	schema,
+	generation_context
+) => {
 	const size = faker.datatype.number({ min: 0, max: 10 });
 
-	const set: z.infer<Z> = new Set();
+	const set: z.infer<typeof schema> = new Set();
 
 	try {
 		for (let i = 0; i < size; i++) {

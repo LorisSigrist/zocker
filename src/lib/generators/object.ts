@@ -4,7 +4,7 @@ import { z } from "zod";
 export const generate_object = <T extends z.ZodRawShape>(
 	object_schema: z.ZodObject<T>,
 	generation_context: GenerationContext<z.ZodObject<T>>
-) => {
+): z.infer<z.ZodObject<T>> => {
 	type Shape = z.infer<typeof object_schema>;
 
 	const mock_entries = [] as [keyof Shape, any][];

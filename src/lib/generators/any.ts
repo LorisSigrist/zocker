@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { GenerationContext, generate } from "../generate.js";
+import { generate, Generator } from "../generate.js";
 import { pick } from "../utils/random.js";
 
 //It's important to have the schemas out here, so that they have reference equality accross generations.
@@ -21,11 +21,11 @@ const potential_schemas = [
 	z.set(z.any())
 ];
 
-export function generate_any<Z extends z.ZodAny>(
-	_schema: Z,
-	generation_context: GenerationContext<Z>
-): z.infer<Z> {
+export const generate_any: Generator<z.ZodAny | z.ZodUnknown> = (
+	_schema,
+	generation_context
+) => {
 	const schema_to_use = pick(potential_schemas);
 	const generated = generate(schema_to_use, generation_context);
 	return generated;
-}
+};

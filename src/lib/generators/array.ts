@@ -1,11 +1,11 @@
 import { faker } from "@faker-js/faker";
-import { GenerationContext, generate } from "../generate.js";
+import { Generator, generate } from "../generate.js";
 import { z } from "zod";
 import { RecursionLimitReachedException } from "../exceptions.js";
 
-export const generate_array = <T extends z.ZodTypeAny>(
-	array_schema: z.ZodArray<T>,
-	generation_context: GenerationContext<z.ZodArray<T>>
+export const generate_array: Generator<z.ZodArray<any>> = (
+	array_schema,
+	generation_context
 ) => {
 	const exact_length = array_schema._def.exactLength?.value ?? null;
 
@@ -19,7 +19,7 @@ export const generate_array = <T extends z.ZodTypeAny>(
 	const length =
 		exact_length !== null ? exact_length : faker.datatype.number({ min, max });
 
-	const generated_array = [] as z.infer<T>[];
+	const generated_array = [];
 
 	try {
 		for (let i = 0; i < length; i++) {

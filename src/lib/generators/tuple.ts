@@ -1,12 +1,12 @@
-import { GenerationContext, generate } from "../generate.js";
+import { Generator, generate } from "../generate.js";
 import { z } from "zod";
 
-export function generate_tuple<T extends z.ZodTuple<any>>(
-	schema: T,
-	generation_context: GenerationContext<T>
-): z.infer<T> {
+export const generate_tuple: Generator<z.ZodTuple<any>> = (
+	schema,
+	generation_context
+) => {
 	const tuple = schema._def.items.map(<Z extends z.ZodSchema>(item: Z) =>
 		generate(item, generation_context)
 	);
-	return tuple as z.infer<T>;
+	return tuple as z.infer<typeof schema>;
 }

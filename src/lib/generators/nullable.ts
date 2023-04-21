@@ -1,12 +1,12 @@
 import { RecursionLimitReachedException } from "../exceptions.js";
-import { GenerationContext, generate } from "../generate.js";
+import { Generator, generate } from "../generate.js";
 import { weighted_random_boolean } from "../utils/random.js";
 import { z } from "zod";
 
-export function generate_nullable<Z extends z.ZodNullable<any>>(
-	schema: Z,
-	generation_context: GenerationContext<Z>
-): z.infer<Z> {
+export const generate_nullable: Generator<z.ZodNullable<any>> = (
+	schema,
+	generation_context
+) => {
 	const should_be_null = weighted_random_boolean(
 		generation_context.null_chance
 	);
@@ -22,4 +22,4 @@ export function generate_nullable<Z extends z.ZodNullable<any>>(
 			throw e;
 		}
 	}
-}
+};

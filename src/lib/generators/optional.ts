@@ -1,12 +1,12 @@
 import { RecursionLimitReachedException } from "../exceptions.js";
-import { GenerationContext, generate } from "../generate.js";
+import { Generator, generate } from "../generate.js";
 import { weighted_random_boolean } from "../utils/random.js";
 import { z } from "zod";
 
-export function generate_optional<Z extends z.ZodOptional<any>>(
-	schema: Z,
-	generation_context: GenerationContext<Z>
-): z.infer<Z> {
+export const generate_optional: Generator<z.ZodOptional<any>> = (
+	schema,
+	generation_context
+) => {
 	const should_be_undefined = weighted_random_boolean(
 		generation_context.undefined_chance
 	);
@@ -22,4 +22,4 @@ export function generate_optional<Z extends z.ZodOptional<any>>(
 			throw e;
 		}
 	}
-}
+};

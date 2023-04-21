@@ -1,10 +1,10 @@
-import { GenerationContext, generate } from "../generate.js";
+import { Generator, generate } from "../generate.js";
 import { z } from "zod";
 
-export function generate_effects<Z extends z.ZodEffects<any>>(
-	effects_schema: Z,
-	generation_options: GenerationContext<Z>
-) {
+export const generate_effects: Generator<z.ZodEffects<any>> = (
+	effects_schema,
+	generation_options
+) => {
 	if (effects_schema._def.effect.type !== "transform") {
 		throw new Error(
 			"To use refinements or preprocessors, you must supply a custom generator for your schema when calling `zocker`"
@@ -23,4 +23,4 @@ export function generate_effects<Z extends z.ZodEffects<any>>(
 		addIssue: () => {},
 		path: []
 	});
-}
+};

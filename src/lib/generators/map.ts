@@ -1,17 +1,17 @@
 import { faker } from "@faker-js/faker";
-import { GenerationContext, generate } from "../generate.js";
+import { Generator, generate } from "../generate.js";
 import { z } from "zod";
 import { RecursionLimitReachedException } from "../exceptions.js";
 
-export function generate_map<Z extends z.ZodMap>(
-	schema: Z,
-	generation_context: GenerationContext<Z>
-): z.infer<Z> {
+export const generate_map: Generator<z.ZodMap> = (
+	schema,
+	generation_context
+) => {
 	const size = faker.datatype.number({ min: 0, max: 10 });
 
 	const map = new Map<
-		z.infer<Z["_def"]["keyType"]>,
-		z.infer<Z["_def"]["valueType"]>
+		z.infer<(typeof schema)["_def"]["keyType"]>,
+		z.infer<(typeof schema)["_def"]["valueType"]>
 	>();
 
 	try {
@@ -28,4 +28,4 @@ export function generate_map<Z extends z.ZodMap>(
 	}
 
 	return map;
-}
+};

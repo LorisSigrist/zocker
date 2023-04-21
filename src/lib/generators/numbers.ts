@@ -1,11 +1,11 @@
 import { z } from "zod";
 import { faker } from "@faker-js/faker";
-import { GenerationContext } from "lib/generate.js";
+import { Generator } from "../generate.js";
 
-export function generate_number<Z extends z.ZodNumber>(
-	number_schema: Z,
-	options: GenerationContext<Z>
-): number {
+export const generate_number: Generator<z.ZodNumber> = (
+	number_schema,
+	generation_context
+) => {
 	let min =
 		get_number_check(number_schema, "min")?.value ??
 		Number.MIN_SAFE_INTEGER / 2;
@@ -21,7 +21,7 @@ export function generate_number<Z extends z.ZodNumber>(
 	} else {
 		return faker.datatype.float({ min, max });
 	}
-}
+};
 
 //Get a check from a ZodNumber schema in a type-safe way
 function get_number_check<Kind extends z.ZodNumberCheck["kind"]>(
