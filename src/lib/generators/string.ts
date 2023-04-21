@@ -2,6 +2,7 @@ import { faker } from "@faker-js/faker";
 import { z } from "zod";
 import Randexp from "randexp";
 import { GenerationContext } from "lib/generate.js";
+import { weighted_random_boolean } from "../utils/random.js";
 
 export function generate_string<Z extends z.ZodString>(
 	string_schema: Z,
@@ -21,7 +22,9 @@ export function generate_string<Z extends z.ZodString>(
 		if (ip_v4) return faker.internet.ipv4();
 		if (ip_v6) return faker.internet.ipv6();
 
-		return Math.random() > 0.5 ? faker.internet.ipv4() : faker.internet.ipv6();
+		return weighted_random_boolean(0.5)
+			? faker.internet.ipv4()
+			: faker.internet.ipv6();
 	}
 
 	const email = get_string_check(string_schema, "email");
