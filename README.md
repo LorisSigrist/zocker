@@ -10,9 +10,10 @@ I just started this project, so there is a lot of work to be done. Feel free to 
 
 A list of features that I think are required to make this a releasable package.
 
-- [x] Generate data for all the Zod-primitives, except effects
+- [x] Generate data for all reasonable Zod-primitives
 - [x] Make tests repeatable, so that developers can reproduce bugs.
 - [x] Generate cyclic schemas
+- [x] Generate "any" schemas
 - [ ] Provide escape hatches for developers to define custom generators for specific types - Including ones that `zocker` can't support itself
 - [ ] Define an API that gives developers control over the generation process. Eg force edge-cases to happen in specific tests, and avoid them in others.
 - [ ] Generate semantically meaningful data, Eg. the `name` field on an object should actually be a name. This is doable using `faker`.
