@@ -33,12 +33,9 @@ export type GenerationContext<Z extends z.ZodSchema> = {
 	/** A factory function for generating values for z.instanceof */
 	instanceof_factories: Map<any, () => any>;
 
-	/** How likely is it that a nullable value will be null */
 	null_chance: number;
-
-	/** How likely is it that an optional value will be undefined */
 	undefined_chance: number;
-
+	default_chance: number;
 	recursion_limit: number;
 
 	/**
@@ -61,16 +58,9 @@ export type GenerationContext<Z extends z.ZodSchema> = {
 
 	/**
 	 * Keep track of all the parent schemas of the current schema.
-	 * This is used to detect circular references.
+	 * This is used to detect and count circular references.
 	 */
 	parent_schemas: Map<z.ZodSchema, number>;
-
-	/**
-	 * The seed to use for generating random values.
-	 *
-	 * This is usually not modified throughout the generation process.
-	 * Don't change it midway unless you know what you are doing.
-	 */
 	seed: number;
 };
 
@@ -202,7 +192,9 @@ export function generate<Z extends z.ZodSchema>(
 			);
 
 		if (schema instanceof z.ZodDefault) {
-			const should_use_default = weighted_random_boolean(0.1);
+			const should_use_default = weighted_random_boolean(
+				generation_context.default_chance
+			);
 			const default_value = schema._def.defaultValue;
 			return should_use_default
 				? default_value()

@@ -24,7 +24,9 @@ describe("Optional generation", () => {
 	it("only generates undefined if the undefined chance is 1", () => {
 		for (let i = 0; i < 100; i++) {
 			const data = generate_optional({
-				undefined_chance: 1
+				probabilities: {
+					undefined_chance: 1
+				}
 			});
 
 			expect(() => undefined_schema.parse(data)).not.toThrow();
@@ -34,7 +36,9 @@ describe("Optional generation", () => {
 	it("never generates undefined if the undefined chance is 0", () => {
 		for (let i = 0; i < 100; i++) {
 			const data = generate_optional({
-				undefined_chance: 0
+				probabilities: {
+					undefined_chance: 0
+				}
 			});
 
 			expect(() => requred_schema.parse(data)).not.toThrow();
