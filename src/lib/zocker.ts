@@ -6,8 +6,8 @@ import { default_generators } from "./default_generators.js";
 export type GeneratorDefinition<Z extends z.ZodTypeAny> = {
 	schema: Z;
 	generator: Generator<Z>;
-	match: "instanceof" | "reference"
-}
+	match: "instanceof" | "reference";
+};
 
 export type ZockerOptions<Z extends z.ZodTypeAny> = {
 	generators?: GeneratorDefinition<any>[];
@@ -43,23 +43,24 @@ export function zocker<Z extends z.ZodSchema>(
 	schema: Z,
 	schema_options: ZockerOptions<Z> = {}
 ): Zocker<Z> {
-
-	const instanceof_generator_definitions = schema_options.generators?.filter(def => def.match === "instanceof") ?? [];
+	const instanceof_generator_definitions =
+		schema_options.generators?.filter((def) => def.match === "instanceof") ??
+		[];
 	instanceof_generator_definitions.push(...default_generators); //Add the built in generators to the list
-	const reference_generator_definitions = schema_options.generators?.filter(def => def.match === "reference") ?? [];
+	const reference_generator_definitions =
+		schema_options.generators?.filter((def) => def.match === "reference") ?? [];
 
 	const instanceof_generators = {
-		types: instanceof_generator_definitions.map(def => def.schema),
-		generators: instanceof_generator_definitions.map(def => def.generator)
-	}
+		types: instanceof_generator_definitions.map((def) => def.schema),
+		generators: instanceof_generator_definitions.map((def) => def.generator)
+	};
 
 	const reference_generators = {
-		types: reference_generator_definitions.map(def => def.schema),
-		generators: reference_generator_definitions.map(def => def.generator)
-	}
+		types: reference_generator_definitions.map((def) => def.schema),
+		generators: reference_generator_definitions.map((def) => def.generator)
+	};
 
 	return function (generation_options = {}) {
-
 		//Set the seed for the random number generator
 		const seed = generation_options.seed ?? Math.random() * 10_000_000;
 		faker.seed(seed);

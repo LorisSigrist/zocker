@@ -4,28 +4,6 @@ import {
 	RecursionLimitReachedException
 } from "./exceptions.js";
 
-import { generate_string } from "./generators/string.js";
-import { generate_number } from "./generators/numbers.js";
-import { generate_date } from "./generators/dates.js";
-import { generate_bigint } from "./generators/bigint.js";
-import { generate_object } from "./generators/object.js";
-import { generate_array } from "./generators/array.js";
-import { generate_effects } from "./generators/effects.js";
-import { generate_tuple } from "./generators/tuple.js";
-import { generate_map } from "./generators/map.js";
-import { generate_record } from "./generators/record.js";
-import { generate_set } from "./generators/set.js";
-import { generate_union } from "./generators/union.js";
-import { generate_discriminated_union } from "./generators/discriminated-union.js";
-import { generate_boolean } from "./generators/boolean.js";
-import { generate_enum } from "./generators/enum.js";
-import { generate_native_enum } from "./generators/native-enum.js";
-import { generate_optional } from "./generators/optional.js";
-import { generate_nullable } from "./generators/nullable.js";
-import { generate_any } from "./generators/any.js";
-import { generate_symbol } from "./generators/symbol.js";
-import { generate_default } from "./generators/default.js";
-
 /**
  * Contains all the necessary configuration to generate a value for a given schema.
  */
@@ -34,7 +12,6 @@ export type GenerationContext<Z extends z.ZodSchema> = {
 		types: any[];
 		generators: Generator<any>[];
 	};
-
 
 	reference_generators: {
 		types: any[];
@@ -45,29 +22,8 @@ export type GenerationContext<Z extends z.ZodSchema> = {
 	undefined_chance: number;
 	default_chance: number;
 	recursion_limit: number;
-
-	/**
-	 * The path to the value that is currently being generated (including the value)
-	 *
-	 * Usefull for generating helpful error messages.
-	 * @example ["user", "profile", "description"]
-	 */
 	path: string[];
-
-	/**
-	 * The semantic context of the value that is currently being generated.
-	 *
-	 * Usefull for generating semantically meaningful values.
-	 * E.g Generate actual street names for a string and not just random strings.
-	 *
-	 * @example ["address", "street"]
-	 */
 	semantic_context: [];
-
-	/**
-	 * Keep track of all the parent schemas of the current schema.
-	 * This is used to detect and count circular references.
-	 */
 	parent_schemas: Map<z.ZodSchema, number>;
 	seed: number;
 };
@@ -104,12 +60,36 @@ export function generate<Z extends z.ZodSchema>(
 		...prev_generation_context,
 		parent_schemas
 	};
-	
-	const custom_generator_index = generation_context.reference_generators.types.findIndex(val => schema === val);
-	if (custom_generator_index !== -1) return generation_context.reference_generators.generators[custom_generator_index]!(schema, generation_context);
 
-	const instanceof_generator_index = generation_context.instanceof_generators.types.findIndex(val => schema instanceof val);
-	if (instanceof_generator_index !== -1) return generation_context.instanceof_generators.generators[instanceof_generator_index]!(schema, generation_context);
-	
-	throw new NoGeneratorException(`No generator for schema ${schema} - You can provide a custom generator in the zocker options`);
+	let generated_value: z.infer<Z>;
+	let generated = false;
+
+	const custom_generator_index =
+		generation_context.reference_generators.types.findIndex(
+			(val) => schema === val
+		);
+	if (custom_generator_index !== -1) {
+		generated_value = generation_context.reference_generators.generators[
+			custom_generator_index
+		]!(schema, generation_context);
+		generated = true;
+	}
+
+	const instanceof_generator_index =
+		generation_context.instanceof_generators.types.findIndex(
+			(val) => schema instanceof val
+		);
+	if (instanceof_generator_index !== -1) {
+		generated_value = generation_context.instanceof_generators.generators[
+			instanceof_generator_index
+		]!(schema, generation_context);
+		generated = true;
+	}
+
+	if (!generated)
+		throw new NoGeneratorException(
+			`No generator for schema ${schema} - You can provide a custom generator in the zocker options`
+		);
+
+	return generated_value!;
 }
