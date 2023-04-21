@@ -16,7 +16,7 @@ A list of features that I think are required to make this a releasable package.
 - [x] Generate "any" schemas
 - [ ] Provide escape hatches for developers to define custom generators for specific types - Including ones that `zocker` can't support itself
 - [ ] Define an API that gives developers control over the generation process. Eg force edge-cases to happen in specific tests, and avoid them in others.
-- [ ] Generate semantically meaningful data, Eg. the `name` field on an object should actually be a name. This is doable using `faker`.
+- [ ] Generate semantically meaningful data, Eg. the `name` field on an object should actually be a name. This is doable using `faker`. It should also be possible to side-step this, and just generate random data (as a torture test).
 - [ ] Force Developers to provide custom generators for types that `zocker` can't support, ideally using just TypeScript.
 
 ## Thoughts on the API
