@@ -21,6 +21,8 @@ import { generate_boolean } from "./generators/boolean.js";
 import { weighted_random_boolean } from "./utils/random.js";
 import { generate_enum } from "./generators/enum.js";
 import { generate_native_enum } from "./generators/native-enum.js";
+import { generate_optional } from "./generators/optional.js";
+import { generate_nullable } from "./generators/nullable.js";
 
 /**
  * Contains all the necessary configuration to generate a value for a given schema.
@@ -145,41 +147,11 @@ export function generate<Z extends z.ZodSchema>(
 		if (schema instanceof z.ZodArray)
 			return generate_array(schema, generation_context);
 
-		if (schema instanceof z.ZodNullable) {
-			const should_be_null = weighted_random_boolean(
-				generation_context.null_chance
-			);
+		if (schema instanceof z.ZodNullable)
+			return generate_nullable(schema, generation_context);
 
-			try {
-				return should_be_null
-					? null
-					: generate(schema._def.innerType, generation_context);
-			} catch (e) {
-				if (e instanceof RecursionLimitReachedException) {
-					return null;
-				} else {
-					throw e;
-				}
-			}
-		}
-
-		if (schema instanceof z.ZodOptional) {
-			const should_be_undefined = weighted_random_boolean(
-				generation_context.undefined_chance
-			);
-
-			try {
-				return should_be_undefined
-					? undefined
-					: generate(schema._def.innerType, generation_context);
-			} catch (e) {
-				if (e instanceof RecursionLimitReachedException) {
-					return undefined;
-				} else {
-					throw e;
-				}
-			}
-		}
+		if (schema instanceof z.ZodOptional)
+			return generate_optional(schema, generation_context);
 
 		if (schema instanceof z.ZodUnion)
 			return generate_union(schema, generation_context);
