@@ -75,15 +75,17 @@ export function generate<Z extends z.ZodSchema>(
 		generated = true;
 	}
 
-	const instanceof_generator_index =
-		generation_context.instanceof_generators.types.findIndex(
-			(val) => schema instanceof val
-		);
-	if (instanceof_generator_index !== -1) {
-		generated_value = generation_context.instanceof_generators.generators[
-			instanceof_generator_index
-		]!(schema, generation_context);
-		generated = true;
+	if (!generated) {
+		const instanceof_generator_index =
+			generation_context.instanceof_generators.types.findIndex(
+				(val) => schema instanceof val
+			);
+		if (instanceof_generator_index !== -1) {
+			generated_value = generation_context.instanceof_generators.generators[
+				instanceof_generator_index
+			]!(schema, generation_context);
+			generated = true;
+		}
 	}
 
 	if (!generated)
