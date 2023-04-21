@@ -43,23 +43,16 @@ export type Generator<Z extends z.ZodSchema> = (
  */
 export function generate<Z extends z.ZodSchema>(
 	schema: Z,
-	prev_generation_context: GenerationContext<Z>
+	generation_context: GenerationContext<Z>
 ): z.infer<Z> {
-	const previous_parent_schemas = prev_generation_context.parent_schemas;
-	const current_recursion_depth = previous_parent_schemas.get(schema) ?? 0;
+	const previous_depth = generation_context.parent_schemas.get(schema) ?? 0;
+	const current_depth = previous_depth + 1;
 
-	if (current_recursion_depth >= prev_generation_context.recursion_limit) {
+	if (current_depth >= generation_context.recursion_limit) {
 		throw new RecursionLimitReachedException("Recursion limit reached");
 	}
 
-	const parent_schemas = new Map(previous_parent_schemas);
-	parent_schemas.set(schema, current_recursion_depth + 1);
-
-	//Create a new generation context for this schema
-	const generation_context: GenerationContext<Z> = {
-		...prev_generation_context,
-		parent_schemas
-	};
+	generation_context.parent_schemas.set(schema, current_depth)
 
 	let generated_value: z.infer<Z>;
 	let generated = false;
@@ -87,6 +80,10 @@ export function generate<Z extends z.ZodSchema>(
 			generated = true;
 		}
 	}
+
+
+	//Undo any mutations to the generation context
+	generation_context.parent_schemas.set(schema, previous_depth);
 
 	if (!generated)
 		throw new NoGeneratorException(
