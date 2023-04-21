@@ -20,9 +20,15 @@ const Partial_Tree = z
 	})
 	.partial();
 
+const Union_Tree = z.object({
+	name: z.string(),
+	children: z.union([z.lazy(()=>Union_Tree), z.string()]).array().min(1)
+});
+
 const cyclic_schemas = {
-	Tree: Person,
-	"Partial Tree": Partial_Tree
+	"Tree": Person,
+	"Partial Tree": Partial_Tree,
+	"Union Tree": Union_Tree
 };
 
 describe("Cyclic Schemas", () => {
