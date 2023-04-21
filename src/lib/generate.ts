@@ -24,6 +24,7 @@ import { generate_native_enum } from "./generators/native-enum.js";
 import { generate_optional } from "./generators/optional.js";
 import { generate_nullable } from "./generators/nullable.js";
 import { generate_any } from "./generators/any.js";
+import { generate_symbol } from "./generators/symbol.js";
 
 /**
  * Contains all the necessary configuration to generate a value for a given schema.
@@ -134,7 +135,8 @@ export function generate<Z extends z.ZodSchema>(
 
 		if (schema instanceof z.ZodNaN) return NaN;
 
-		if (schema instanceof z.ZodSymbol) return Symbol();
+		if (schema instanceof z.ZodSymbol)
+			return generate_symbol(schema, generation_context);
 
 		if (schema instanceof z.ZodEffects)
 			return generate_effects(schema, generation_context);
