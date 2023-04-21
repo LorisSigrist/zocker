@@ -25,7 +25,7 @@ export function zocker<Z extends z.ZodSchema>(
 	schema_options: ZockerOptions<Z> = {}
 ): Zocker<Z> {
 	return function (generation_options = {}) {
-		const seed = generation_options.seed ?? Math.random();
+		const seed = generation_options.seed ?? Math.random() * 1000_000;
 
 		faker.seed(seed);
 

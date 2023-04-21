@@ -211,7 +211,7 @@ export function generate<Z extends z.ZodSchema>(
 		if(schema instanceof z.ZodDefault) {
 			const should_use_default = weighted_random_boolean(0.1);
 			const default_value = schema._def.defaultValue;
-			return should_use_default ? default_value: generate(schema._def.innerType, generation_context);
+			return should_use_default ? default_value() : generate(schema._def.innerType, generation_context);
 		}
 
 		throw new NoGeneratorException(
