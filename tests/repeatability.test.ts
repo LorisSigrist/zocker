@@ -39,4 +39,11 @@ describe("repeatability", () => {
 
 		expect(first).not.toEqual(second);
 	});
+
+	it("should generate different values if the seed is not specified", () => {
+		const first = generate();
+		const second = generate();
+
+		expect(first).not.toEqual(second);
+	});
 });
