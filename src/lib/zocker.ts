@@ -10,6 +10,7 @@ export type ZockerGeneratorOptions<Z extends z.ZodTypeAny> = {
 	null_chance?: number;
 	undefined_chance?: number;
 	seed?: number;
+	recursion_limit?: number;
 };
 export type Zocker<Z extends z.ZodTypeAny> = (
 	options?: ZockerGeneratorOptions<Z>
@@ -37,7 +38,7 @@ export function zocker<Z extends z.ZodSchema>(
 			path: [],
 			semantic_context: [],
 			parent_schemas: new Map(),
-			recursion_limit: 3,
+			recursion_limit: generation_options.recursion_limit ?? 5,
 			seed
 		};
 
