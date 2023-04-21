@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { GenerationContext, generate } from "./generate.js";
+import { faker } from "@faker-js/faker";
 
 export type ZockerOptions<Z extends z.ZodTypeAny> = {
 	generators?: Map<z.ZodTypeAny, () => any>;
@@ -8,6 +9,7 @@ export type ZockerOptions<Z extends z.ZodTypeAny> = {
 export type ZockerGeneratorOptions<Z extends z.ZodTypeAny> = {
 	null_chance?: number;
 	undefined_chance?: number;
+	seed?: number;
 };
 export type Zocker<Z extends z.ZodTypeAny> = (
 	options?: ZockerGeneratorOptions<Z>
@@ -23,6 +25,10 @@ export function zocker<Z extends z.ZodSchema>(
 	schema_options: ZockerOptions<Z> = {}
 ): Zocker<Z> {
 	return function (generation_options = {}) {
+		const seed = generation_options.seed ?? Math.random();
+
+		faker.seed(seed);
+
 		const root_generation_context: GenerationContext<Z> = {
 			generators: schema_options.generators || new Map(),
 			instanceof_factories: new Map(),
@@ -30,7 +36,8 @@ export function zocker<Z extends z.ZodSchema>(
 			undefined_chance: generation_options.undefined_chance ?? 0.1,
 			path: [],
 			semantic_context: [],
-			parent_schemas: new Set()
+			parent_schemas: new Set(),
+			seed
 		};
 
 		return generate(schema, root_generation_context);

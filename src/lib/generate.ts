@@ -15,6 +15,8 @@ import { generate_union } from "./generators/union.js";
 import { generate_discriminated_union } from "./generators/discriminated-union.js";
 import { generate_boolean } from "./generators/boolean.js";
 import { weighted_random_boolean } from "./utils/random.js";
+import { generate_enum } from "./generators/enum.js";
+import { generate_native_enum } from "./generators/native-enum.js";
 
 /**
  * Contains all the necessary configuration to generate a value for a given schema.
@@ -54,6 +56,14 @@ export type GenerationContext<Z extends z.ZodSchema> = {
 	 * This is used to detect circular references.
 	 */
 	parent_schemas: Set<z.ZodSchema>;
+
+	/**
+	 * The seed to use for generating random values.
+	 *
+	 * This is usually not modified throughout the generation process.
+	 * Don't change it midway unless you know what you are doing.
+	 */
+	seed: number;
 };
 
 /**
@@ -123,13 +133,21 @@ export function generate<Z extends z.ZodSchema>(
 		}
 
 		if (schema instanceof z.ZodNullable) {
-			const should_be_null = weighted_random_boolean(generation_context.null_chance);
-			return should_be_null ? null : generate(schema._def.innerType, generation_context);
+			const should_be_null = weighted_random_boolean(
+				generation_context.null_chance
+			);
+			return should_be_null
+				? null
+				: generate(schema._def.innerType, generation_context);
 		}
 
 		if (schema instanceof z.ZodOptional) {
-			const should_be_undefined = weighted_random_boolean(generation_context.undefined_chance);
-			return should_be_undefined ? undefined : generate(schema._def.innerType, generation_context);
+			const should_be_undefined = weighted_random_boolean(
+				generation_context.undefined_chance
+			);
+			return should_be_undefined
+				? undefined
+				: generate(schema._def.innerType, generation_context);
 		}
 
 		if (schema instanceof z.ZodUnion)
@@ -138,24 +156,17 @@ export function generate<Z extends z.ZodSchema>(
 		if (schema instanceof z.ZodDiscriminatedUnion)
 			return generate_discriminated_union(schema, generation_context);
 
-		if (schema instanceof z.ZodEnum) {
-			const values = schema._def.values;
-			const random_value = values[Math.floor(Math.random() * values.length)];
-			return random_value;
-		}
+		if (schema instanceof z.ZodEnum)
+			return generate_enum(schema, generation_context);
 
-		if (schema instanceof z.ZodNativeEnum) {
-			const values = Object.values(schema._def.values);
-			const random_value = values[Math.floor(Math.random() * values.length)];
-			return random_value;
-		}
+		if (schema instanceof z.ZodNativeEnum)
+			return generate_native_enum(schema, generation_context);
 
 		if (schema instanceof z.ZodTuple)
 			return generate_tuple(schema, generation_context);
 
 		if (schema instanceof z.ZodPromise)
 			return Promise.resolve(generate(schema._def.type, generation_context));
-
 
 		if (schema instanceof z.ZodBranded)
 			return generate(schema._def.type, generation_context);
