@@ -1,17 +1,17 @@
 import { z } from "zod";
 import { faker } from "@faker-js/faker";
 
-import { generate_string } from "./datatypes/string.js";
-import { generate_number } from "./datatypes/numbers.js";
-import { generate_date } from "./datatypes/dates.js";
-import { generate_bigint } from "./datatypes/bigint.js";
-import { generate_object } from "./datatypes/object.js";
-import { generate_array } from "./datatypes/array.js";
-import { generate_effects } from "./datatypes/effects.js";
-import { generate_tuple } from "./datatypes/tuple.js";
-import { generate_map } from "./datatypes/map.js";
-import { generate_record } from "./datatypes/record.js";
-import { generate_set } from "./datatypes/set.js";
+import { generate_string } from "./generators/string.js";
+import { generate_number } from "./generators/numbers.js";
+import { generate_date } from "./generators/dates.js";
+import { generate_bigint } from "./generators/bigint.js";
+import { generate_object } from "./generators/object.js";
+import { generate_array } from "./generators/array.js";
+import { generate_effects } from "./generators/effects.js";
+import { generate_tuple } from "./generators/tuple.js";
+import { generate_map } from "./generators/map.js";
+import { generate_record } from "./generators/record.js";
+import { generate_set } from "./generators/set.js";
 
 /**
  * Contains all the necessary configuration to generate a value for a given schema.
@@ -28,11 +28,29 @@ export type GenerationContext<Z extends z.ZodSchema> = {
 	/** How likely is it that an optional value will be undefined */
 	undefined_chance: number;
 
-	/** The path to the value that is currently being generated (but not including that value) */
+	/**
+	 * The path to the value that is currently being generated (including the value)
+	 *
+	 * Usefull for generating helpful error messages.
+	 * @example ["user", "profile", "description"]
+	 */
 	path: string[];
 
-	/** The semantic context of the value that is currently being generated. E.g ["address", "street"] */
+	/**
+	 * The semantic context of the value that is currently being generated.
+	 *
+	 * Usefull for generating semantically meaningful values.
+	 * E.g Generate actual street names for a string and not just random strings.
+	 *
+	 * @example ["address", "street"]
+	 */
 	semantic_context: [];
+
+	/**
+	 * Keep track of all the parent schemas of the current schema.
+	 * This is used to detect circular references.
+	 */
+	parent_schemas: Set<z.ZodSchema>;
 };
 
 /**
@@ -45,8 +63,13 @@ export type GenerationContext<Z extends z.ZodSchema> = {
  */
 export function generate<Z extends z.ZodSchema>(
 	schema: Z,
-	generation_context: GenerationContext<Z>
+	prev_generation_context: GenerationContext<Z>
 ): z.infer<Z> {
+	const generation_context: GenerationContext<Z> = {
+		...prev_generation_context,
+		path: [...prev_generation_context.path, schema._type]
+	};
+
 	//Check if there is a custom generator for this schema and use it if there is.
 	const custom_generator = generation_context.generators.get(schema);
 	if (custom_generator) return custom_generator();
