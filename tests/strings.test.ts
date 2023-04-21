@@ -19,6 +19,7 @@ const string_schemas = {
 	"ISO datetime": z.string().datetime(),
 	"cuid": z.string().cuid(),
 	"cuid2" : z.string().cuid2(),
+	"ulid": z.string().ulid(),
 } as const;
 
 describe("String generation", () => {

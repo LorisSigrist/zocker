@@ -5,6 +5,7 @@ import { zocker } from "../src";
 const schema = z.object({
 	name: z.string(),
 	age: z.number(),
+	email: z.string().email(),
 	isAwesome: z.boolean(),
 	addresses: z.array(
 		z.object({
@@ -12,7 +13,11 @@ const schema = z.object({
 			city: z.string(),
 			country: z.string().regex(/^[A-Z]{2}$/)
 		})
-	)
+	),
+	id: z.string().uuid(),
+	cuid: z.string().cuid(),
+	cuid2: z.string().cuid2(),
+	ulid: z.string().ulid(),
 });
 
 const generate = zocker(schema);
