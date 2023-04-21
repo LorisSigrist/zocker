@@ -26,8 +26,8 @@ export function zocker<Z extends z.ZodSchema>(
 		const root_generation_context: GenerationContext<Z> = {
 			generators: schema_options.generators || new Map(),
 			instanceof_factories: new Map(),
-			null_chance: generation_options.null_chance || 0.1,
-			undefined_chance: generation_options.undefined_chance || 0.1,
+			null_chance: generation_options.null_chance ?? 0.1,
+			undefined_chance: generation_options.undefined_chance ?? 0.1,
 			path: [],
 			semantic_context: [],
 			parent_schemas: new Set()

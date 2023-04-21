@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { faker } from "@faker-js/faker";
 
 import { generate_string } from "./generators/string.js";
 import { generate_number } from "./generators/numbers.js";
@@ -12,6 +11,10 @@ import { generate_tuple } from "./generators/tuple.js";
 import { generate_map } from "./generators/map.js";
 import { generate_record } from "./generators/record.js";
 import { generate_set } from "./generators/set.js";
+import { generate_union } from "./generators/union.js";
+import { generate_discriminated_union } from "./generators/discriminated-union.js";
+import { generate_boolean } from "./generators/boolean.js";
+import { weighted_random_boolean } from "./utils/random.js";
 
 /**
  * Contains all the necessary configuration to generate a value for a given schema.
@@ -65,14 +68,12 @@ export function generate<Z extends z.ZodSchema>(
 	schema: Z,
 	prev_generation_context: GenerationContext<Z>
 ): z.infer<Z> {
-
 	//Create a new generation context for this schema
 	const generation_context: GenerationContext<Z> = {
-		...prev_generation_context,
+		...prev_generation_context
 	};
 
 	try {
-
 		//Check if there is a custom generator for this schema and use it if there is.
 		const custom_generator = generation_context.generators.get(schema);
 		if (custom_generator) return custom_generator();
@@ -80,104 +81,62 @@ export function generate<Z extends z.ZodSchema>(
 		if (schema instanceof z.ZodNumber)
 			return generate_number(schema, generation_context);
 
-		if (schema instanceof z.ZodString) {
-			const str = generate_string(schema, generation_context);
-			return str;
-		}
+		if (schema instanceof z.ZodString)
+			return generate_string(schema, generation_context);
 
-		if (schema instanceof z.ZodBoolean) {
-			return faker.datatype.boolean();
-		}
+		if (schema instanceof z.ZodBoolean)
+			return generate_boolean(schema, generation_context);
 
-		if (schema instanceof z.ZodDate) {
+		if (schema instanceof z.ZodDate)
 			return generate_date(schema, generation_context);
-		}
 
-		if (schema instanceof z.ZodBigInt) {
+		if (schema instanceof z.ZodBigInt)
 			return generate_bigint(schema, generation_context);
-		}
 
-		if (schema instanceof z.ZodUndefined) {
-			return undefined;
-		}
+		if (schema instanceof z.ZodUndefined) return undefined;
 
-		if (schema instanceof z.ZodNull) {
-			return null;
-		}
+		if (schema instanceof z.ZodNull) return null;
 
-		if (schema instanceof z.ZodVoid) {
-			return;
-		}
+		if (schema instanceof z.ZodVoid) return;
 
-		if (schema instanceof z.ZodLiteral) {
-			return schema._def.value;
-		}
+		if (schema instanceof z.ZodLiteral) return schema._def.value;
 
-		if (schema instanceof z.ZodUnknown) {
-			return undefined;
-		}
+		if (schema instanceof z.ZodUnknown) return undefined;
 
-		if (schema instanceof z.ZodAny) {
-			return undefined;
-		}
+		if (schema instanceof z.ZodAny) return undefined;
 
-		if (schema instanceof z.ZodNaN) {
-			return NaN;
-		}
+		if (schema instanceof z.ZodNaN) return NaN;
 
-		if (schema instanceof z.ZodSymbol) {
-			return Symbol();
-		}
+		if (schema instanceof z.ZodSymbol) return Symbol();
 
-		if (schema instanceof z.ZodNever) {
+		if (schema instanceof z.ZodNever)
 			throw new Error("We currently don't support ZodNever.");
-		}
 
-		if (schema instanceof z.ZodEffects) {
+		if (schema instanceof z.ZodEffects)
 			return generate_effects(schema, generation_context);
-		}
 
-		if (schema instanceof z.ZodObject) {
+		if (schema instanceof z.ZodObject)
 			return generate_object(schema, generation_context);
-		}
 
 		if (schema instanceof z.ZodArray) {
 			return generate_array(schema, generation_context);
 		}
 
 		if (schema instanceof z.ZodNullable) {
-			if (Math.random() < generation_context.null_chance) {
-				return null;
-			}
-
-			return generate(schema._def.innerType, generation_context);
+			const should_be_null = weighted_random_boolean(generation_context.null_chance);
+			return should_be_null ? null : generate(schema._def.innerType, generation_context);
 		}
 
 		if (schema instanceof z.ZodOptional) {
-			if (Math.random() < generation_context.undefined_chance) {
-				return undefined;
-			}
-
-			return generate(schema._def.innerType, generation_context);
+			const should_be_undefined = weighted_random_boolean(generation_context.undefined_chance);
+			return should_be_undefined ? undefined : generate(schema._def.innerType, generation_context);
 		}
 
-		if (schema instanceof z.ZodUnion) {
-			const schemas = schema._def.options;
+		if (schema instanceof z.ZodUnion)
+			return generate_union(schema, generation_context);
 
-			//Pick a random schema from the union
-			const random_schema = schemas[Math.floor(Math.random() * schemas.length)];
-
-			return generate(random_schema, generation_context);
-		}
-
-		if (schema instanceof z.ZodDiscriminatedUnion) {
-			const schemas = schema._def.options;
-
-			//Pick a random schema from the union
-			const random_schema = schemas[Math.floor(Math.random() * schemas.length)];
-
-			return generate(random_schema, generation_context);
-		}
+		if (schema instanceof z.ZodDiscriminatedUnion)
+			return generate_discriminated_union(schema, generation_context);
 
 		if (schema instanceof z.ZodEnum) {
 			const values = schema._def.values;
@@ -191,50 +150,41 @@ export function generate<Z extends z.ZodSchema>(
 			return random_value;
 		}
 
-		if (schema instanceof z.ZodTuple) {
+		if (schema instanceof z.ZodTuple)
 			return generate_tuple(schema, generation_context);
-		}
 
-		if (schema instanceof z.ZodPromise) {
+		if (schema instanceof z.ZodPromise)
 			return Promise.resolve(generate(schema._def.type, generation_context));
-		}
 
-		if (schema instanceof z.ZodPipeline) {
+
+		if (schema instanceof z.ZodBranded)
+			return generate(schema._def.type, generation_context);
+
+		if (schema instanceof z.ZodMap)
+			return generate_map(schema, generation_context);
+
+		if (schema instanceof z.ZodSet)
+			return generate_set(schema, generation_context);
+
+		if (schema instanceof z.ZodLazy)
+			return generate(schema._def.getter(), generation_context);
+
+		if (schema instanceof z.ZodRecord)
+			return generate_record(schema, generation_context);
+
+		if (schema instanceof z.ZodPipeline)
 			throw new Error(
 				"ZodPipeline is not supported yet. You can provide a custom generator in the options to generate values anyway."
 			);
-		}
 
-		if (schema instanceof z.ZodBranded) {
-			return generate(schema._def.type, generation_context);
-		}
-
-		if (schema instanceof z.ZodMap) {
-			return generate_map(schema, generation_context);
-		}
-
-		if (schema instanceof z.ZodSet) {
-			return generate_set(schema, generation_context);
-		}
-
-		if (schema instanceof z.ZodRecord) {
-			return generate_record(schema, generation_context);
-		}
-
-		if (schema instanceof z.ZodFunction) {
+		if (schema instanceof z.ZodFunction)
 			throw new Error(
 				"ZodFunction is not supported yet. You can provide a custom generator in the options to generate values anyway."
 			);
-		}
-		
-		if (schema instanceof z.ZodLazy) {
-			return generate(schema._def.getter(), generation_context);
-		}
 
 		throw new Error(
 			`The Zod Type ${schema._type} is not yet supported - You can provide a custom generator in the options.`
 		);
-
 	} catch (error) {
 		throw error;
 	}
