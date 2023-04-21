@@ -1,8 +1,6 @@
-import { describe, it, expect } from "vitest";
+import { describe } from "vitest";
 import { z } from "zod";
-import { zocker } from "../src";
-
-const repeats = 10;
+import { test_schema_generation } from "../utils";
 
 //This is a real schema from a real project
 
@@ -31,7 +29,6 @@ const TimerecordCreateData = z.object({
     end_time: hh_mm.nullable().default(null),
 });
 
-const generate = zocker(TimerecordCreateData);
 
 function filter_duplicate_ids(array: IndicatorValue[]) : IndicatorValue[] {
     const seen = new Set();
@@ -43,12 +40,11 @@ function filter_duplicate_ids(array: IndicatorValue[]) : IndicatorValue[] {
     })
 }
 
-describe("Realworld TimerecordCreateData Schema", () => {
+const schemas = {
+    "TimerecordCreateData": TimerecordCreateData,
+    "IndicatorValueSchema": IndicatorValueSchema,
+}
 
-    it("reliably generates valid timerecords", () => {
-        for (let i = 0; i < repeats; i++) {
-            const data = generate();
-            expect(() => TimerecordCreateData.parse(data)).not.toThrow();
-        }
-    });
+describe("Realworld TimerecordCreateData Schema", () => {
+    test_schema_generation(schemas, 10);
 });
