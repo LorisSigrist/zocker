@@ -1,6 +1,10 @@
 import { GeneratorDefinition } from "./zocker.js";
 import { z } from "zod";
 
+import { Optional } from "./generators/optional.js";
+import { Nullable } from "./generators/nullable.js";
+import { Default } from "./generators/default.js";
+
 import { generate_string } from "./generators/string.js";
 import { generate_number } from "./generators/numbers.js";
 import { generate_date } from "./generators/dates.js";
@@ -17,11 +21,8 @@ import { generate_discriminated_union } from "./generators/discriminated-union.j
 import { generate_boolean } from "./generators/boolean.js";
 import { generate_enum } from "./generators/enum.js";
 import { generate_native_enum } from "./generators/native-enum.js";
-import { generate_optional } from "./generators/optional.js";
-import { generate_nullable } from "./generators/nullable.js";
 import { generate_any } from "./generators/any.js";
 import { generate_symbol } from "./generators/symbol.js";
-import { generate_default } from "./generators/default.js";
 import { generate_lazy } from "./generators/lazy.js";
 import { generate_branded } from "./generators/branded.js";
 import { generate_promise } from "./generators/promise.js";
@@ -59,12 +60,12 @@ export const default_generators: GeneratorDefinition<any>[] = [
 	},
 	{
 		schema: z.ZodOptional,
-		generator: generate_optional,
+		generator: Optional(),
 		match: "instanceof"
 	},
 	{
 		schema: z.ZodNullable,
-		generator: generate_nullable,
+		generator: Nullable(),
 		match: "instanceof"
 	},
 	{
@@ -154,7 +155,7 @@ export const default_generators: GeneratorDefinition<any>[] = [
 	},
 	{
 		schema: z.ZodDefault,
-		generator: generate_default,
+		generator: Default(),
 		match: "instanceof"
 	},
 	{

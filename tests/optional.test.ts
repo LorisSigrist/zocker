@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { z } from "zod";
-import { zocker } from "../src/";
+import { zocker, Optional } from "../src/";
 import { test_schema_generation } from "./utils";
 
 const optional_schemas = {
@@ -16,30 +16,39 @@ const requred_schema = z.number();
 const optional_schema = requred_schema.optional();
 const undefined_schema = z.undefined();
 
-const generate_optional = zocker(optional_schema);
-
 describe("Optional generation", () => {
 	test_schema_generation(optional_schemas);
 
 	it("only generates undefined if the undefined chance is 1", () => {
-		for (let i = 0; i < 100; i++) {
-			const data = generate_optional({
-				probabilities: {
-					undefined_chance: 1
+		const generate_optional = zocker(optional_schema, {
+			generators: [
+				{
+					schema: z.ZodOptional,
+					generator: Optional(1),
+					match: "instanceof"
 				}
-			});
+			]
+		});
 
+		for (let i = 0; i < 100; i++) {
+			const data = generate_optional();
 			expect(() => undefined_schema.parse(data)).not.toThrow();
 		}
 	});
 
 	it("never generates undefined if the undefined chance is 0", () => {
-		for (let i = 0; i < 100; i++) {
-			const data = generate_optional({
-				probabilities: {
-					undefined_chance: 0
+
+		const generate_optional = zocker(optional_schema, {
+			generators: [
+				{
+					schema: z.ZodOptional,
+					generator: Optional(0) ,
+					match: "instanceof"
 				}
-			});
+			]
+		});
+		for (let i = 0; i < 100; i++) {
+			const data = generate_optional();
 
 			expect(() => requred_schema.parse(data)).not.toThrow();
 		}

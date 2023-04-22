@@ -18,13 +18,12 @@ export type GenerationContext<Z extends z.ZodSchema> = {
 		generators: Generator<any>[];
 	};
 
-	null_chance: number;
-	undefined_chance: number;
-	default_chance: number;
+	parent_schemas: Map<z.ZodSchema, number>;
 	recursion_limit: number;
+
 	path: string[];
 	semantic_context: [];
-	parent_schemas: Map<z.ZodSchema, number>;
+
 	seed: number;
 };
 

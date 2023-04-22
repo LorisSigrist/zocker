@@ -19,16 +19,6 @@ export type ZockerGeneratorOptions<Z extends z.ZodTypeAny> = {
 
 	/** The maximum number of times a schema can be cyclically generated */
 	recursion_limit?: number;
-
-	/** Define the probabilities of certain generation decisions being made */
-	probabilities?: {
-		/** How likely is it that a nullable value will be null @default 0.3 */
-		null_chance?: number;
-		/** How likely is it that an optional value will be undefined @default 0.3 */
-		undefined_chance?: number;
-		/** How likely is it that a default value will be used if given @default 0.3 */
-		default_chance?: number;
-	};
 };
 export type Zocker<Z extends z.ZodTypeAny> = (
 	options?: ZockerGeneratorOptions<Z>
@@ -68,11 +58,6 @@ export function zocker<Z extends z.ZodSchema>(
 		const root_generation_context: GenerationContext<Z> = {
 			reference_generators,
 			instanceof_generators,
-
-			null_chance: generation_options.probabilities?.null_chance ?? 0.3,
-			undefined_chance:
-				generation_options.probabilities?.undefined_chance ?? 0.3,
-			default_chance: generation_options.probabilities?.default_chance ?? 0.3,
 			recursion_limit: generation_options.recursion_limit ?? 5,
 
 			path: [],
