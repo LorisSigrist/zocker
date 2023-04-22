@@ -20,7 +20,7 @@ const potential_schemas = [
 	z.map(z.any(), z.any()),
 	z.set(z.any()),
 	z.promise(z.any())
-];
+].map((schema) => schema.optional());
 
 export const generate_any: Generator<z.ZodAny | z.ZodUnknown> = (
 	_schema,
