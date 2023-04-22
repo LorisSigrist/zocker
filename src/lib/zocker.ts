@@ -73,7 +73,7 @@ export function zocker<Z extends z.ZodSchema>(
 			undefined_chance:
 				generation_options.probabilities?.undefined_chance ?? 0.3,
 			default_chance: generation_options.probabilities?.default_chance ?? 0.3,
-			recursion_limit: generation_options.recursion_limit ?? 3,
+			recursion_limit: generation_options.recursion_limit ?? 5,
 
 			path: [],
 			semantic_context: [],
