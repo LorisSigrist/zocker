@@ -58,7 +58,6 @@ export function generate<Z extends z.ZodSchema>(
 		decrement_recursion_count(schema, generation_context);
 		throw e;
 	}
-
 }
 
 const generate_value: Generator<z.ZodSchema> = (schema, generation_context) => {
@@ -90,12 +89,17 @@ const generate_value: Generator<z.ZodSchema> = (schema, generation_context) => {
 	}
 
 	if (!generated)
-		throw new NoGeneratorException(`No generator for schema ${schema} - You can provide a custom generator in the zocker options`);
+		throw new NoGeneratorException(
+			`No generator for schema ${schema} - You can provide a custom generator in the zocker options`
+		);
 
 	return generated_value;
-}
+};
 
-function increment_recursion_count<Z extends z.ZodSchema>(schema: Z, ctx: GenerationContext<Z>) {
+function increment_recursion_count<Z extends z.ZodSchema>(
+	schema: Z,
+	ctx: GenerationContext<Z>
+) {
 	const previous_depth = ctx.parent_schemas.get(schema) ?? 0;
 	const current_depth = previous_depth + 1;
 
@@ -103,12 +107,15 @@ function increment_recursion_count<Z extends z.ZodSchema>(schema: Z, ctx: Genera
 		throw new RecursionLimitReachedException("Recursion limit reached");
 	}
 
-	ctx.parent_schemas.set(schema, current_depth)
+	ctx.parent_schemas.set(schema, current_depth);
 }
 
-function decrement_recursion_count<Z extends z.ZodSchema>(schema: Z, ctx: GenerationContext<Z>) {
+function decrement_recursion_count<Z extends z.ZodSchema>(
+	schema: Z,
+	ctx: GenerationContext<Z>
+) {
 	const previous_depth = ctx.parent_schemas.get(schema) ?? 0;
 	const current_depth = previous_depth - 1;
 
-	ctx.parent_schemas.set(schema, current_depth)
+	ctx.parent_schemas.set(schema, current_depth);
 }
