@@ -45,7 +45,7 @@ export function generate<Z extends z.ZodSchema>(
 	schema: Z,
 	generation_context: GenerationContext<Z>
 ): z.infer<Z> {
-	//Mutate the generation context (creating a new one would be too expensive)
+	//Mutate the generation context (creating a new one was too expensive - this gets called a lot)
 	//Make sure to undo the mutations after the generation is done (even if it fails)
 	increment_recursion_count(schema, generation_context);
 	try {
