@@ -21,7 +21,10 @@ const string_schemas = {
 	cuid2: z.string().cuid2(),
 	ulid: z.string().ulid(),
 	emoji: z.string().emoji(),
-	"emoji with min-length": z.string().emoji().min(5)
+	"emoji with min-length": z.string().emoji().min(5),
+	"ends with": z.string().endsWith("foo"),
+	"starts with": z.string().startsWith("foo"),
+	includes: z.string().includes("foo").includes("bar")
 } as const;
 
 describe("String generation", () => {

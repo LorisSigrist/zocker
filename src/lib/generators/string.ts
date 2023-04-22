@@ -55,8 +55,15 @@ export const generate_string: Generator<z.ZodString> = (
 		return randexp.gen();
 	}
 
-	const exact_length = get_string_check(string_schema, "length")?.value ?? null;
+	const ends_with = get_string_check(string_schema, "endsWith")?.value ?? "";
+	const starts_with =
+		get_string_check(string_schema, "startsWith")?.value ?? "";
 
+	const include_checks = string_schema._def.checks.filter((check) => check.kind === "includes") as Extract<z.ZodStringCheck, { kind: "includes" }>[]
+	const includes = include_checks.map((check) => check.value);
+
+
+	const exact_length = get_string_check(string_schema, "length")?.value ?? null;
 	const min_length = get_string_check(string_schema, "min")?.value ?? 0;
 	const max_length =
 		get_string_check(string_schema, "max")?.value ?? min_length + 10000;
@@ -78,17 +85,25 @@ export const generate_string: Generator<z.ZodString> = (
 		return emojis;
 	}
 
-	return exact_length
-		? faker.datatype.string(exact_length)
-		: faker.datatype.string(
-				faker.datatype.number({ min: min_length, max: max_length })
-		  );
+	let length =
+		exact_length ?? faker.datatype.number({ min: min_length, max: max_length });
+	return generate_random_string(length, starts_with, ends_with, includes);
 };
+
+function generate_random_string(
+	length: number,
+	starts_with: string,
+	ends_with: string,
+	includes: string[]
+): string {
+	const generated_length = length - starts_with.length - ends_with.length - includes.reduce((a, b) => a + b.length, 0);
+	return starts_with + faker.datatype.string(generated_length) + includes.join() + ends_with;
+}
 
 //Get a check from a ZodString schema in a type-safe way
 function get_string_check<Kind extends z.ZodStringCheck["kind"]>(
 	schema: z.ZodString,
-	kind: Kind
+	kind: Kind,
 ): Extract<z.ZodStringCheck, { kind: Kind }> | undefined {
 	const check = schema._def.checks.find((check) => check.kind === kind) as
 		| Extract<z.ZodStringCheck, { kind: Kind }>
