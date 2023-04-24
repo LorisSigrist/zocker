@@ -15,13 +15,20 @@ export const generate_record: Generator<z.ZodRecord> = (
 	const record = {} as any as Record<Key, Value>;
 
 	try {
+		const keys: Key[] = [];
 		for (let i = 0; i < size; i++) {
 			const key = generate(schema._def.keyType, generation_context) as Key;
+			if (keys.includes(key)) throw new Error("Duplicate key");
+			keys.push(key);
+		}
+
+		for (let i = 0; i < size; i++) {
 			const value = generate(
 				schema._def.valueType,
 				generation_context
 			) as Value;
-			record[key] = value;
+
+			record[keys[i]!] = value;
 		}
 	} catch (error) {
 		if (error instanceof RecursionLimitReachedException) return record;
