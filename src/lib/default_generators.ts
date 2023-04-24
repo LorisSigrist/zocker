@@ -4,6 +4,7 @@ import { z } from "zod";
 import { Optional } from "./generators/optional.js";
 import { Nullable } from "./generators/nullable.js";
 import { Default } from "./generators/default.js";
+import { Any } from "./generators/any.js";
 
 import { generate_string } from "./generators/string.js";
 import { generate_number } from "./generators/numbers.js";
@@ -21,7 +22,6 @@ import { generate_discriminated_union } from "./generators/discriminated-union.j
 import { generate_boolean } from "./generators/boolean.js";
 import { generate_enum } from "./generators/enum.js";
 import { generate_native_enum } from "./generators/native-enum.js";
-import { generate_any } from "./generators/any.js";
 import { generate_symbol } from "./generators/symbol.js";
 import { generate_lazy } from "./generators/lazy.js";
 import { generate_branded } from "./generators/branded.js";
@@ -70,12 +70,12 @@ export const default_generators: GeneratorDefinition<any>[] = [
 	},
 	{
 		schema: z.ZodAny,
-		generator: generate_any,
+		generator: Any(),
 		match: "instanceof"
 	},
 	{
 		schema: z.ZodUnknown,
-		generator: generate_any,
+		generator: Any(),
 		match: "instanceof"
 	},
 	{
