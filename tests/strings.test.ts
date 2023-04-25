@@ -49,6 +49,7 @@ const string_schemas = {
 	"ends with and length": z.string().endsWith("foo").length(3),
 	"starts with and includes with length": z.string().startsWith("foo").includes("oo").length(3),
 	"ends with and includes with length": z.string().endsWith("foo").includes("oo").length(3),
+	"date with offset": z.string().datetime({ offset: true }),
 } as const;
 
 describe("String generation", () => {

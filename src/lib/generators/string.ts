@@ -38,7 +38,16 @@ export const generate_string: Generator<z.ZodString> = (string_schema, ctx) => {
 		for (const check of datetime_checks) {
 			if (check.offset !== true) offset = false;
 		}
-		return faker.date.recent().toISOString();
+		let datetime = faker.date.recent().toISOString()
+		if (offset) {
+			const hours_number = faker.datatype.number({ min: 0, max: 23 });
+			const minutes_number = faker.datatype.number({ min: 0, max: 59 });
+			const hours = hours_number.toString().padStart(2, "0");
+			const minutes = minutes_number.toString().padStart(2, "0");
+
+			datetime = datetime.replace("Z", `+${hours}:${minutes}`);
+		}
+		return datetime
 	}
 
 	const uuid = get_string_checks(string_schema, "uuid")[0];
