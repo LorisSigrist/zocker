@@ -1,17 +1,27 @@
 import { faker } from "@faker-js/faker";
-import { GenerationContext, Generator } from "lib/generate.js";
+import { Generator } from "lib/generate.js";
+import { GeneratorDefinitionFactory } from "lib/zocker.js";
 import { z } from "zod";
 
-export const generate_date: Generator<z.ZodDate> = (date_schema, options) => {
-	const min =
-		get_date_check(date_schema, "min")?.value ??
-		new Date("1970-01-01").getTime();
-	const max =
-		get_date_check(date_schema, "max")?.value ??
-		new Date(min + 1000_000).getTime();
+export const DateGenerator: GeneratorDefinitionFactory<z.ZodDate> = (options = {}) => {
 
-	return faker.datatype.datetime({ min, max });
-};
+	const generate_date: Generator<z.ZodDate> = (date_schema, options) => {
+		const min =
+			get_date_check(date_schema, "min")?.value ??
+			new Date("1970-01-01").getTime();
+		const max =
+			get_date_check(date_schema, "max")?.value ??
+			new Date(min + 1000_000).getTime();
+
+		return faker.datatype.datetime({ min, max });
+	};
+
+	return {
+		schema: options.schema ?? z.ZodDate as any,
+		generator: generate_date,
+		match: options.match ?? "instanceof"
+	}
+}
 
 function get_date_check<Kind extends z.ZodDateCheck["kind"]>(
 	schema: z.ZodDate,

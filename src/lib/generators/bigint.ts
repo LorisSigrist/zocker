@@ -1,10 +1,21 @@
 import { faker } from "@faker-js/faker";
 import { Generator } from "../generate.js";
 import { z } from "zod";
+import { GeneratorDefinitionFactory } from "lib/zocker.js";
 
-export const generate_bigint: Generator<z.ZodBigInt> = (
+export const BigintGenerator: GeneratorDefinitionFactory<z.ZodBigInt> = (
+	options = {}
+) => {
+	return {
+		schema: options.schema ?? z.ZodBigInt as any,
+		generator: generate_bigint,
+		match: options.match ?? "instanceof",
+	};
+};
+
+const generate_bigint: Generator<z.ZodBigInt> = (
 	bigint_schema,
-	options
+	ctx
 ) => {
 	const multiple_of =
 		get_bigint_check(bigint_schema, "multipleOf")?.value ?? 1n;

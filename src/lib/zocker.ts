@@ -3,7 +3,18 @@ import { GenerationContext, generate, Generator } from "./generate.js";
 import { faker } from "@faker-js/faker";
 import { default_generators } from "./default_generators.js";
 
-export type GeneratorDefinition<Z extends z.ZodTypeAny> = {
+/**
+ * A factory function that creates a GeneratorDefinition with the given options.
+ */
+export type GeneratorDefinitionFactory<Z extends z.ZodSchema, O extends {} = {}> = (options?: O & {
+	match?: "instanceof" | "reference"
+	schema?: Z
+}) => GeneratorDefinition<Z>;
+
+/**
+ * A definition of a generator and when it should be used.
+ */
+export type GeneratorDefinition<Z extends z.ZodSchema> = {
 	schema: Z;
 	generator: Generator<Z>;
 	match: "instanceof" | "reference";

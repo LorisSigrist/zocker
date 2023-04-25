@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { z } from "zod";
-import { Optional, zocker } from "../src";
+import { OptionalGenerator, zocker } from "../src";
 
 const object_schema = z.object({
 	a: z.string(),
@@ -14,11 +14,9 @@ describe("Partial object generation", () => {
 	it("should make some properties optional, if the schema is partial", () => {
 		const generate = zocker(partial_object, {
 			generators: [
-				{
-					schema: z.ZodOptional,
-					generator: Optional(1),
-					match: "instanceof"
-				}
+				OptionalGenerator({
+					undefined_chance: 1
+				})
 			]
 		});
 		const data = generate();
@@ -32,11 +30,9 @@ describe("Partial object generation", () => {
 	it("should not make properties undefined, if the undefined chance is 0", () => {
 		const generate = zocker(partial_object, {
 			generators: [
-				{
-					schema: z.ZodOptional,
-					generator: Optional(0),
-					match: "instanceof"
-				}
+				OptionalGenerator({
+					undefined_chance: 0
+				})
 			]
 		});
 		const data = generate();

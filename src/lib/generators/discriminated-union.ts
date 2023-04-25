@@ -2,8 +2,19 @@ import { z } from "zod";
 import { Generator, generate } from "../generate.js";
 import { faker } from "@faker-js/faker";
 import { RecursionLimitReachedException } from "../exceptions.js";
+import { GeneratorDefinitionFactory } from "../zocker.js";
 
-export const generate_discriminated_union: Generator<
+export const DiscriminatedUnionGenerator: GeneratorDefinitionFactory<z.ZodDiscriminatedUnion<any, any>> = (
+	options = {}
+) => {
+	return {
+		schema: options.schema ?? z.ZodDiscriminatedUnion as any,
+		generator: generate_discriminated_union,
+		match: options.match ?? "instanceof",
+	};
+};
+
+const generate_discriminated_union: Generator<
 	z.ZodDiscriminatedUnion<string, any>
 > = (schema, ctx) => {
 	const schemas = schema._def.options as z.ZodTypeAny[];

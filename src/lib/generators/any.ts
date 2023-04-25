@@ -1,13 +1,31 @@
 import { z } from "zod";
 import { generate, Generator } from "../generate.js";
 import { pick } from "../utils/random.js";
+import { GeneratorDefinitionFactory } from "../zocker.js";
+
+
+export const AnyGenerator: GeneratorDefinitionFactory<z.ZodAny> = (options = {}) => {
+	return {
+		schema: options.schema ?? z.ZodAny as any,
+		generator: Any() as Generator<z.ZodAny>,
+		match: options.match ?? "instanceof",
+	};
+};
+
+export const UnknownGenerator: GeneratorDefinitionFactory<z.ZodUnknown> = (options = {}) => {
+	return {
+		schema: options.schema ?? z.ZodUnknown as any,
+		generator: Any() as Generator<z.ZodUnknown>,
+		match: options.match ?? "instanceof",
+	};
+};
 
 /**
  * Create a Generator for the `z.any()` and `z.unknown()` schemas.
  * @param strategy - How to generate the value. "true-any" will generate any possible value, "json-compatible" will generate any JSON-compatible value, and "fast" will just return undefined, but is vastly faster.
  * @returns
  */
-export function Any(
+function Any(
 	strategy: "true-any" | "json-compatible" | "fast" = "true-any"
 ): Generator<z.ZodAny | z.ZodUnknown> {
 	if (strategy === "fast") {

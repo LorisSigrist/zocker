@@ -1,7 +1,19 @@
+import { GeneratorDefinitionFactory } from "lib/zocker.js";
 import { Generator, generate } from "../generate.js";
 import { z } from "zod";
 
-export const generate_effects: Generator<z.ZodEffects<any>> = (
+
+export const EffectsGenerator: GeneratorDefinitionFactory<z.ZodEffects<any>> = (
+	options = {}
+) => {
+	return {
+		schema: options.schema ?? z.ZodEffects as any,
+		generator: generate_effects,
+		match: options.match ?? "instanceof",
+	};
+};
+
+const generate_effects: Generator<z.ZodEffects<any>> = (
 	effects_schema,
 	generation_options
 ) => {
@@ -20,7 +32,7 @@ export const generate_effects: Generator<z.ZodEffects<any>> = (
 	const transform_function = effects_schema._def.effect.transform;
 
 	return transform_function(argument, {
-		addIssue: () => {},
+		addIssue: () => { },
 		path: []
 	});
 };

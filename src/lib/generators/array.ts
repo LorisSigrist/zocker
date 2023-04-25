@@ -2,8 +2,19 @@ import { faker } from "@faker-js/faker";
 import { Generator, generate } from "../generate.js";
 import { z } from "zod";
 import { RecursionLimitReachedException } from "../exceptions.js";
+import { GeneratorDefinitionFactory } from "lib/zocker.js";
 
-export const generate_array: Generator<z.ZodArray<any>> = (
+export const ArrayGenerator: GeneratorDefinitionFactory<z.ZodArray<any>> = (
+	options = {}
+) => {
+	return {
+		schema: options.schema ?? z.ZodArray as any,
+		generator: generate_array,
+		match: options.match ?? "instanceof",
+	};
+};
+
+const generate_array: Generator<z.ZodArray<any>> = (
 	array_schema,
 	ctx
 ) => {

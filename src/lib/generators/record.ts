@@ -2,44 +2,66 @@ import { faker } from "@faker-js/faker";
 import { Generator, generate } from "../generate.js";
 import { z } from "zod";
 import { RecursionLimitReachedException } from "../exceptions.js";
+import { GeneratorDefinitionFactory } from "lib/zocker.js";
 
-export const generate_record: Generator<z.ZodRecord> = (
-	schema,
-	generation_context
-) => {
-	const size = faker.datatype.number({ min: 0, max: 10 });
+type RecordOptions = {
+	max: number;
+	min: number;
+};
 
-	type Key = z.infer<(typeof schema)["_def"]["keyType"]>;
-	type Value = z.infer<(typeof schema)["_def"]["valueType"]>;
+const default_record_options: RecordOptions = {
+	max: 10,
+	min: 0
+};
 
-	const record = {} as any as Record<Key, Value>;
+export const RecordGenerator: GeneratorDefinitionFactory<z.ZodRecord, Partial<RecordOptions>> = (partial_options = {}) => {
+	const options = { ...default_record_options, ...partial_options };
 
-	try {
-		const keys: Key[] = [];
-		for (let i = 0; i < size; i++) {
-			const key = generate(schema._def.keyType, generation_context) as Key;
-			keys.push(key);
-		}
+	const generate_record: Generator<z.ZodRecord> = (
+		schema,
+		generation_context
+	) => {
+		const size = faker.datatype.number({ min: options.min, max: options.max });
 
-		for (let i = 0; i < size; i++) {
-			let value: Value;
+		type Key = z.infer<(typeof schema)["_def"]["keyType"]>;
+		type Value = z.infer<(typeof schema)["_def"]["valueType"]>;
 
-			try {
-				generation_context.path.push(keys[i]!);
-				generation_context.semantic_context.push("key");
+		const record = {} as any as Record<Key, Value>;
 
-				value = generate(schema._def.valueType, generation_context) as Value;
-			} finally {
-				generation_context.path.pop();
-				generation_context.semantic_context.pop();
+		try {
+			const keys: Key[] = [];
+			for (let i = 0; i < size; i++) {
+				const key = generate(schema._def.keyType, generation_context) as Key;
+				keys.push(key);
 			}
 
-			record[keys[i]!] = value;
-		}
-	} catch (error) {
-		if (error instanceof RecursionLimitReachedException) return record;
-		throw error;
-	}
+			for (let i = 0; i < size; i++) {
+				let value: Value;
 
-	return record;
-};
+				try {
+					generation_context.path.push(keys[i]!);
+					generation_context.semantic_context.push("key");
+
+					value = generate(schema._def.valueType, generation_context) as Value;
+				} finally {
+					generation_context.path.pop();
+					generation_context.semantic_context.pop();
+				}
+
+				record[keys[i]!] = value;
+			}
+		} catch (error) {
+			if (error instanceof RecursionLimitReachedException) return record;
+			throw error;
+		}
+
+		return record;
+	};
+
+
+	return {
+		schema: options.schema ?? z.ZodRecord as any,
+		generator: generate_record,
+		match: options.match ?? "instanceof"
+	}
+}

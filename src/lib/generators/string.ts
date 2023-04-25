@@ -4,6 +4,7 @@ import Randexp from "randexp";
 import { Generator } from "../generate.js";
 import { weighted_random_boolean } from "../utils/random.js";
 import { InvalidSchemaException, NoGeneratorException } from "../exceptions.js";
+import { GeneratorDefinitionFactory } from "../zocker.js";
 
 type LengthConstraints = {
 	min: number | null;
@@ -28,9 +29,18 @@ type CacheEntry = {
 	transform_constaints: TransformDefinition;
 };
 
+export const StringGenerator: GeneratorDefinitionFactory<z.ZodString> = (options = {}) => {
+	return {
+		schema: options.schema ?? z.ZodString as any,
+		generator: generate_string,
+		match: options.match ?? "instanceof"
+	};
+};
+
+
 const cache = new WeakMap<z.ZodString, CacheEntry>();
 
-export const generate_string: Generator<z.ZodString> = (string_schema, ctx) => {
+const generate_string: Generator<z.ZodString> = (string_schema, ctx) => {
 	const cache_hit = cache.get(string_schema);
 
 	const cc =
@@ -61,8 +71,8 @@ function generate_random_string(
 		0,
 		lc.min ?? 0,
 		(cc.starts_with?.length ?? 0) +
-			(cc.ends_with?.length ?? 0) +
-			cc.includes.reduce((a, b) => a + b.length, 0)
+		(cc.ends_with?.length ?? 0) +
+		cc.includes.reduce((a, b) => a + b.length, 0)
 	);
 
 	const max = lc.max ?? (lc.min !== null ? lc.min + 10_000 : 10_000);
