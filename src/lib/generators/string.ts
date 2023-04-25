@@ -253,7 +253,9 @@ const generate_pre_transform = (string_schema: z.ZodString, lc: LengthConstraint
 			const hours = hours_number.toString().padStart(2, "0");
 			const minutes = minutes_number.toString().padStart(2, "0");
 
-			datetime = datetime.replace("Z", `+${hours}:${minutes}`);
+			const sign = weighted_random_boolean(0.5) ? "+" : "-";
+
+			datetime = datetime.replace("Z", `${sign}${hours}:${minutes}`);
 		}
 		return datetime
 	}
