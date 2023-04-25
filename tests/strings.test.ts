@@ -44,7 +44,11 @@ const string_schemas = {
 	"ip-v4 and unspecified": z.string().ip({ version: "v4" }).ip(), //should be narrowed to v4
 	"ip-v6 and unspecified": z.string().ip({ version: "v6" }).ip(), //should be narrowed to v6,
 	"unspecified and ip-v4": z.string().ip().ip({ version: "v4" }), //should be narrowed to v4
-	"unspecified and ip-v6": z.string().ip().ip({ version: "v6" }) //should be narrowed to v6,
+	"unspecified and ip-v6": z.string().ip().ip({ version: "v6" }), //should be narrowed to v6,
+	"starts with and length": z.string().startsWith("foo").length(3),
+	"ends with and length": z.string().endsWith("foo").length(3),
+	"starts with and includes with length": z.string().startsWith("foo").includes("oo").length(3),
+	"ends with and includes with length": z.string().endsWith("foo").includes("oo").length(3),
 } as const;
 
 describe("String generation", () => {

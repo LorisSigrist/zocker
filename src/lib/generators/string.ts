@@ -40,7 +40,7 @@ export const generate_string: Generator<z.ZodString> = (string_schema, ctx) => {
 
 	const ip_checks = get_string_checks(string_schema, "ip");
 	if (ip_checks.length > 0) {
-		let version = undefined;
+		let version: z.IpVersion | undefined = undefined;
 		for (const check of ip_checks) {
 			if (check.version && version && check.version !== version) {
 				throw new InvalidSchemaException(
@@ -108,11 +108,22 @@ function generate_random_string(
 	lc: LengthConstraints,
 	cc: ContentConstraints
 ): string {
+	const min = Math.max(
+		0,
+		lc.min ?? 0,
+		(cc.starts_with?.length ?? 0) +
+		(cc.ends_with?.length ?? 0) +
+		cc.includes.reduce((a, b) => a + b.length, 0)
+	)
+
+	const max = lc.max ?? (lc.min !== null ? lc.min + 10_000 : 10_000);
+
+
 	let length =
 		lc.exact ??
 		faker.datatype.number({
-			min: lc.min ?? 0,
-			max: lc.max ?? (lc.min !== null ? lc.min + 10_000 : 10_000)
+			min,
+			max
 		});
 
 	const generated_length =
@@ -120,6 +131,12 @@ function generate_random_string(
 		(cc.starts_with?.length ?? 0) -
 		(cc.ends_with?.length ?? 0) -
 		cc.includes.reduce((a, b) => a + b.length, 0);
+
+	if (generated_length < 0) {
+		throw new InvalidSchemaException(
+			"Length constraints are impossible to satisfy"
+		);
+	}
 	return (
 		(cc.starts_with ?? "") +
 		faker.datatype.string(generated_length) +
@@ -220,7 +237,23 @@ function content_constraints(schema: z.ZodString): ContentConstraints {
 	const include_checks = schema._def.checks.filter(
 		(check) => check.kind === "includes"
 	) as Extract<z.ZodStringCheck, { kind: "includes" }>[];
-	const includes = include_checks.map((check) => check.value);
+
+	//get the includes checks, get the values, sort them from longest to shortest
+	let includes = include_checks.map((check) => check.value).sort((a, b) => b.length - a.length);
+
+	if (includes.length >= 2) {
+	}
+
+
+	//If "startsWith" includes one of the "includes" checks, remove it
+	if (starts_with !== null) {
+		includes = includes.filter((include) => !starts_with.includes(include));
+	}
+
+	//If "endsWith" includes one of the "includes" checks, remove it
+	if (ends_with !== null) {
+		includes = includes.filter((include) => !ends_with.includes(include));
+	}
 
 	return { starts_with, ends_with, includes };
 }
