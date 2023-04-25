@@ -1,5 +1,6 @@
-import { describe } from "vitest";
+import { describe, it, expect } from "vitest";
 import { z } from "zod";
+import { zocker } from "../src";
 import { test_schema_generation } from "./utils";
 
 const string_schemas = {
@@ -54,4 +55,31 @@ const string_schemas = {
 
 describe("String generation", () => {
 	test_schema_generation(string_schemas);
+
+	it("should generate Uppercase strings when toUpperCase() is used", () => {
+		const transformed_schema = z.string().regex(/[a-z]*/).toUpperCase();
+		const uppercase_schema = z.string().regex(/[A-Z]*/);
+
+		const generate = zocker(transformed_schema);
+		const generated = generate();
+		expect(() => uppercase_schema.parse(generated)).not.toThrow();
+	});
+
+	it("should generate Lowercase strings when toLowerCase() is used", () => {
+		const transformed_schema = z.string().regex(/[A-Z]*/).toLowerCase();
+		const lowercase_schema = z.string().regex(/[a-z]*/);
+
+		const generate = zocker(transformed_schema);
+		const generated = generate();
+		expect(() => lowercase_schema.parse(generated)).not.toThrow();
+	});
+
+	it("should generate trimmed strings when trim() is used", () => {
+		const transformed_schema = z.string().regex(/\W+foo\W+/).trim();
+		const trimmed_schema = z.string().regex(/foo/);
+
+		const generate = zocker(transformed_schema);
+		const generated = generate();
+		expect(() => trimmed_schema.parse(generated)).not.toThrow();
+	});
 });
