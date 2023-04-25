@@ -24,7 +24,9 @@ const string_schemas = {
 	"emoji with min-length": z.string().emoji().min(5),
 	"ends with": z.string().endsWith("foo"),
 	"starts with": z.string().startsWith("foo"),
-	includes: z.string().includes("foo").includes("bar")
+	includes: z.string().includes("foo").includes("bar"),
+	"multiple starts with": z.string().startsWith("some_string").startsWith("some_string_that_is_longer"),
+	"multiple ends with": z.string().endsWith("a_string").endsWith("this_is_a_string"),
 } as const;
 
 describe("String generation", () => {
