@@ -5,9 +5,9 @@ import { Optional } from "./generators/optional.js";
 import { Nullable } from "./generators/nullable.js";
 import { Default } from "./generators/default.js";
 import { Any } from "./generators/any.js";
+import { number } from "./generators/numbers.js";
 
 import { generate_string } from "./generators/string.js";
-import { generate_number } from "./generators/numbers.js";
 import { generate_date } from "./generators/dates.js";
 import { generate_bigint } from "./generators/bigint.js";
 import { generate_object } from "./generators/object.js";
@@ -35,7 +35,7 @@ export const default_generators: GeneratorDefinition<any>[] = [
 	},
 	{
 		schema: z.ZodNumber,
-		generator: generate_number,
+		generator: number(0.3),
 		match: "instanceof"
 	},
 	{

@@ -5,7 +5,7 @@ import { RecursionLimitReachedException } from "../exceptions.js";
 
 export const generate_union: Generator<z.ZodUnion<any>> = (
 	schema,
-	generation_context
+	ctx
 ) => {
 	const schemas = schema._def.options as z.ZodTypeAny[];
 
@@ -15,14 +15,17 @@ export const generate_union: Generator<z.ZodUnion<any>> = (
 	//Generate a value for the first schema that doesn't throw a RecursionLimitReachedException
 	for (const index of indexes) {
 		try {
+			ctx.path.push(index);
 			const schema = schemas[index]!;
-			return generate(schema, generation_context);
+			return generate(schema, ctx);
 		} catch (e) {
 			if (e instanceof RecursionLimitReachedException) {
 				continue;
 			} else {
 				throw e;
 			}
+		} finally {
+			ctx.path.pop();
 		}
 	}
 

@@ -18,15 +18,21 @@ export const generate_record: Generator<z.ZodRecord> = (
 		const keys: Key[] = [];
 		for (let i = 0; i < size; i++) {
 			const key = generate(schema._def.keyType, generation_context) as Key;
-			if (keys.includes(key)) throw new Error("Duplicate key");
 			keys.push(key);
 		}
 
 		for (let i = 0; i < size; i++) {
-			const value = generate(
-				schema._def.valueType,
-				generation_context
-			) as Value;
+			let value: Value;
+
+			try {
+				generation_context.path.push(keys[i]!);
+				generation_context.semantic_context.push("key");
+
+				value = generate(schema._def.valueType, generation_context) as Value;
+			} finally {
+				generation_context.path.pop();
+				generation_context.semantic_context.pop();
+			}
 
 			record[keys[i]!] = value;
 		}

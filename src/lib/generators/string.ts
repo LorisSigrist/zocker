@@ -1,14 +1,26 @@
 import { faker } from "@faker-js/faker";
-import { z } from "zod";
+import { Schema, z } from "zod";
 import Randexp from "randexp";
 import { Generator } from "../generate.js";
 import { weighted_random_boolean } from "../utils/random.js";
 import { InvalidSchemaException } from "../exceptions.js";
 
-export const generate_string: Generator<z.ZodString> = (
-	string_schema,
-	generation_options
-) => {
+type LengthConstraints = {
+	min: number | null;
+	max: number | null;
+	exact: number | null;
+};
+
+type ContentConstraints = {
+	starts_with: string | null;
+	ends_with: string | null;
+	includes: string[];
+};
+
+export const generate_string: Generator<z.ZodString> = (string_schema, ctx) => {
+	const cc = content_constraints(string_schema);
+	const lc = length_constraints(string_schema);
+
 	let regex: RegExp | undefined = undefined;
 
 	const datetime = get_string_check(string_schema, "datetime");
@@ -55,29 +67,12 @@ export const generate_string: Generator<z.ZodString> = (
 		return randexp.gen();
 	}
 
-	const ends_with = get_string_check(string_schema, "endsWith")?.value ?? "";
-	const starts_with =
-		get_string_check(string_schema, "startsWith")?.value ?? "";
-
-	const include_checks = string_schema._def.checks.filter((check) => check.kind === "includes") as Extract<z.ZodStringCheck, { kind: "includes" }>[]
-	const includes = include_checks.map((check) => check.value);
-
-
-	const exact_length = get_string_check(string_schema, "length")?.value ?? null;
-	const min_length = get_string_check(string_schema, "min")?.value ?? 0;
-	const max_length =
-		get_string_check(string_schema, "max")?.value ?? min_length + 10000;
-
-	if (min_length > max_length)
-		throw new InvalidSchemaException(
-			"min length is greater than max length - The Schema never matches"
-		);
 
 	const emoji = get_string_check(string_schema, "emoji");
 	if (emoji) {
 		const length =
-			exact_length ??
-			faker.datatype.number({ min: min_length, max: max_length });
+			lc.exact ??
+			faker.datatype.number({ min: lc.min ?? 0, max: lc.max ?? (lc.min !== null ? lc.min + 10_000 : 10_000) });
 		let emojis = "";
 		for (let i = 0; i < length; i++) {
 			emojis += faker.internet.emoji();
@@ -85,28 +80,77 @@ export const generate_string: Generator<z.ZodString> = (
 		return emojis;
 	}
 
-	let length =
-		exact_length ?? faker.datatype.number({ min: min_length, max: max_length });
-	return generate_random_string(length, starts_with, ends_with, includes);
+	return generate_random_string(lc, cc);
 };
 
 function generate_random_string(
-	length: number,
-	starts_with: string,
-	ends_with: string,
-	includes: string[]
+	lc: LengthConstraints,
+	cc: ContentConstraints
 ): string {
-	const generated_length = length - starts_with.length - ends_with.length - includes.reduce((a, b) => a + b.length, 0);
-	return starts_with + faker.datatype.string(generated_length) + includes.join() + ends_with;
+
+	let length = lc.exact ?? faker.datatype.number({ min: lc.min ?? 0, max: lc.max ?? (lc.min !== null ? lc.min + 10_000 : 10_000) });
+
+	const generated_length =
+		length -
+		(cc.starts_with?.length ?? 0) -
+		(cc.ends_with?.length ?? 0) -
+		cc.includes.reduce((a, b) => a + b.length, 0);
+	return (
+		(cc.starts_with ?? "") +
+		faker.datatype.string(generated_length) +
+		cc.includes.join() +
+		(cc.ends_with ?? "")
+	);
 }
 
 //Get a check from a ZodString schema in a type-safe way
 function get_string_check<Kind extends z.ZodStringCheck["kind"]>(
 	schema: z.ZodString,
-	kind: Kind,
+	kind: Kind
 ): Extract<z.ZodStringCheck, { kind: Kind }> | undefined {
 	const check = schema._def.checks.find((check) => check.kind === kind) as
 		| Extract<z.ZodStringCheck, { kind: Kind }>
 		| undefined;
 	return check;
+}
+
+/**
+ * Gets the length constraints from a ZodString schema
+ * @param schema 
+ * @throws InvalidSchemaException if the schemas length constraints are impossible
+ */
+function length_constraints(schema: z.ZodString): LengthConstraints {
+	const exact = get_string_check(schema, "length")?.value ?? null;
+	const min = get_string_check(schema, "min")?.value ?? null;
+	const max = get_string_check(schema, "max")?.value ?? null;
+
+	if (min !== null && max !== null && min > max)
+		throw new InvalidSchemaException(
+			"min length is greater than max length - The Schema cannot be satisfied"
+		);
+
+	if (exact !== null) {
+		if (min !== null && exact < min)
+			throw new InvalidSchemaException(
+				"exact length is less than min length - The Schema cannot be satisfied"
+			);
+		if (max !== null && exact > max)
+			throw new InvalidSchemaException(
+				"exact length is greater than max length - The Schema cannot be satisfied"
+			);
+	}
+	return { exact, min, max };
+}
+
+
+function content_constraints(schema: z.ZodString): ContentConstraints {
+	const starts_with = get_string_check(schema, "startsWith")?.value ?? null;
+	const ends_with = get_string_check(schema, "endsWith")?.value ?? null;
+
+	const include_checks = schema._def.checks.filter(
+		(check) => check.kind === "includes"
+	) as Extract<z.ZodStringCheck, { kind: "includes" }>[];
+	const includes = include_checks.map((check) => check.value);
+
+	return { starts_with, ends_with, includes };
 }

@@ -5,7 +5,7 @@ import { RecursionLimitReachedException } from "../exceptions.js";
 
 export const generate_array: Generator<z.ZodArray<any>> = (
 	array_schema,
-	generation_context
+	ctx
 ) => {
 	const exact_length = array_schema._def.exactLength?.value ?? null;
 
@@ -23,10 +23,13 @@ export const generate_array: Generator<z.ZodArray<any>> = (
 
 	try {
 		for (let i = 0; i < length; i++) {
-			const generated_value = generate(
-				array_schema.element,
-				generation_context
-			);
+			let generated_value;
+			try {
+				ctx.path.push(i);
+				generated_value = generate(array_schema.element, ctx);
+			} finally {
+				ctx.path.pop();
+			}
 			generated_array.push(generated_value);
 		}
 		return generated_array;

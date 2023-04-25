@@ -14,12 +14,18 @@ describe("Transform generation", () => {
 	});
 
 	it("Generates valid data for numbers with transforms", () => {
-		const chained_schema = z
+		const doubled = z
 			.number()
-			.negative()
-			.transform((s) => s * s);
-		const result_schema = z.number().positive();
-		const result = zocker(chained_schema)();
-		expect(() => result_schema.parse(result)).not.toThrow();
+			.int()
+			.positive()
+			.transform((s) => s * 2);
+
+		const even_schema = z.number().int().positive().multipleOf(2);
+		const generate = zocker(doubled);
+
+		for (let i = 0; i < 100; i++) {
+			const result = generate();
+			expect(() => even_schema.parse(result)).not.toThrow();
+		}
 	});
 });

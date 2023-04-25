@@ -1,27 +1,27 @@
 import { z } from "zod";
 import { faker } from "@faker-js/faker";
 import { Generator } from "../generate.js";
+import { weighted_random_boolean } from "../utils/random.js";
 
-export const generate_number: Generator<z.ZodNumber> = (
-	number_schema,
-	generation_context
-) => {
-	let min =
-		get_number_check(number_schema, "min")?.value ??
-		Number.MIN_SAFE_INTEGER / 2;
-	let max =
-		get_number_check(number_schema, "max")?.value ??
-		Number.MAX_SAFE_INTEGER / 2;
+export function number(non_finite_chance: number): Generator<z.ZodNumber> {
+	return (number_schema, ctx) => {
+		let min =
+			get_number_check(number_schema, "min")?.value ??
+			Number.MIN_SAFE_INTEGER / 2;
+		let max =
+			get_number_check(number_schema, "max")?.value ??
+			Number.MAX_SAFE_INTEGER / 2;
 
-	let finite = !!get_number_check(number_schema, "finite");
-	let int = !!get_number_check(number_schema, "int");
+		let finite = !!get_number_check(number_schema, "finite");
+		let int = !!get_number_check(number_schema, "int");
 
-	if (int) {
-		return faker.datatype.number({ min, max });
-	} else {
-		return faker.datatype.float({ min, max });
-	}
-};
+		if (int) {
+			return faker.datatype.number({ min, max });
+		} else {
+			return faker.datatype.float({ min, max });
+		}
+	};
+}
 
 //Get a check from a ZodNumber schema in a type-safe way
 function get_number_check<Kind extends z.ZodNumberCheck["kind"]>(

@@ -21,11 +21,13 @@ export type GenerationContext<Z extends z.ZodSchema> = {
 	parent_schemas: Map<z.ZodSchema, number>;
 	recursion_limit: number;
 
-	path: string[];
-	semantic_context: [];
+	path: (string | number | symbol)[];
+	semantic_context: SemanticFlag[];
 
 	seed: number;
 };
+
+type SemanticFlag = "key" | "name" | "street" | "city" | "country";
 
 export type Generator<Z extends z.ZodSchema> = (
 	schema: Z,
@@ -45,17 +47,13 @@ export function generate<Z extends z.ZodSchema>(
 	generation_context: GenerationContext<Z>
 ): z.infer<Z> {
 	//Mutate the generation context (creating a new one was too expensive - this gets called a lot)
-	//Make sure to undo the mutations after the generation is done (even if it fails)
 	increment_recursion_count(schema, generation_context);
 	try {
-		//attempt to generate a value
-		const generation_result = generate_value(schema, generation_context);
-
+		return generate_value(schema, generation_context);
+	} finally {
+		//Make sure to undo the mutations after the generation is done (even if it fails)
+		//finally runs before the caller gets the return value
 		decrement_recursion_count(schema, generation_context);
-		return generation_result;
-	} catch (e) {
-		decrement_recursion_count(schema, generation_context);
-		throw e;
 	}
 }
 

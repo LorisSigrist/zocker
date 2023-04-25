@@ -37,12 +37,11 @@ describe("Optional generation", () => {
 	});
 
 	it("never generates undefined if the undefined chance is 0", () => {
-
 		const generate_optional = zocker(optional_schema, {
 			generators: [
 				{
 					schema: z.ZodOptional,
-					generator: Optional(0) ,
+					generator: Optional(0),
 					match: "instanceof"
 				}
 			]

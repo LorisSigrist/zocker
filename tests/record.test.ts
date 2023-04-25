@@ -2,8 +2,6 @@ import { describe } from "vitest";
 import { z } from "zod";
 import { test_schema_generation } from "./utils";
 
-const a = z.record(z.number(), z.number());
-
 const record_schemas = {
 	"record of numbers": z.record(z.number()),
 	"record of objects": z.record(z.object({ b: z.string() })),

@@ -5,7 +5,7 @@ import { RecursionLimitReachedException } from "../exceptions.js";
 
 export const generate_set: Generator<z.ZodSet<any>> = (
 	schema,
-	generation_context
+	ctx
 ) => {
 	const size = faker.datatype.number({ min: 0, max: 10 });
 
@@ -13,8 +13,13 @@ export const generate_set: Generator<z.ZodSet<any>> = (
 
 	try {
 		for (let i = 0; i < size; i++) {
-			const value = generate(schema._def.valueType, generation_context);
-			set.add(value);
+			try {
+				ctx.path.push(i);
+				const value = generate(schema._def.valueType, ctx);
+				set.add(value);
+			} finally {
+				ctx.path.pop();
+			}
 		}
 	} catch (error) {
 		if (error instanceof RecursionLimitReachedException) {

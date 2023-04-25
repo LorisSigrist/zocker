@@ -5,26 +5,30 @@ import { pick } from "../utils/random.js";
 /**
  * Create a Generator for the `z.any()` and `z.unknown()` schemas.
  * @param strategy - How to generate the value. "true-any" will generate any possible value, "json-compatible" will generate any JSON-compatible value, and "fast" will just return undefined, but is vastly faster.
- * @returns 
+ * @returns
  */
-export function Any(strategy: "true-any" | "json-compatible" | "fast" = "true-any"): Generator<z.ZodAny | z.ZodUnknown> {
-
+export function Any(
+	strategy: "true-any" | "json-compatible" | "fast" = "true-any"
+): Generator<z.ZodAny | z.ZodUnknown> {
 	if (strategy === "fast") {
 		return () => undefined;
 	}
 
 	if (strategy === "json-compatible") {
-
-		const literalSchema = z.union([z.string(), z.number(), z.boolean(), z.null()]);
-		const jsonSchema : z.ZodSchema = z.lazy(() =>
+		const literalSchema = z.union([
+			z.string(),
+			z.number(),
+			z.boolean(),
+			z.null()
+		]);
+		const jsonSchema: z.ZodSchema = z.lazy(() =>
 			z.union([literalSchema, z.array(jsonSchema), z.record(jsonSchema)])
 		);
-
 
 		return (_schema, generation_context) => {
 			const generated = generate(jsonSchema, generation_context);
 			return generated;
-		}
+		};
 	}
 
 	const any = z.any();

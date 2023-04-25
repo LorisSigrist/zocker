@@ -5,7 +5,7 @@ import { RecursionLimitReachedException } from "../exceptions.js";
 
 export const generate_discriminated_union: Generator<
 	z.ZodDiscriminatedUnion<string, any>
-> = (schema, generation_context) => {
+> = (schema, ctx) => {
 	const schemas = schema._def.options as z.ZodTypeAny[];
 
 	const possible_indexes = new Array(schemas.length).fill(0).map((_, i) => i);
@@ -14,14 +14,17 @@ export const generate_discriminated_union: Generator<
 	//Generate a value for the first schema that doesn't throw a RecursionLimitReachedException
 	for (const index of indexes) {
 		try {
+			ctx.path.push(index);
 			const schema = schemas[index]!;
-			return generate(schema, generation_context);
+			return generate(schema, ctx);
 		} catch (e) {
 			if (e instanceof RecursionLimitReachedException) {
 				continue;
 			} else {
 				throw e;
 			}
+		} finally {
+			ctx.path.pop();
 		}
 	}
 
