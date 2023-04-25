@@ -41,10 +41,14 @@ export const generate_string: Generator<z.ZodString> = (string_schema, ctx) => {
 	if (uuid) return faker.datatype.uuid();
 
 	const ip_checks = get_string_checks(string_schema, "ip");
-	const ip = ip_checks[0];
-	if (ip) {
-		const ip_v4 = ip.version === "v4" ?? false;
-		const ip_v6 = ip.version === "v6" ?? false;
+	if (ip_checks.length > 0) {
+		const version = ip_checks.reduce((acc: z.IpVersion | undefined, check) => {
+			const version = check.version;
+			if (acc && version && acc !== version) throw new InvalidSchemaException("Specified multiple incompatible versions of IP address");
+			return version ?? acc;
+		}, undefined);
+		const ip_v4 = version === "v4" ?? false;
+		const ip_v6 = version === "v6" ?? false;
 
 		if (ip_v4) return faker.internet.ipv4();
 		if (ip_v6) return faker.internet.ipv6();
@@ -159,13 +163,16 @@ function length_constraints(schema: z.ZodString): LengthConstraints {
 
 
 function content_constraints(schema: z.ZodString): ContentConstraints {
-	const starts_with_checks = get_string_checks(schema, "startsWith")
-	const ends_with_checks = get_string_checks(schema, "endsWith")
+	//Sort from longest to shortest
+	const starts_with_checks = get_string_checks(schema, "startsWith").sort((a, b) => b.value.length - a.value.length);
+	const ends_with_checks = get_string_checks(schema, "endsWith").sort((a, b) => b.value.length - a.value.length);
+
+
+	//If there are multiple startsWith or endsWith checks, we can just use the longest one
+	const starts_with = starts_with_checks[0]?.value ?? null;
+	const ends_with = ends_with_checks[0]?.value ?? null;
 
 	if (starts_with_checks.length >= 2) {
-		//Sort from longest to shortest
-		starts_with_checks.sort((a, b) => b.value.length - a.value.length);
-
 		//For each adjacent pair of checks, check if the first starts with the second
 		for (let i = 0; i < starts_with_checks.length - 1; i++) {
 			const first = starts_with_checks[i]!.value;
@@ -180,9 +187,6 @@ function content_constraints(schema: z.ZodString): ContentConstraints {
 	}
 
 	if (ends_with_checks.length >= 2) {
-		//Sort from longest to shortest
-		ends_with_checks.sort((a, b) => b.value.length - a.value.length);
-
 		//For each adjacent pair of checks, check if the first ends with the second
 		for (let i = 0; i < ends_with_checks.length - 1; i++) {
 			const first = ends_with_checks[i]!.value;
@@ -195,11 +199,6 @@ function content_constraints(schema: z.ZodString): ContentConstraints {
 			}
 		}
 	}
-
-	//If there are multiple startsWith or endsWith checks, we can just use the longest one
-	//They will have been sorted by the conflict-check above
-	const starts_with = starts_with_checks[0]?.value ?? null;
-	const ends_with = ends_with_checks[0]?.value ?? null;
 
 	const include_checks = schema._def.checks.filter(
 		(check) => check.kind === "includes"
