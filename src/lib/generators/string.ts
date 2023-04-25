@@ -21,8 +21,6 @@ const cc_cache = new WeakMap<z.ZodString, ContentConstraints>();
 const lc_cache = new WeakMap<z.ZodString, LengthConstraints>();
 
 export const generate_string: Generator<z.ZodString> = (string_schema, ctx) => {
-
-
 	const cc_cache_hit = cc_cache.get(string_schema);
 	const lc_cache_hit = lc_cache.get(string_schema);
 
@@ -42,11 +40,16 @@ export const generate_string: Generator<z.ZodString> = (string_schema, ctx) => {
 
 	const ip_checks = get_string_checks(string_schema, "ip");
 	if (ip_checks.length > 0) {
-		const version = ip_checks.reduce((acc: z.IpVersion | undefined, check) => {
-			const version = check.version;
-			if (acc && version && acc !== version) throw new InvalidSchemaException("Specified multiple incompatible versions of IP address");
-			return version ?? acc;
-		}, undefined);
+		let version = undefined;
+		for (const check of ip_checks) {
+			if (check.version && version && check.version !== version) {
+				throw new InvalidSchemaException(
+					"Specified multiple incompatible versions of IP address"
+				);
+			}
+			version = check.version ?? version;
+		}
+
 		const ip_v4 = version === "v4" ?? false;
 		const ip_v6 = version === "v6" ?? false;
 
@@ -83,12 +86,14 @@ export const generate_string: Generator<z.ZodString> = (string_schema, ctx) => {
 		return randexp.gen();
 	}
 
-
 	const emoji = get_string_checks(string_schema, "emoji")[0];
 	if (emoji) {
 		const length =
 			lc.exact ??
-			faker.datatype.number({ min: lc.min ?? 0, max: lc.max ?? (lc.min !== null ? lc.min + 10_000 : 10_000) });
+			faker.datatype.number({
+				min: lc.min ?? 0,
+				max: lc.max ?? (lc.min !== null ? lc.min + 10_000 : 10_000)
+			});
 		let emojis = "";
 		for (let i = 0; i < length; i++) {
 			emojis += faker.internet.emoji();
@@ -103,8 +108,12 @@ function generate_random_string(
 	lc: LengthConstraints,
 	cc: ContentConstraints
 ): string {
-
-	let length = lc.exact ?? faker.datatype.number({ min: lc.min ?? 0, max: lc.max ?? (lc.min !== null ? lc.min + 10_000 : 10_000) });
+	let length =
+		lc.exact ??
+		faker.datatype.number({
+			min: lc.min ?? 0,
+			max: lc.max ?? (lc.min !== null ? lc.min + 10_000 : 10_000)
+		});
 
 	const generated_length =
 		length -
@@ -125,13 +134,13 @@ function get_string_checks<Kind extends z.ZodStringCheck["kind"]>(
 	kind: Kind
 ): Extract<z.ZodStringCheck, { kind: Kind }>[] {
 	const check = schema._def.checks.filter((check) => check.kind === kind) as
-		| Extract<z.ZodStringCheck, { kind: Kind }>[]
+		| Extract<z.ZodStringCheck, { kind: Kind }>[];
 	return check;
 }
 
 /**
  * Gets the length constraints from a ZodString schema
- * @param schema 
+ * @param schema
  * @throws InvalidSchemaException if the schemas length constraints are impossible
  */
 function length_constraints(schema: z.ZodString): LengthConstraints {
@@ -140,8 +149,14 @@ function length_constraints(schema: z.ZodString): LengthConstraints {
 	const min_checks = get_string_checks(schema, "min");
 	const max_checks = get_string_checks(schema, "max");
 
-	const min = min_checks.length === 0 ? null : min_checks.map((c) => c.value).reduce((a, b) => Math.max(a, b), 0);
-	const max = max_checks.length === 0 ? null : max_checks.map((c) => c.value).reduce((a, b) => Math.min(a, b), 10_000);
+	const min =
+		min_checks.length === 0
+			? null
+			: min_checks.map((c) => c.value).reduce((a, b) => Math.max(a, b), 0);
+	const max =
+		max_checks.length === 0
+			? null
+			: max_checks.map((c) => c.value).reduce((a, b) => Math.min(a, b), 10_000);
 
 	if (min !== null && max !== null && min > max)
 		throw new InvalidSchemaException(
@@ -161,12 +176,14 @@ function length_constraints(schema: z.ZodString): LengthConstraints {
 	return { exact, min, max };
 }
 
-
 function content_constraints(schema: z.ZodString): ContentConstraints {
 	//Sort from longest to shortest
-	const starts_with_checks = get_string_checks(schema, "startsWith").sort((a, b) => b.value.length - a.value.length);
-	const ends_with_checks = get_string_checks(schema, "endsWith").sort((a, b) => b.value.length - a.value.length);
-
+	const starts_with_checks = get_string_checks(schema, "startsWith").sort(
+		(a, b) => b.value.length - a.value.length
+	);
+	const ends_with_checks = get_string_checks(schema, "endsWith").sort(
+		(a, b) => b.value.length - a.value.length
+	);
 
 	//If there are multiple startsWith or endsWith checks, we can just use the longest one
 	const starts_with = starts_with_checks[0]?.value ?? null;
@@ -204,8 +221,6 @@ function content_constraints(schema: z.ZodString): ContentConstraints {
 		(check) => check.kind === "includes"
 	) as Extract<z.ZodStringCheck, { kind: "includes" }>[];
 	const includes = include_checks.map((check) => check.value);
-
-
 
 	return { starts_with, ends_with, includes };
 }

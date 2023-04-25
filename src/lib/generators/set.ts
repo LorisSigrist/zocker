@@ -3,10 +3,7 @@ import { faker } from "@faker-js/faker";
 import { generate, Generator } from "../generate.js";
 import { RecursionLimitReachedException } from "../exceptions.js";
 
-export const generate_set: Generator<z.ZodSet<any>> = (
-	schema,
-	ctx
-) => {
+export const generate_set: Generator<z.ZodSet<any>> = (schema, ctx) => {
 	const size = faker.datatype.number({ min: 0, max: 10 });
 
 	const set: z.infer<typeof schema> = new Set();
