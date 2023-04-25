@@ -48,16 +48,27 @@ const string_schemas = {
 	"unspecified and ip-v6": z.string().ip().ip({ version: "v6" }), //should be narrowed to v6,
 	"starts with and length": z.string().startsWith("foo").length(3),
 	"ends with and length": z.string().endsWith("foo").length(3),
-	"starts with and includes with length": z.string().startsWith("foo").includes("oo").length(3),
-	"ends with and includes with length": z.string().endsWith("foo").includes("oo").length(3),
-	"date with offset": z.string().datetime({ offset: true }),
+	"starts with and includes with length": z
+		.string()
+		.startsWith("foo")
+		.includes("oo")
+		.length(3),
+	"ends with and includes with length": z
+		.string()
+		.endsWith("foo")
+		.includes("oo")
+		.length(3),
+	"date with offset": z.string().datetime({ offset: true })
 } as const;
 
 describe("String generation", () => {
 	test_schema_generation(string_schemas);
 
 	it("should generate Uppercase strings when toUpperCase() is used", () => {
-		const transformed_schema = z.string().regex(/[a-z]*/).toUpperCase();
+		const transformed_schema = z
+			.string()
+			.regex(/[a-z]*/)
+			.toUpperCase();
 		const uppercase_schema = z.string().regex(/[A-Z]*/);
 
 		const generate = zocker(transformed_schema);
@@ -66,7 +77,10 @@ describe("String generation", () => {
 	});
 
 	it("should generate Lowercase strings when toLowerCase() is used", () => {
-		const transformed_schema = z.string().regex(/[A-Z]*/).toLowerCase();
+		const transformed_schema = z
+			.string()
+			.regex(/[A-Z]*/)
+			.toLowerCase();
 		const lowercase_schema = z.string().regex(/[a-z]*/);
 
 		const generate = zocker(transformed_schema);
@@ -75,7 +89,10 @@ describe("String generation", () => {
 	});
 
 	it("should generate trimmed strings when trim() is used", () => {
-		const transformed_schema = z.string().regex(/\W+foo\W+/).trim();
+		const transformed_schema = z
+			.string()
+			.regex(/\W+foo\W+/)
+			.trim();
 		const trimmed_schema = z.string().regex(/foo/);
 
 		const generate = zocker(transformed_schema);

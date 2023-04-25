@@ -18,26 +18,32 @@ type ContentConstraints = {
 };
 
 type TransformDefinition = {
-	trim: boolean,
-	case: "upper" | "lower" | null
-}
+	trim: boolean;
+	case: "upper" | "lower" | null;
+};
 
-const cc_cache = new WeakMap<z.ZodString, ContentConstraints>();
-const lc_cache = new WeakMap<z.ZodString, LengthConstraints>();
-const tf_cache = new WeakMap<z.ZodString, TransformDefinition>();
+type CacheEntry = {
+	length_constraints: LengthConstraints;
+	content_constraints: ContentConstraints;
+	transform_constaints: TransformDefinition;
+};
+
+const cache = new WeakMap<z.ZodString, CacheEntry>();
 
 export const generate_string: Generator<z.ZodString> = (string_schema, ctx) => {
-	const cc_cache_hit = cc_cache.get(string_schema);
-	const lc_cache_hit = lc_cache.get(string_schema);
-	const tf_cache_hit = tf_cache.get(string_schema);
+	const cache_hit = cache.get(string_schema);
 
-	const cc = cc_cache_hit ?? content_constraints(string_schema);
-	const lc = lc_cache_hit ?? length_constraints(string_schema);
-	const tf = tf_cache_hit ?? transforms(string_schema);
+	const cc =
+		cache_hit?.content_constraints ?? content_constraints(string_schema);
+	const lc = cache_hit?.length_constraints ?? length_constraints(string_schema);
+	const tf = cache_hit?.transform_constaints ?? transforms(string_schema);
 
-	if (!cc_cache_hit) cc_cache.set(string_schema, cc);
-	if (!lc_cache_hit) lc_cache.set(string_schema, lc);
-	if (!tf_cache_hit) tf_cache.set(string_schema, tf);
+	if (!cache_hit)
+		cache.set(string_schema, {
+			length_constraints: lc,
+			content_constraints: cc,
+			transform_constaints: tf
+		});
 
 	let generated = generate_pre_transform(string_schema, lc, cc);
 	if (tf.trim) generated = generated.trim();
@@ -55,12 +61,11 @@ function generate_random_string(
 		0,
 		lc.min ?? 0,
 		(cc.starts_with?.length ?? 0) +
-		(cc.ends_with?.length ?? 0) +
-		cc.includes.reduce((a, b) => a + b.length, 0)
-	)
+			(cc.ends_with?.length ?? 0) +
+			cc.includes.reduce((a, b) => a + b.length, 0)
+	);
 
 	const max = lc.max ?? (lc.min !== null ? lc.min + 10_000 : 10_000);
-
 
 	let length =
 		lc.exact ??
@@ -182,11 +187,12 @@ function content_constraints(schema: z.ZodString): ContentConstraints {
 	) as Extract<z.ZodStringCheck, { kind: "includes" }>[];
 
 	//get the includes checks, get the values, sort them from longest to shortest
-	let includes = include_checks.map((check) => check.value).sort((a, b) => b.length - a.length);
+	let includes = include_checks
+		.map((check) => check.value)
+		.sort((a, b) => b.length - a.length);
 
 	if (includes.length >= 2) {
 	}
-
 
 	//If "startsWith" includes one of the "includes" checks, remove it
 	if (starts_with !== null) {
@@ -202,19 +208,24 @@ function content_constraints(schema: z.ZodString): ContentConstraints {
 }
 
 function transforms(schema: z.ZodString): TransformDefinition {
-
 	const transform_definition: TransformDefinition = {
 		trim: false,
 		case: null
-	}
+	};
 
-	const transform_types: z.ZodStringCheck["kind"][] = ["trim", "toUpperCase", "toLowerCase"];
+	const transform_types: z.ZodStringCheck["kind"][] = [
+		"trim",
+		"toUpperCase",
+		"toLowerCase"
+	];
 	let transform_seen = false;
 
 	for (const check of schema._def.checks) {
 		const is_transform = transform_types.includes(check.kind);
 		if (!is_transform && transform_seen) {
-			throw new NoGeneratorException("Zocker currently does not support `trim` and `toUpperCase`/`toLowerCase`, unless they are the last checks in the chain")
+			throw new NoGeneratorException(
+				"Zocker currently does not support `trim` and `toUpperCase`/`toLowerCase`, unless they are the last checks in the chain"
+			);
 		}
 		transform_seen = transform_seen || is_transform;
 
@@ -231,13 +242,15 @@ function transforms(schema: z.ZodString): TransformDefinition {
 					break;
 			}
 		}
-
 	}
 	return transform_definition;
 }
 
-const generate_pre_transform = (string_schema: z.ZodString, lc: LengthConstraints, cc: ContentConstraints) => {
-
+const generate_pre_transform = (
+	string_schema: z.ZodString,
+	lc: LengthConstraints,
+	cc: ContentConstraints
+) => {
 	let regex: RegExp | undefined = undefined;
 
 	const datetime_checks = get_string_checks(string_schema, "datetime");
@@ -246,7 +259,7 @@ const generate_pre_transform = (string_schema: z.ZodString, lc: LengthConstraint
 		for (const check of datetime_checks) {
 			if (check.offset !== true) offset = false;
 		}
-		let datetime = faker.date.recent().toISOString()
+		let datetime = faker.date.recent().toISOString();
 		if (offset) {
 			const hours_number = faker.datatype.number({ min: 0, max: 23 });
 			const minutes_number = faker.datatype.number({ min: 0, max: 59 });
@@ -257,7 +270,7 @@ const generate_pre_transform = (string_schema: z.ZodString, lc: LengthConstraint
 
 			datetime = datetime.replace("Z", `${sign}${hours}:${minutes}`);
 		}
-		return datetime
+		return datetime;
 	}
 
 	const uuid = get_string_checks(string_schema, "uuid")[0];
@@ -292,14 +305,21 @@ const generate_pre_transform = (string_schema: z.ZodString, lc: LengthConstraint
 	const url = get_string_checks(string_schema, "url")[0];
 	if (url) return faker.internet.url();
 
-	const regex_checks = get_string_checks(string_schema, "regex")
+	const regex_checks = get_string_checks(string_schema, "regex");
 	if (regex_checks.length > 0) {
-
-		if (cc.starts_with !== null || cc.ends_with !== null || cc.includes.length > 0)
-			throw new NoGeneratorException("Zocker's included regex generator currently does not work together with `starts_with`, `ends_with` or `includes`. Incorperate these into your regex, or provide a custom generator.");
+		if (
+			cc.starts_with !== null ||
+			cc.ends_with !== null ||
+			cc.includes.length > 0
+		)
+			throw new NoGeneratorException(
+				"Zocker's included regex generator currently does not work together with `starts_with`, `ends_with` or `includes`. Incorperate these into your regex, or provide a custom generator."
+			);
 
 		if (regex_checks.length > 1)
-			throw new NoGeneratorException("Zocker's included regex generator currently does support multiple regex checks on the same string. Provide a custom generator instead.");
+			throw new NoGeneratorException(
+				"Zocker's included regex generator currently does support multiple regex checks on the same string. Provide a custom generator instead."
+			);
 
 		regex = regex_checks[0]!.regex;
 	}
@@ -336,4 +356,4 @@ const generate_pre_transform = (string_schema: z.ZodString, lc: LengthConstraint
 	}
 
 	return generate_random_string(lc, cc);
-}
+};
