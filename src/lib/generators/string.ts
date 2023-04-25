@@ -3,7 +3,7 @@ import { z } from "zod";
 import Randexp from "randexp";
 import { Generator } from "../generate.js";
 import { weighted_random_boolean } from "../utils/random.js";
-import { InvalidSchemaException } from "../exceptions.js";
+import { InvalidSchemaException, NoGeneratorException } from "../exceptions.js";
 
 type LengthConstraints = {
 	min: number | null;
@@ -32,8 +32,14 @@ export const generate_string: Generator<z.ZodString> = (string_schema, ctx) => {
 
 	let regex: RegExp | undefined = undefined;
 
-	const datetime = get_string_checks(string_schema, "datetime")[0];
-	if (datetime) return faker.date.recent().toISOString();
+	const datetime_checks = get_string_checks(string_schema, "datetime");
+	if (datetime_checks.length > 0) {
+		let offset = true;
+		for (const check of datetime_checks) {
+			if (check.offset !== true) offset = false;
+		}
+		return faker.date.recent().toISOString();
+	}
 
 	const uuid = get_string_checks(string_schema, "uuid")[0];
 	if (uuid) return faker.datatype.uuid();
@@ -67,8 +73,17 @@ export const generate_string: Generator<z.ZodString> = (string_schema, ctx) => {
 	const url = get_string_checks(string_schema, "url")[0];
 	if (url) return faker.internet.url();
 
-	const regex_check = get_string_checks(string_schema, "regex")[0];
-	if (regex_check) regex = regex_check.regex;
+	const regex_checks = get_string_checks(string_schema, "regex")
+	if (regex_checks.length > 0) {
+
+		if (cc.starts_with !== null || cc.ends_with !== null || cc.includes.length > 0)
+			throw new NoGeneratorException("Zocker's included regex generator currently does not work together with `starts_with`, `ends_with` or `includes`. Incorperate these into your regex, or provide a custom generator.");
+
+		if (regex_checks.length > 1)
+			throw new NoGeneratorException("Zocker's included regex generator currently does support multiple regex checks on the same string. Provide a custom generator instead.");
+
+		regex = regex_checks[0]!.regex;
+	}
 
 	const cuid = get_string_checks(string_schema, "cuid")[0];
 	if (cuid) regex = /^c[^\s-]{8,}$/i;

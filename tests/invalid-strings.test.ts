@@ -15,7 +15,11 @@ const invalid_string_schemas = {
     "multiple incompatible ip versions": z
         .string()
         .ip({ version: "v4" })
-        .ip({ version: "v6" })
+        .ip({ version: "v6" }),
+    "multiple different regexes": z.string().regex(/foo/).regex(/foo2/),
+    "regex with starts_with": z.string().regex(/foo/).startsWith("foo"),
+    "regex with ends_with": z.string().regex(/foo/).endsWith("foo"),
+    "regex with includes": z.string().regex(/foo/).includes("foo"),
 } as const;
 
 describe("Invalid string generation", () => {
