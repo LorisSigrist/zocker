@@ -3,19 +3,6 @@
 Writing Mock data is the worst. It's tedious, and it always gets out of sync with your actual system.
 Zocker is a library that automatically generates reasonable mock data from your Zod schemas. That way your mock data is always up to date, and you can focus on what's important.
 
-## Minimum Viable Package
-
-A list of features that I think are required to make this a releasable package. (might publish before this is done to reserve the name)
-
-- [x] Generate data for all reasonable Zod-primitives
-- [x] Make tests repeatable, so that developers can reproduce bugs.
-- [x] Generate cyclic schemas
-- [x] Generate "any" schemas
-- [x] Provide escape hatches for developers to define custom generators for specific types - Including ones that `zocker` can't support itself
-- [x] Define an API that gives developers control over the generation process. Eg force edge-cases to happen in specific tests, and avoid them in others.
-- [ ] Generate semantically meaningful data, Eg. the `name` field on an object should actually be a name. This is doable using `faker`.
-- [ ] Documentation
-
 ## Installation
 
 ```bash
@@ -23,7 +10,7 @@ npm install --save-dev zocker
 ```
 
 ## Usage
-Wrapping your zod-schema in `zocker` will give you a function that you can use to generate mock data.
+Wrapping your zod-schema in `zocker()` will give you a function that you can use to generate mock data.
 
 ```typescript
 import { z } from "zod";
@@ -35,7 +22,9 @@ const schema = z.object({
 });
 
 const generate = zocker(schema);
-const mockData = generate();
+const mockData_1 = generate();
+const mockData_2 = generate();
+//...
 ```
 
 Having this two-step process makes it a lot easier to customize the generation process later on.
@@ -82,3 +71,36 @@ Generator functions recive two arguments:
 1. The schema that they are generating data for
 2. A context object that contains information about the current generation process. This one is rarely used.
 
+### Customizing the generation process
+The way to customize the generation process is to override the built-in generators. But this doesn't mean that you have to write your own generators from scratch. All built-in generators have factory-functions that generate a generator for you, with the behavior you want. For example, you could have a number generator that always generates the most extreme values possible.
+
+```typescript
+import { z } from 'zod';
+import { zocker, NumberGenerator } from 'zocker';
+
+const generate = zocker(my_schema)
+const data = generate({
+    generators: [
+        NumberGenerator({
+            always: "max"
+        })
+    ]
+})
+```
+
+Notice that you can pass the return-value directly into the `generators` field, as it comes included with the matching-configuration. This is the case for all built-in generators. 
+
+You will be able to achieve most of the customization you need by using the built-in generators. But if you need to, you can also write your own generators as described above.
+
+### Repeatability
+You can specify a seed to make the generation process repeatable. This ensures that your test are never flaky.
+    
+```typescript
+    const generate = zocker(schema);
+
+    test("my test" , ()=>{
+        const data = generate({ seed: 23 }); // always the same
+    })
+```
+
+We guarantee that the same seed will always produce the same data, with the same schema and the same generator configuration. Different generator configurations may produce different data, even if the differences are never actually called.
