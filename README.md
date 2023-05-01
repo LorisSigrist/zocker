@@ -96,11 +96,11 @@ You will be able to achieve most of the customization you need by using the buil
 You can specify a seed to make the generation process repeatable. This ensures that your test are never flaky.
     
 ```typescript
-    const generate = zocker(schema);
+const generate = zocker(schema);
 
-    test("my test" , ()=>{
-        const data = generate({ seed: 23 }); // always the same
-    })
+test("my test" , ()=>{;
+    const data = generate({ seed: 23 }); // always the same
+})
 ```
 
 We guarantee that the same seed will always produce the same data, with the same schema and the same generator configuration. Different generator configurations may produce different data, even if the differences are never actually called.
