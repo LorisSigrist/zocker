@@ -15,6 +15,7 @@ export type SemanticFlag =
     | "zip"
     | "jobtitle"
     | "color"
+    | "color-hex"
 
 
 const paragraph_triggers = ["about", "description", "paragraph", "text", "body", "content"]
@@ -45,6 +46,7 @@ export function get_semantic_flag(str: string): SemanticFlag {
     if (str.includes("phone")) return "phoneNumber";
     if (str.includes("age")) return "age";
 
+    if(str.includes("hex")) return "color-hex";
     if(str.includes("color")) return "color";
     if (str.includes("zip")) return "zip";
 

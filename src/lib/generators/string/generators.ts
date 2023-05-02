@@ -132,6 +132,7 @@ export const any: StringKindGenerator = (ctx, lc, cc, td) => {
 			"word": faker.lorem.word,
 			"jobtitle": faker.name.jobTitle,
 			"color": color,
+			"color-hex": faker.internet.color
 		}
 		const generator = semantic_generators[ctx.semantic_context];
 		if (!generator)
