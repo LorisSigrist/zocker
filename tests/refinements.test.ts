@@ -9,18 +9,16 @@ const object_with_refined_string = z.object({
 });
 
 describe("Provide a generation function for a schema (by reference)", () => {
-	const generate = zocker(object_with_refined_string, {
-		generators: [
-			{
-				schema: refined_string,
-				generator: () => "123456",
-				match: "reference"
-			}
-		]
-	});
+	const generators = [
+		{
+			schema: refined_string,
+			generator: () => "123456",
+			match: "reference"
+		}
+	]
 
 	it("should generate a valid value", () => {
-		const value = generate();
+		const value = zocker(object_with_refined_string, { generators });
 		object_with_refined_string.parse(value);
 	});
 });

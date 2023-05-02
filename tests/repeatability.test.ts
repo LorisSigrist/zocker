@@ -20,29 +20,27 @@ const schema = z.object({
 	ulid: z.string().ulid()
 });
 
-const generate = zocker(schema);
-
 describe("repeatability", () => {
 	it("should generate identcal values for the same seed", () => {
 		const seed = 0;
-		const first = generate({ seed });
+		const first = zocker(schema, { seed });
 
 		for (let i = 0; i < 10; i++) {
-			const next = generate({ seed });
+			const next = zocker(schema, { seed });
 			expect(next).toEqual(first);
 		}
 	});
 
 	it("should generate different values for different seeds", () => {
-		const first = generate({ seed: 0 });
-		const second = generate({ seed: 1 });
+		const first = zocker(schema, { seed: 0 });
+		const second = zocker(schema, { seed: 1 });
 
 		expect(first).not.toEqual(second);
 	});
 
 	it("should generate different values if the seed is not specified", () => {
-		const first = generate();
-		const second = generate();
+		const first = zocker(schema);
+		const second = zocker(schema);
 
 		expect(first).not.toEqual(second);
 	});

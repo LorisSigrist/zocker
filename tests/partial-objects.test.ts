@@ -12,14 +12,12 @@ const partial_object = object_schema.partial();
 
 describe("Partial object generation", () => {
 	it("should make some properties optional, if the schema is partial", () => {
-		const generate = zocker(partial_object, {
-			generators: [
-				OptionalGenerator({
-					undefined_chance: 1
-				})
-			]
-		});
-		const data = generate();
+		const generators = [
+			OptionalGenerator({
+				undefined_chance: 1
+			})
+		]
+		const data = zocker(partial_object, { generators });
 		expect(data).toEqual({
 			a: undefined,
 			b: undefined,
@@ -28,14 +26,14 @@ describe("Partial object generation", () => {
 	});
 
 	it("should not make properties undefined, if the undefined chance is 0", () => {
-		const generate = zocker(partial_object, {
-			generators: [
-				OptionalGenerator({
-					undefined_chance: 0
-				})
-			]
-		});
-		const data = generate();
+
+		const generators = [
+			OptionalGenerator({
+				undefined_chance: 0
+			})
+		]
+
+		const data = zocker(partial_object, { generators });
 		expect(() => object_schema.parse(data)).not.toThrow();
 	});
 });

@@ -20,9 +20,8 @@ const primitives = {
 
 describe("primitives", () => {
 	for (const [name, schema] of Object.entries(primitives)) {
-		const generate = zocker(schema);
 		bench(name, () => {
-			generate();
+			zocker(schema);
 		});
 	}
 });

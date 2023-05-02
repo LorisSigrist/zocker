@@ -3,20 +3,14 @@ import {
 	NoGeneratorException,
 	RecursionLimitReachedException
 } from "./exceptions.js";
+import { GeneratorDefinition } from "./zocker.js";
 
 /**
  * Contains all the necessary configuration to generate a value for a given schema.
  */
 export type GenerationContext<Z extends z.ZodSchema> = {
-	instanceof_generators: {
-		types: any[];
-		generators: Generator<any>[];
-	};
-
-	reference_generators: {
-		types: any[];
-		generators: Generator<any>[];
-	};
+	instanceof_generators: GeneratorDefinition<Z>[];
+	reference_generators: GeneratorDefinition<Z>[];
 
 	parent_schemas: Map<z.ZodSchema, number>;
 	recursion_limit: number;
@@ -39,58 +33,37 @@ export type Generator<Z extends z.ZodSchema> = (
  * This get's called recursively until schema generation is done.
  *
  * @param schema - The schema to generate a value for.
- * @param generation_context - The context and configuration for the generation process.
+ * @param ctx - The context and configuration for the generation process.
  * @returns - A random value that matches the given schema.
  */
 export function generate<Z extends z.ZodSchema>(
 	schema: Z,
-	generation_context: GenerationContext<Z>
+	ctx: GenerationContext<Z>
 ): z.infer<Z> {
 	//Mutate the generation context (creating a new one was too expensive - this gets called a lot)
-	increment_recursion_count(schema, generation_context);
+	increment_recursion_count(schema, ctx);
 	try {
-		return generate_value(schema, generation_context);
+		//@ts-ignore
+		return generate_value(schema, ctx);
 	} finally {
 		//Make sure to undo the mutations after the generation is done (even if it fails)
 		//finally runs before the caller gets the return value
-		decrement_recursion_count(schema, generation_context);
+		decrement_recursion_count(schema, ctx);
 	}
 }
 
 const generate_value: Generator<z.ZodSchema> = (schema, generation_context) => {
-	let generated_value: any;
-	let generated = false;
+	//Check if a reference generator is available for this schema
+	const reference_generator = generation_context.reference_generators.find(g => g.schema === schema);
+	if (reference_generator) return reference_generator.generator(schema, generation_context);
 
-	const custom_generator_index =
-		generation_context.reference_generators.types.findIndex(
-			(val) => schema === val
-		);
-	if (custom_generator_index !== -1) {
-		generated_value = generation_context.reference_generators.generators[
-			custom_generator_index
-		]!(schema, generation_context);
-		generated = true;
-	}
+	//Check if an instanceof generator is available for this schema
+	const instanceof_generator = generation_context.instanceof_generators.find(g => schema instanceof (g.schema as any));
+	if (instanceof_generator) return instanceof_generator.generator(schema, generation_context);
 
-	if (!generated) {
-		const instanceof_generator_index =
-			generation_context.instanceof_generators.types.findIndex(
-				(val) => schema instanceof val
-			);
-		if (instanceof_generator_index !== -1) {
-			generated_value = generation_context.instanceof_generators.generators[
-				instanceof_generator_index
-			]!(schema, generation_context);
-			generated = true;
-		}
-	}
-
-	if (!generated)
-		throw new NoGeneratorException(
-			`No generator for schema ${schema} - You can provide a custom generator in the zocker options`
-		);
-
-	return generated_value;
+	throw new NoGeneratorException(
+		`No generator for schema ${schema} - You can provide a custom generator in the zocker options`
+	);
 };
 
 function increment_recursion_count<Z extends z.ZodSchema>(

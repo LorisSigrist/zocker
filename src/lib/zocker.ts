@@ -20,20 +20,15 @@ export type GeneratorDefinition<Z extends z.ZodSchema> = {
 	match: "instanceof" | "reference";
 };
 
-export type ZockerOptions<Z extends z.ZodTypeAny> = {
+export type ZockerOptions = {
+	/** A list of generators to use for generation. This will be appended by the built-in generators */
 	generators?: GeneratorDefinition<any>[];
-};
-
-export type ZockerGeneratorOptions<Z extends z.ZodTypeAny> = {
 	/** The seed to use for the random number generator */
 	seed?: number;
 
 	/** The maximum number of times a schema can be cyclically generated */
 	recursion_limit?: number;
 };
-export type Zocker<Z extends z.ZodTypeAny> = (
-	options?: ZockerGeneratorOptions<Z>
-) => z.infer<Z>;
 
 /**
  * Create a Zocker-Function from a Zod-Schema that generates random test-data.
@@ -42,41 +37,31 @@ export type Zocker<Z extends z.ZodTypeAny> = (
  */
 export function zocker<Z extends z.ZodSchema>(
 	schema: Z,
-	schema_options: ZockerOptions<Z> = {}
-): Zocker<Z> {
-	const instanceof_generator_definitions =
-		schema_options.generators?.filter((def) => def.match === "instanceof") ??
-		[];
-	instanceof_generator_definitions.push(...default_generators); //Add the built in generators to the list
-	const reference_generator_definitions =
-		schema_options.generators?.filter((def) => def.match === "reference") ?? [];
+	options: ZockerOptions = {}
+): z.infer<Z> {
 
-	const instanceof_generators = {
-		types: instanceof_generator_definitions.map((def) => def.schema),
-		generators: instanceof_generator_definitions.map((def) => def.generator)
+
+	//add the default generators to the list of generators
+	const generators: GeneratorDefinition<Z>[] = [...(options.generators ?? []), ...default_generators]
+
+	//Split the generators into instanceof and reference generators
+	const reference_generators = generators.filter(g => g.match === "reference");
+	const instanceof_generators = generators.filter(g => g.match === "instanceof");
+
+	//Set the seed for the random number generator
+	const seed = options.seed ?? Math.random() * 10_000_000;
+	faker.seed(seed);
+
+	const root_generation_context: GenerationContext<Z> = {
+		reference_generators,
+		instanceof_generators,
+		recursion_limit: options.recursion_limit ?? 5,
+
+		path: [],
+		semantic_context: [],
+		parent_schemas: new Map(),
+		seed
 	};
 
-	const reference_generators = {
-		types: reference_generator_definitions.map((def) => def.schema),
-		generators: reference_generator_definitions.map((def) => def.generator)
-	};
-
-	return function (generation_options = {}) {
-		//Set the seed for the random number generator
-		const seed = generation_options.seed ?? Math.random() * 10_000_000;
-		faker.seed(seed);
-
-		const root_generation_context: GenerationContext<Z> = {
-			reference_generators,
-			instanceof_generators,
-			recursion_limit: generation_options.recursion_limit ?? 5,
-
-			path: [],
-			semantic_context: [],
-			parent_schemas: new Map(),
-			seed
-		};
-
-		return generate(schema, root_generation_context);
-	};
+	return generate(schema, root_generation_context);
 }

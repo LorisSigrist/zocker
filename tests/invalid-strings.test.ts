@@ -25,8 +25,7 @@ const invalid_string_schemas = {
 describe("Invalid string generation", () => {
 	for (const [name, schema] of Object.entries(invalid_string_schemas)) {
 		it("fails on " + name, () => {
-			const generate = zocker(schema);
-			expect(() => generate()).toThrow();
+			expect(() => zocker(schema)).toThrow();
 		});
 	}
 });
