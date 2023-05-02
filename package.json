@@ -11,7 +11,7 @@
 		"type": "git",
 		"url": "https://github.com/LorisSigrist/zocker.git"
 	},
-	"homepage": "https://www.github.com/LorisSigrist/zocker#readme",
+	"homepage": "https://zocker.sigrist.dev",
 	"scripts": {
 		"build": "tsc",
 		"test": "vitest --run --passWithNoTests",
