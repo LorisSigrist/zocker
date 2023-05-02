@@ -139,7 +139,7 @@ Since `zocker` supports `z.lazy`, you can use it to generate cyclic data.
 
 ```typescript
 const literalSchema = z.union([z.string(), z.number(), z.boolean(), z.null()]);
-const jsonSchema: z.ZodType<Json> = z.lazy(() =>
+const jsonSchema = z.lazy(() =>
 	z.union([literalSchema, z.array(jsonSchema), z.record(jsonSchema)])
 );
 
