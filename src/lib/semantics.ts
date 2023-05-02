@@ -15,7 +15,17 @@ export type SemanticFlag =
 	| "zip"
 	| "jobtitle"
 	| "color"
-	| "color-hex";
+	| "color-hex"
+	| "age"
+	| "year"
+	| "month"
+	| "day-of-the-month"
+	| "hour"
+	| "minute"
+	| "second"
+	| "millisecond"
+	| "weekday"
+	| "birthday"
 
 const paragraph_triggers = [
 	"about",
@@ -61,6 +71,17 @@ export function get_semantic_flag(str: string): SemanticFlag {
 	if (str.includes("hex")) return "color-hex";
 	if (str.includes("color")) return "color";
 	if (str.includes("zip")) return "zip";
+
+	if (str.includes("week") && str.includes("day")) return "weekday";
+	if (str.includes("birthday")) return "birthday";
+	if (str.includes("year")) return "year";
+	if (str.includes("month")) return "month";
+	if (str.includes("day")) return "day-of-the-month";
+	if (str.includes("hour")) return "hour";
+	if (str.includes("minute")) return "minute";
+	if (str.includes("second")) return "second";
+	if (str.includes("millisecond")) return "millisecond";
+
 
 	return "unspecified";
 }

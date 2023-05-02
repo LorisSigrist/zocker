@@ -69,7 +69,8 @@ Generator functions recive two arguments:
 1. The schema that they are generating data for
 2. A context object that contains information about the current generation process. This one is rarely used.
 
-### Customizing the generation process
+### Customizing the generation process
+
 The way to customize the generation process is to override the built-in generators. But this doesn't mean that you have to write your own generators from scratch. All built-in generators have factory-functions that generate a generator for you, with the behavior you want. For example, you could have a number generator that always generates the most extreme values possible.
 
 ```typescript
