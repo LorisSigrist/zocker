@@ -75,27 +75,41 @@ export const StringGenerator: GeneratorDefinitionFactory<z.ZodString> = (options
                 transform_constaints: tf
             });
 
-        switch (cc.format.kind) {
-            case "ip":
-                return StrGens.ip(ctx, lc, cc, tf);
+        const generate_raw_string = () => {
+            switch (cc.format.kind) {
+                case "ip":
+                    return StrGens.ip(ctx, lc, cc, tf);
 
-            case "datetime":
-                return StrGens.datetime(ctx, lc, cc, tf);
+                case "datetime":
+                    return StrGens.datetime(ctx, lc, cc, tf);
 
-            case "email": return StrGens.email(ctx, lc, cc, tf);
-            case "url": return StrGens.url(ctx, lc, cc, tf);
-            case "uuid": return StrGens.uuid(ctx, lc, cc, tf);
+                case "email": return StrGens.email(ctx, lc, cc, tf);
+                case "url": return StrGens.url(ctx, lc, cc, tf);
+                case "uuid": return StrGens.uuid(ctx, lc, cc, tf);
 
-            case "cuid": return StrGens.cuid(ctx, lc, cc, tf);
-            case "cuid2": return StrGens.cuid2(ctx, lc, cc, tf);
-            case "ulid": return StrGens.ulid(ctx, lc, cc, tf);
+                case "cuid": return StrGens.cuid(ctx, lc, cc, tf);
+                case "cuid2": return StrGens.cuid2(ctx, lc, cc, tf);
+                case "ulid": return StrGens.ulid(ctx, lc, cc, tf);
 
-            case "emoji": return StrGens.emoji(ctx, lc, cc, tf);
+                case "emoji": return StrGens.emoji(ctx, lc, cc, tf);
 
-            case "regex": return StrGens.regex(ctx, lc, cc, tf);
-            case "any":
-            default: return StrGens.any(ctx, lc, cc, tf);
+                case "regex": return StrGens.regex(ctx, lc, cc, tf);
+                case "any":
+                default: return StrGens.any(ctx, lc, cc, tf);
+            }
         }
+
+        let string = generate_raw_string();
+
+        if (tf.trim)
+            string = string.trim();
+        
+        if (tf.case === "upper")
+            string = string.toUpperCase();
+        else if (tf.case === "lower")
+            string = string.toLowerCase();
+        
+        return string;
     }
 
     return {
@@ -228,24 +242,24 @@ function content_constraints(schema: z.ZodString): ContentConstraints {
     if (email_checks.length) format = { kind: "email" };
 
     const url_checks = get_string_checks(schema, "url");
-    if (url_checks.length) format =  { kind: "url" };
+    if (url_checks.length) format = { kind: "url" };
 
     const regex_checks = get_string_checks(schema, "regex");
     if (regex_checks.length) {
         if (
-			starts_with !== null ||
-			ends_with !== null ||
-			includes.length > 0
-		)
-			throw new NoGeneratorException(
-				"Zocker's included regex generator currently does not work together with `starts_with`, `ends_with` or `includes`. Incorperate these into your regex, or provide a custom generator."
-			);
-
-		if (regex_checks.length > 1)
-			throw new NoGeneratorException(
-				"Zocker's included regex generator currently does support multiple regex checks on the same string. Provide a custom generator instead."
+            starts_with !== null ||
+            ends_with !== null ||
+            includes.length > 0
+        )
+            throw new NoGeneratorException(
+                "Zocker's included regex generator currently does not work together with `starts_with`, `ends_with` or `includes`. Incorperate these into your regex, or provide a custom generator."
             );
-        
+
+        if (regex_checks.length > 1)
+            throw new NoGeneratorException(
+                "Zocker's included regex generator currently does support multiple regex checks on the same string. Provide a custom generator instead."
+            );
+
         const regex = regex_checks[0]?.regex!;
         format = { kind: "regex", regex };
     }
@@ -287,7 +301,7 @@ function content_constraints(schema: z.ZodString): ContentConstraints {
     }
 
 
-    return {  format, starts_with, ends_with, includes };
+    return { format, starts_with, ends_with, includes };
 }
 
 function transforms(schema: z.ZodString): TransformDefinition {

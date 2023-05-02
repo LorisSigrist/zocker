@@ -1,6 +1,6 @@
 import { StringKindGenerator } from "./index.js";
 import { faker } from "@faker-js/faker";
-import { InvalidSchemaException, NoGeneratorException } from "../../exceptions.js";
+import { InvalidSchemaException } from "../../exceptions.js";
 import Randexp from "randexp";
 import { weighted_random_boolean } from "../../utils/random.js";
 
