@@ -11,7 +11,15 @@ const number_schemas = {
 	"integer with max": z.number().int().max(10),
 	"integer with min and max": z.number().int().min(10_000).max(20_000),
 	"integer with min and max negative": z.number().int().min(-20).max(-10),
-	"integer exact": z.number().int().max(10).min(10)
+	"integer exact": z.number().int().max(10).min(10),
+	"number lte": z.number().lte(10),
+	"number gte": z.number().gte(10),
+	"number lt": z.number().lt(10),
+	"number gt": z.number().gt(10),
+	"integer lte": z.number().int().lte(10),
+	"integer gte": z.number().int().gte(10),
+	"integer lt": z.number().int().lt(10),
+	"integer gt": z.number().int().gt(10),
 } as const;
 
 describe("Number generation", () => {

@@ -78,7 +78,7 @@ import { zocker, NumberGenerator } from "zocker";
 
 const generators = [
 	NumberGenerator({
-		always: "max"
+		extreme_value_chance: 1 //Set the chance of generating an extreme value to 100%
 	})
 ];
 
