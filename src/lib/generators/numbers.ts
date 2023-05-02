@@ -21,19 +21,20 @@ export const NumberGenerator: GeneratorDefinitionFactory<
 
 	const generate_number: Generator<z.ZodNumber> = (number_schema, ctx) => {
 		let is_extreme_value = weighted_random_boolean(options.extreme_value_chance);
-		let is_int = !!get_number_check(number_schema, "int");
-		let is_finite = !!get_number_check(number_schema, "finite");
+		let is_int = get_number_checks(number_schema, "int").length !== 0
+		let is_finite = get_number_checks(number_schema, "finite").length !== 0
 
-		let min_check = get_number_check(number_schema, "min") ?? null
-		let max_check = get_number_check(number_schema, "max") ?? null;
+		let min_checks = get_number_checks(number_schema, "min");
+		let max_checks = get_number_checks(number_schema, "max");
+
+		let min_check = min_checks.length === 0 ? null : min_checks.reduce((prev, curr) => prev.value > curr.value ? prev : curr);
+		let max_check = max_checks.length === 0 ? null : max_checks.reduce((prev, curr) => prev.value < curr.value ? prev : curr);
 
 		let inclusive_min = min_check?.inclusive ?? true;
 		let inclusive_max = max_check?.inclusive ?? true;
 
 		let min = min_check?.value ?? Number.MIN_SAFE_INTEGER / 2;
 		let max = max_check?.value ?? Number.MAX_SAFE_INTEGER / 2;
-
-
 
 		if (!inclusive_min) {
 			const float_step = float_step_size(min)
@@ -49,19 +50,37 @@ export const NumberGenerator: GeneratorDefinitionFactory<
 			throw new InvalidSchemaException("max must be greater than min if specified");
 		}
 
+		let value : number;
+
 		if (is_int) {
-			return faker.datatype.number({ min, max });
+			value = faker.datatype.number({ min, max });
 		} else {
 			if (is_extreme_value) {
 				const use_lower_extreme = weighted_random_boolean(0.5);
 				if (use_lower_extreme)
-					return is_finite ? -Infinity : min;
+					value =  is_finite ? -Infinity : min;
 				else
-					return is_finite ? Infinity : max;
+					value =  is_finite ? Infinity : max;
 			}
 
-			return faker.datatype.float({ min, max });
+			value = faker.datatype.float({ min, max });
 		}
+
+		if (value === undefined) throw new Error("Failed to generate Number. This is a bug in the built-in generator");
+		
+		let multipleof_checks = get_number_checks(number_schema, "multipleOf");
+		let multipleof = multipleof_checks.length === 0 ? null : multipleof_checks[0]?.value!;
+
+		if (multipleof !== null) {
+			let next_higher = value + (multipleof - (value % multipleof));
+			let next_lower = value - (value % multipleof);
+
+			if (next_higher <= max) value = next_higher;
+			else if (next_lower >= min) value = next_lower;
+			else throw new InvalidSchemaException("No valid multipleOf value found");
+		}
+
+		return value;
 	};
 
 	return {
@@ -72,15 +91,11 @@ export const NumberGenerator: GeneratorDefinitionFactory<
 };
 
 //Get a check from a ZodNumber schema in a type-safe way
-function get_number_check<Kind extends z.ZodNumberCheck["kind"]>(
+function get_number_checks<Kind extends z.ZodNumberCheck["kind"]>(
 	schema: z.ZodNumber,
 	kind: Kind
-): Extract<z.ZodNumberCheck, { kind: Kind }> | undefined {
-	const check = schema._def.checks.find((check) => check.kind === kind) as
-		| Extract<z.ZodNumberCheck, { kind: Kind }>
-		| undefined;
-
-	return check;
+){
+	return schema._def.checks.filter((check) => check.kind === kind) as Extract<z.ZodNumberCheck, { kind: Kind }>[] 
 }
 
 //Calculate the step size for modifying a float value

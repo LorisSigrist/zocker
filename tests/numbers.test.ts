@@ -20,6 +20,9 @@ const number_schemas = {
 	"integer gte": z.number().int().gte(10),
 	"integer lt": z.number().int().lt(10),
 	"integer gt": z.number().int().gt(10),
+	"number multipleof": z.number().multipleOf(10),
+	"integer multipleof": z.number().int().multipleOf(10),
+	"number with multiple mins and maxs" : z.number().min(10).max(20).min(15).max(25),
 } as const;
 
 describe("Number generation", () => {
