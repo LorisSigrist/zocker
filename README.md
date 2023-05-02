@@ -1,5 +1,7 @@
 # Zocker
 
+> :warning: **This library is still in development - Expect breaking changes**
+
 Writing Mock data is the worst. It's tedious, and it always gets out of sync with your actual system.
 Zocker is a library that automatically generates reasonable mock data from your Zod schemas. That way your mock data is always up to date, and you can focus on what's important.
 
@@ -44,7 +46,7 @@ const mockData = zocker(person_schema);
 ```
 
 ### Features & Limitations
-`zocker` is still in early development, but it already supports most schemas out of the box. It is certainly the most feature-complete library of its kind. It's easier to list the limitations than the features. All these limitations can be worked around by providing your own generator, see below.
+`zocker` is still in early development, but it already is the most feature-complete library of its kind. It's easier to list the limitations than the features. All these limitations can be worked around by providing your own generator (see below).
 
 1. `z.preprocess` and `z.refine` are not supported out of the box (and probably never will be)
 2. `toUpperCase`, `toLowerCase` and `trim` only work if they are the last operation in the chain
@@ -52,7 +54,7 @@ const mockData = zocker(person_schema);
 4. `z.Intersection` is not supported
 4. `z.transform` is only supported if it's the last operation in the chain
 5. `z.regex` can be used at most once per string
-6. The generation-customizatio options are very limited (ideas are welcome)
+6. The generation-customization options are very limited (ideas are welcome)
 
 ### Providing a custom generator
 
@@ -154,3 +156,9 @@ Zocker supports `z.string().regex()` out of the box, thanks to the amazing [rand
 const regex_schema = z.string().regex(/^[a-z0-9]{5,10}$/);
 const data = zocker(regex_schema);
 ```
+
+
+## The Future
+I intend to continue expanding the number of built-in generators, and make the generation process more customizable. If you have any ideas, please open an issue or a pull request - I'd love to hear your thoughts. 
+
+Good APIs usually take a lot of iterations to get right, ideas are always welcome.
