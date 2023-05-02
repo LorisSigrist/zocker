@@ -81,7 +81,6 @@ function increment_recursion_count<Z extends z.ZodSchema>(
 	ctx.parent_schemas.set(schema, current_depth);
 }
 
-
 function decrement_recursion_count<Z extends z.ZodSchema>(
 	schema: Z,
 	ctx: GenerationContext<Z>
