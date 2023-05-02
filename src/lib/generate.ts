@@ -4,31 +4,23 @@ import {
 	RecursionLimitReachedException
 } from "./exceptions.js";
 import { GeneratorDefinition } from "./zocker.js";
+import { SemanticFlag } from "./semantics.js";
 
 /**
  * Contains all the necessary configuration to generate a value for a given schema.
  */
 export type GenerationContext<Z extends z.ZodSchema> = {
-	instanceof_generators: GeneratorDefinition<Z>[];
-	reference_generators: GeneratorDefinition<Z>[];
+	instanceof_generators: GeneratorDefinition<any>[];
+	reference_generators: GeneratorDefinition<any>[];
 
 	parent_schemas: Map<z.ZodSchema, number>;
 	recursion_limit: number;
 
 	path: (string | number | symbol)[];
-	semantic_context: SemanticFlag[];
+	semantic_context: SemanticFlag;
 
 	seed: number;
 };
-
-type SemanticFlag =
-	| "key"
-	| "fullname"
-	| "firstname"
-	| "lastname"
-	| "street"
-	| "city"
-	| "country";
 
 export type Generator<Z extends z.ZodSchema> = (
 	schema: Z,
@@ -47,14 +39,10 @@ export function generate<Z extends z.ZodSchema>(
 	schema: Z,
 	ctx: GenerationContext<Z>
 ): z.infer<Z> {
-	//Mutate the generation context (creating a new one was too expensive - this gets called a lot)
 	increment_recursion_count(schema, ctx);
 	try {
-		//@ts-ignore
 		return generate_value(schema, ctx);
 	} finally {
-		//Make sure to undo the mutations after the generation is done (even if it fails)
-		//finally runs before the caller gets the return value
 		decrement_recursion_count(schema, ctx);
 	}
 }
@@ -92,6 +80,7 @@ function increment_recursion_count<Z extends z.ZodSchema>(
 
 	ctx.parent_schemas.set(schema, current_depth);
 }
+
 
 function decrement_recursion_count<Z extends z.ZodSchema>(
 	schema: Z,

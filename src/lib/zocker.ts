@@ -25,9 +25,9 @@ export type GeneratorDefinition<Z extends z.ZodSchema> = {
 	match: "instanceof" | "reference";
 };
 
-export type ZockerOptions = {
+export type ZockerOptions<Z extends z.ZodSchema> = {
 	/** A list of generators to use for generation. This will be appended by the built-in generators */
-	generators?: GeneratorDefinition<any>[];
+	generators?: GeneratorDefinition<Z>[];
 	/** The seed to use for the random number generator */
 	seed?: number;
 
@@ -36,13 +36,13 @@ export type ZockerOptions = {
 };
 
 /**
- * Create a Zocker-Function from a Zod-Schema that generates random test-data.
+ * Generate random* valid mock-data from a Zod-Schem
  * @param schema A Zod-Schema
  * @returns A Zocker-Function that can be used to generate random data that matches the schema.
  */
 export function zocker<Z extends z.ZodSchema>(
 	schema: Z,
-	options: ZockerOptions = {}
+	options: ZockerOptions<Z> = {}
 ): z.infer<Z> {
 	//add the default generators to the list of generators
 	const generators: GeneratorDefinition<Z>[] = [
@@ -54,6 +54,7 @@ export function zocker<Z extends z.ZodSchema>(
 	const reference_generators = generators.filter(
 		(g) => g.match === "reference"
 	);
+
 	const instanceof_generators = generators.filter(
 		(g) => g.match === "instanceof"
 	);
@@ -68,7 +69,7 @@ export function zocker<Z extends z.ZodSchema>(
 		recursion_limit: options.recursion_limit ?? 5,
 
 		path: [],
-		semantic_context: [],
+		semantic_context: "unspecified",
 		parent_schemas: new Map(),
 		seed
 	};

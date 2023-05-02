@@ -36,15 +36,16 @@ export const MapGenerator: GeneratorDefinitionFactory<
 			}
 
 			for (const key of keys) {
+				let prev_semantic_context = generation_context.semantic_context;
 				try {
 					generation_context.path.push(key);
-					generation_context.semantic_context.push("key");
+					generation_context.semantic_context = "key";
 
 					const value = generate(schema._def.valueType, generation_context);
 					map.set(key, value);
 				} finally {
 					generation_context.path.pop();
-					generation_context.semantic_context.pop();
+					generation_context.semantic_context = prev_semantic_context;
 				}
 			}
 		} catch (error) {

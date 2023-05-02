@@ -1,8 +1,9 @@
-import { StringKindGenerator } from "./index.js";
+import { ContentConstraints, LengthConstraints, StringKindGenerator } from "./index.js";
 import { faker } from "@faker-js/faker";
 import { InvalidSchemaException } from "../../exceptions.js";
 import Randexp from "randexp";
-import { weighted_random_boolean } from "../../utils/random.js";
+import { pick, weighted_random_boolean } from "../../utils/random.js";
+import { SemanticFlag } from "lib/semantics.js";
 
 export const uuid: StringKindGenerator = (ctx, lc, cc, td) => {
 	if (lc.exact && lc.exact !== 36)
@@ -113,6 +114,36 @@ export const regex: StringKindGenerator = (ctx, lc, cc, td) => {
 };
 
 export const any: StringKindGenerator = (ctx, lc, cc, td) => {
+	try {
+
+		const semantic_generators: {
+			[flag in SemanticFlag]?: ()=>string
+		} = {
+			"fullname": faker.name.fullName,
+			"firstname": faker.name.firstName,
+			"lastname": faker.name.lastName,
+			"street": faker.address.street,
+			"city": faker.address.city,
+			"country": faker.address.country,
+			"zip": faker.address.zipCode,
+			"phoneNumber": faker.phone.number,
+			"paragraph": faker.lorem.paragraph,
+			"sentence": faker.lorem.sentence,
+			"word": faker.lorem.word,
+			"jobtitle": faker.name.jobTitle,
+			"color": color,
+		}
+		const generator = semantic_generators[ctx.semantic_context];
+		if (!generator)
+			throw new Error("No semantic generator found for context - falling back to random string")
+
+		const proposed_string = generator();
+		if (!matches_constraints(proposed_string, lc, cc))
+			throw new Error("Invalid string generated, falling back to random string")
+		
+		return proposed_string;
+	} catch (e) { }
+
 	const min = Math.max(
 		0,
 		lc.min ?? 0,
@@ -149,6 +180,27 @@ export const any: StringKindGenerator = (ctx, lc, cc, td) => {
 		(cc.ends_with ?? "")
 	);
 };
+
+function color(): string {
+	const generators = [
+		faker.color.human,
+		faker.internet.color,
+	]
+
+	return pick(generators)();
+}
+
+function matches_constraints(str: string, lc: LengthConstraints, cc: ContentConstraints) : boolean {
+	if (lc.exact && str.length !== lc.exact) return false;
+	if (lc.min && str.length < lc.min) return false;
+	if (lc.max && str.length > lc.max) return false;
+
+	if (cc.starts_with && !str.startsWith(cc.starts_with)) return false;
+	if (cc.ends_with && !str.endsWith(cc.ends_with)) return false;
+	if (cc.includes.length > 0 && !cc.includes.every(i => str.includes(i))) return false;
+
+	return true;
+}
 
 function generate_regex(regex: RegExp): string {
 	const randexp = new Randexp(regex);
