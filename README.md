@@ -49,6 +49,7 @@ const mockData = zocker(person_schema);
 1. `z.preprocess` and `z.refine` are not supported out of the box (and probably never will be)
 2. `toUpperCase`, `toLowerCase` and `trim` only work if they are the last operation in the chain
 3. `z.function` is not supported
+4. `z.Intersection` is not supported
 4. `z.transform` is only supported if it's the last operation in the chain
 5. `z.regex` can be used at most once per string
 6. The generation-customizatio options are very limited (ideas are welcome)
