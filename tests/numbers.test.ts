@@ -22,6 +22,7 @@ const number_schemas = {
 	"integer gt": z.number().int().gt(10),
 	"number multipleof": z.number().multipleOf(10),
 	"integer multipleof": z.number().int().multipleOf(10),
+	"interger mutliple multipleof": z.number().int().multipleOf(10).multipleOf(5).multipleOf(3),
 	"number with multiple mins and maxs" : z.number().min(10).max(20).min(15).max(25),
 } as const;
 

@@ -69,7 +69,10 @@ export const NumberGenerator: GeneratorDefinitionFactory<
 		if (value === undefined) throw new Error("Failed to generate Number. This is a bug in the built-in generator");
 		
 		let multipleof_checks = get_number_checks(number_schema, "multipleOf");
-		let multipleof = multipleof_checks.length === 0 ? null : multipleof_checks[0]?.value!;
+		let multipleof = multipleof_checks.length === 0 ? null : multipleof_checks.reduce((acc, val) => {
+			if (acc % val.value === 0) return Math.max(acc, val.value);
+			else return acc * val.value 
+		}, multipleof_checks[0]?.value!);
 
 		if (multipleof !== null) {
 			let next_higher = value + (multipleof - (value % multipleof));
