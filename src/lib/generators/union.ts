@@ -4,13 +4,15 @@ import { faker } from "@faker-js/faker";
 import { RecursionLimitReachedException } from "../exceptions.js";
 import { GeneratorDefinitionFactory } from "lib/zocker.js";
 
-export const UnionGenerator: GeneratorDefinitionFactory<z.ZodUnion<any>> = (options = {}) => {
+export const UnionGenerator: GeneratorDefinitionFactory<z.ZodUnion<any>> = (
+	options = {}
+) => {
 	return {
-		schema: options.schema ?? z.ZodUnion as any,
+		schema: options.schema ?? (z.ZodUnion as any),
 		generator: generate_union,
 		match: options.match ?? "instanceof"
-	}
-}
+	};
+};
 
 const generate_union: Generator<z.ZodUnion<any>> = (schema, ctx) => {
 	const schemas = schema._def.options as z.ZodTypeAny[];

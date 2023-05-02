@@ -8,16 +8,13 @@ export const ArrayGenerator: GeneratorDefinitionFactory<z.ZodArray<any>> = (
 	options = {}
 ) => {
 	return {
-		schema: options.schema ?? z.ZodArray as any,
+		schema: options.schema ?? (z.ZodArray as any),
 		generator: generate_array,
-		match: options.match ?? "instanceof",
+		match: options.match ?? "instanceof"
 	};
 };
 
-const generate_array: Generator<z.ZodArray<any>> = (
-	array_schema,
-	ctx
-) => {
+const generate_array: Generator<z.ZodArray<any>> = (array_schema, ctx) => {
 	const exact_length = array_schema._def.exactLength?.value ?? null;
 
 	const min = array_schema._def.minLength

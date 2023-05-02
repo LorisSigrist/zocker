@@ -6,9 +6,9 @@ export const LazyGenerator: GeneratorDefinitionFactory<z.ZodLazy<any>> = (
 	options = {}
 ) => {
 	return {
-		schema: options.schema ?? z.ZodLazy as any,
+		schema: options.schema ?? (z.ZodLazy as any),
 		generator: generate_lazy,
-		match: options.match ?? "instanceof",
+		match: options.match ?? "instanceof"
 	};
 };
 

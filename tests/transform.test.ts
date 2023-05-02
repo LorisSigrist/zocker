@@ -23,7 +23,7 @@ describe("Transform generation", () => {
 		const even_schema = z.number().int().positive().multipleOf(2);
 
 		for (let i = 0; i < 100; i++) {
-			const result =zocker(doubled);
+			const result = zocker(doubled);
 			expect(() => even_schema.parse(result)).not.toThrow();
 		}
 	});

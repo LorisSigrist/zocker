@@ -59,7 +59,7 @@ const string_schemas = {
 		.includes("oo")
 		.length(3),
 	"date with offset": z.string().datetime({ offset: true }),
-	"regex with no whitespace" : z.string().regex(/^[^\s-]$/)
+	"regex with no whitespace": z.string().regex(/^[^\s-]$/)
 } as const;
 
 describe("String generation", () => {

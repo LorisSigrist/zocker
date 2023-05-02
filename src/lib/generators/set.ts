@@ -14,7 +14,10 @@ const default_set_options: SetOptions = {
 	min: 0
 };
 
-export const SetGenerator: GeneratorDefinitionFactory<z.ZodSet<any>, Partial<SetOptions>> = (partial_options = {}) => {
+export const SetGenerator: GeneratorDefinitionFactory<
+	z.ZodSet<any>,
+	Partial<SetOptions>
+> = (partial_options = {}) => {
 	const options = { ...default_set_options, ...partial_options };
 
 	const generate_set: Generator<z.ZodSet<any>> = (schema, ctx) => {
@@ -43,9 +46,8 @@ export const SetGenerator: GeneratorDefinitionFactory<z.ZodSet<any>, Partial<Set
 	};
 
 	return {
-		schema: options.schema ?? z.ZodSet as any,
+		schema: options.schema ?? (z.ZodSet as any),
 		generator: generate_set,
 		match: options.match ?? "instanceof"
-	}
-}
-
+	};
+};

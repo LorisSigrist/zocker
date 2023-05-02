@@ -7,12 +7,11 @@ export const BooleanGenerator: GeneratorDefinitionFactory<z.ZodBoolean> = (
 	options = {}
 ) => {
 	return {
-		schema: options.schema ?? z.ZodBoolean as any,
+		schema: options.schema ?? (z.ZodBoolean as any),
 		generator: generate_boolean,
-		match: options.match ?? "instanceof",
+		match: options.match ?? "instanceof"
 	};
 };
-
 
 const generate_boolean: Generator<z.ZodBoolean> = () => {
 	return faker.datatype.boolean();

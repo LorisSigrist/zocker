@@ -26,8 +26,7 @@ import {
 	DiscriminatedUnionGenerator,
 	PromiseGenerator,
 	LazyGenerator,
-	BrandedGenerator,
-
+	BrandedGenerator
 } from "./generators/index.js";
 
 export const default_generators: GeneratorDefinition<any>[] = [
@@ -58,7 +57,7 @@ export const default_generators: GeneratorDefinition<any>[] = [
 	BrandedGenerator(),
 	{
 		schema: z.ZodVoid,
-		generator: () => { },
+		generator: () => {},
 		match: "instanceof"
 	},
 	{

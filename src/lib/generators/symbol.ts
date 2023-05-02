@@ -7,9 +7,9 @@ export const SymbolGenerator: GeneratorDefinitionFactory<z.ZodSymbol> = (
 	options = {}
 ) => {
 	return {
-		schema: options.schema ?? z.ZodSymbol as any,
+		schema: options.schema ?? (z.ZodSymbol as any),
 		generator: generate_symbol,
-		match: options.match ?? "instanceof",
+		match: options.match ?? "instanceof"
 	};
 };
 

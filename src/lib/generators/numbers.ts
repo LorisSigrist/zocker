@@ -4,15 +4,18 @@ import { GeneratorDefinitionFactory } from "lib/zocker.js";
 import { Generator } from "../generate.js";
 
 type NumberGeneratorOptions = {
-	non_finite_chance: number
-}
+	non_finite_chance: number;
+};
 
 const default_options: NumberGeneratorOptions = {
 	non_finite_chance: 0.3
-}
+};
 
-export const NumberGenerator: GeneratorDefinitionFactory<z.ZodNumber, Partial<NumberGeneratorOptions>> = (partial_options = {}) => {
-	const options = { ...default_options, ...partial_options }
+export const NumberGenerator: GeneratorDefinitionFactory<
+	z.ZodNumber,
+	Partial<NumberGeneratorOptions>
+> = (partial_options = {}) => {
+	const options = { ...default_options, ...partial_options };
 
 	const generate_number: Generator<z.ZodNumber> = (number_schema, ctx) => {
 		let min =
@@ -30,15 +33,14 @@ export const NumberGenerator: GeneratorDefinitionFactory<z.ZodNumber, Partial<Nu
 		} else {
 			return faker.datatype.float({ min, max });
 		}
-	}
+	};
 
 	return {
-		schema: options.schema ?? z.ZodNumber as any,
+		schema: options.schema ?? (z.ZodNumber as any),
 		generator: generate_number,
 		match: options.match ?? "instanceof"
-	}
-}
-
+	};
+};
 
 //Get a check from a ZodNumber schema in a type-safe way
 function get_number_check<Kind extends z.ZodNumberCheck["kind"]>(

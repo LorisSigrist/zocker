@@ -12,7 +12,7 @@ describe("Any generation", () => {
 
 	it("generates the same value for the same seed", () => {
 		for (let i = 0; i < 100; i++) {
-			const s = z.any()
+			const s = z.any();
 			const value1 = zocker(s, { seed: i });
 			const value2 = zocker(s, { seed: i });
 

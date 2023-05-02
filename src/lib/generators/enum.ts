@@ -3,11 +3,13 @@ import { Generator } from "../generate.js";
 import { pick } from "../utils/random.js";
 import { z } from "zod";
 
-export const EnumGenerator: GeneratorDefinitionFactory<z.ZodEnum<any>> = (options = {}) => {
+export const EnumGenerator: GeneratorDefinitionFactory<z.ZodEnum<any>> = (
+	options = {}
+) => {
 	return {
-		schema: options.schema ?? z.ZodEnum as any,
+		schema: options.schema ?? (z.ZodEnum as any),
 		generator: generate_enum,
-		match: options.match ?? "instanceof",
+		match: options.match ?? "instanceof"
 	};
 };
 

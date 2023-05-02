@@ -15,7 +15,7 @@ describe("Provide a generation function for a schema (by reference)", () => {
 			generator: () => "123456",
 			match: "reference"
 		}
-	]
+	];
 
 	it("should generate a valid value", () => {
 		const value = zocker(object_with_refined_string, { generators });

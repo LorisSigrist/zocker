@@ -6,17 +6,20 @@ import { z } from "zod";
 
 type NullableOptions = {
 	null_chance: number;
-}
-
-const default_options: NullableOptions = {
-	null_chance: 0.3,
 };
 
-export const NullableGenerator: GeneratorDefinitionFactory<z.ZodNullable<any>, Partial<NullableOptions>> = (partial_options = {}) => {
+const default_options: NullableOptions = {
+	null_chance: 0.3
+};
+
+export const NullableGenerator: GeneratorDefinitionFactory<
+	z.ZodNullable<any>,
+	Partial<NullableOptions>
+> = (partial_options = {}) => {
 	const options = { ...default_options, ...partial_options };
 
 	return {
-		schema: options.schema ?? z.ZodNullable as any,
+		schema: options.schema ?? (z.ZodNullable as any),
 		generator: (schema, generation_context) => {
 			const should_be_null = weighted_random_boolean(options.null_chance);
 
@@ -32,6 +35,6 @@ export const NullableGenerator: GeneratorDefinitionFactory<z.ZodNullable<any>, P
 				}
 			}
 		},
-		match: options.match ?? "instanceof",
+		match: options.match ?? "instanceof"
 	};
-}
+};

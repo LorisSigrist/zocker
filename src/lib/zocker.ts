@@ -6,10 +6,15 @@ import { default_generators } from "./default_generators.js";
 /**
  * A factory function that creates a GeneratorDefinition with the given options.
  */
-export type GeneratorDefinitionFactory<Z extends z.ZodSchema, O extends {} = {}> = (options?: O & {
-	match?: "instanceof" | "reference"
-	schema?: Z
-}) => GeneratorDefinition<Z>;
+export type GeneratorDefinitionFactory<
+	Z extends z.ZodSchema,
+	O extends {} = {}
+> = (
+	options?: O & {
+		match?: "instanceof" | "reference";
+		schema?: Z;
+	}
+) => GeneratorDefinition<Z>;
 
 /**
  * A definition of a generator and when it should be used.
@@ -39,14 +44,19 @@ export function zocker<Z extends z.ZodSchema>(
 	schema: Z,
 	options: ZockerOptions = {}
 ): z.infer<Z> {
-
-
 	//add the default generators to the list of generators
-	const generators: GeneratorDefinition<Z>[] = [...(options.generators ?? []), ...default_generators]
+	const generators: GeneratorDefinition<Z>[] = [
+		...(options.generators ?? []),
+		...default_generators
+	];
 
 	//Split the generators into instanceof and reference generators
-	const reference_generators = generators.filter(g => g.match === "reference");
-	const instanceof_generators = generators.filter(g => g.match === "instanceof");
+	const reference_generators = generators.filter(
+		(g) => g.match === "reference"
+	);
+	const instanceof_generators = generators.filter(
+		(g) => g.match === "instanceof"
+	);
 
 	//Set the seed for the random number generator
 	const seed = options.seed ?? Math.random() * 10_000_000;

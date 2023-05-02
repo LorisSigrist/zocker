@@ -4,13 +4,13 @@ import { faker } from "@faker-js/faker";
 import { RecursionLimitReachedException } from "../exceptions.js";
 import { GeneratorDefinitionFactory } from "../zocker.js";
 
-export const DiscriminatedUnionGenerator: GeneratorDefinitionFactory<z.ZodDiscriminatedUnion<any, any>> = (
-	options = {}
-) => {
+export const DiscriminatedUnionGenerator: GeneratorDefinitionFactory<
+	z.ZodDiscriminatedUnion<any, any>
+> = (options = {}) => {
 	return {
-		schema: options.schema ?? z.ZodDiscriminatedUnion as any,
+		schema: options.schema ?? (z.ZodDiscriminatedUnion as any),
 		generator: generate_discriminated_union,
-		match: options.match ?? "instanceof",
+		match: options.match ?? "instanceof"
 	};
 };
 

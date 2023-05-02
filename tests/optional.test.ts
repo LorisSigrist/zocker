@@ -24,7 +24,7 @@ describe("Optional generation", () => {
 			OptionalGenerator({
 				undefined_chance: 1
 			})
-		]
+		];
 
 		for (let i = 0; i < 100; i++) {
 			const data = zocker(optional_schema, { generators });
@@ -33,14 +33,14 @@ describe("Optional generation", () => {
 	});
 
 	it("never generates undefined if the undefined chance is 0", () => {
-		const generators= [
+		const generators = [
 			OptionalGenerator({
 				undefined_chance: 0
 			})
-		]
-	
+		];
+
 		for (let i = 0; i < 100; i++) {
-			const data = zocker(optional_schema, { generators })
+			const data = zocker(optional_schema, { generators });
 
 			expect(() => requred_schema.parse(data)).not.toThrow();
 		}

@@ -21,7 +21,14 @@ export type GenerationContext<Z extends z.ZodSchema> = {
 	seed: number;
 };
 
-type SemanticFlag = "key" | "fullname" | "firstname" | "lastname" | "street" | "city" | "country";
+type SemanticFlag =
+	| "key"
+	| "fullname"
+	| "firstname"
+	| "lastname"
+	| "street"
+	| "city"
+	| "country";
 
 export type Generator<Z extends z.ZodSchema> = (
 	schema: Z,
@@ -54,12 +61,18 @@ export function generate<Z extends z.ZodSchema>(
 
 const generate_value: Generator<z.ZodSchema> = (schema, generation_context) => {
 	//Check if a reference generator is available for this schema
-	const reference_generator = generation_context.reference_generators.find(g => g.schema === schema);
-	if (reference_generator) return reference_generator.generator(schema, generation_context);
+	const reference_generator = generation_context.reference_generators.find(
+		(g) => g.schema === schema
+	);
+	if (reference_generator)
+		return reference_generator.generator(schema, generation_context);
 
 	//Check if an instanceof generator is available for this schema
-	const instanceof_generator = generation_context.instanceof_generators.find(g => schema instanceof (g.schema as any));
-	if (instanceof_generator) return instanceof_generator.generator(schema, generation_context);
+	const instanceof_generator = generation_context.instanceof_generators.find(
+		(g) => schema instanceof (g.schema as any)
+	);
+	if (instanceof_generator)
+		return instanceof_generator.generator(schema, generation_context);
 
 	throw new NoGeneratorException(
 		`No generator for schema ${schema} - You can provide a custom generator in the zocker options`

@@ -7,16 +7,13 @@ export const BigintGenerator: GeneratorDefinitionFactory<z.ZodBigInt> = (
 	options = {}
 ) => {
 	return {
-		schema: options.schema ?? z.ZodBigInt as any,
+		schema: options.schema ?? (z.ZodBigInt as any),
 		generator: generate_bigint,
-		match: options.match ?? "instanceof",
+		match: options.match ?? "instanceof"
 	};
 };
 
-const generate_bigint: Generator<z.ZodBigInt> = (
-	bigint_schema,
-	ctx
-) => {
+const generate_bigint: Generator<z.ZodBigInt> = (bigint_schema, ctx) => {
 	const multiple_of =
 		get_bigint_check(bigint_schema, "multipleOf")?.value ?? 1n;
 

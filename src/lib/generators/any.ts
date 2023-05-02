@@ -3,20 +3,23 @@ import { generate, Generator } from "../generate.js";
 import { pick } from "../utils/random.js";
 import { GeneratorDefinitionFactory } from "../zocker.js";
 
-
-export const AnyGenerator: GeneratorDefinitionFactory<z.ZodAny> = (options = {}) => {
+export const AnyGenerator: GeneratorDefinitionFactory<z.ZodAny> = (
+	options = {}
+) => {
 	return {
-		schema: options.schema ?? z.ZodAny as any,
+		schema: options.schema ?? (z.ZodAny as any),
 		generator: Any() as Generator<z.ZodAny>,
-		match: options.match ?? "instanceof",
+		match: options.match ?? "instanceof"
 	};
 };
 
-export const UnknownGenerator: GeneratorDefinitionFactory<z.ZodUnknown> = (options = {}) => {
+export const UnknownGenerator: GeneratorDefinitionFactory<z.ZodUnknown> = (
+	options = {}
+) => {
 	return {
-		schema: options.schema ?? z.ZodUnknown as any,
+		schema: options.schema ?? (z.ZodUnknown as any),
 		generator: Any() as Generator<z.ZodUnknown>,
-		match: options.match ?? "instanceof",
+		match: options.match ?? "instanceof"
 	};
 };
 

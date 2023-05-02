@@ -3,8 +3,9 @@ import { Generator } from "lib/generate.js";
 import { GeneratorDefinitionFactory } from "lib/zocker.js";
 import { z } from "zod";
 
-export const DateGenerator: GeneratorDefinitionFactory<z.ZodDate> = (options = {}) => {
-
+export const DateGenerator: GeneratorDefinitionFactory<z.ZodDate> = (
+	options = {}
+) => {
 	const generate_date: Generator<z.ZodDate> = (date_schema, options) => {
 		const min =
 			get_date_check(date_schema, "min")?.value ??
@@ -17,11 +18,11 @@ export const DateGenerator: GeneratorDefinitionFactory<z.ZodDate> = (options = {
 	};
 
 	return {
-		schema: options.schema ?? z.ZodDate as any,
+		schema: options.schema ?? (z.ZodDate as any),
 		generator: generate_date,
 		match: options.match ?? "instanceof"
-	}
-}
+	};
+};
 
 function get_date_check<Kind extends z.ZodDateCheck["kind"]>(
 	schema: z.ZodDate,

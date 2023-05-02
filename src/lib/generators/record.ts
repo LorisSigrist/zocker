@@ -14,7 +14,10 @@ const default_record_options: RecordOptions = {
 	min: 0
 };
 
-export const RecordGenerator: GeneratorDefinitionFactory<z.ZodRecord, Partial<RecordOptions>> = (partial_options = {}) => {
+export const RecordGenerator: GeneratorDefinitionFactory<
+	z.ZodRecord,
+	Partial<RecordOptions>
+> = (partial_options = {}) => {
 	const options = { ...default_record_options, ...partial_options };
 
 	const generate_record: Generator<z.ZodRecord> = (
@@ -58,10 +61,9 @@ export const RecordGenerator: GeneratorDefinitionFactory<z.ZodRecord, Partial<Re
 		return record;
 	};
 
-
 	return {
-		schema: options.schema ?? z.ZodRecord as any,
+		schema: options.schema ?? (z.ZodRecord as any),
 		generator: generate_record,
 		match: options.match ?? "instanceof"
-	}
-}
+	};
+};

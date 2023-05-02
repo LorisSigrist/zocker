@@ -14,13 +14,13 @@ const default_map_options: MapOptions = {
 	min: 0
 };
 
-export const MapGenerator: GeneratorDefinitionFactory<z.ZodMap, Partial<MapOptions>> = (partial_options = {}) => {
+export const MapGenerator: GeneratorDefinitionFactory<
+	z.ZodMap,
+	Partial<MapOptions>
+> = (partial_options = {}) => {
 	const options = { ...default_map_options, ...partial_options };
 
-	const generate_map: Generator<z.ZodMap> = (
-		schema,
-		generation_context
-	) => {
+	const generate_map: Generator<z.ZodMap> = (schema, generation_context) => {
 		const size = faker.datatype.number({ min: options.min, max: options.max });
 
 		type Key = z.infer<(typeof schema)["_def"]["keyType"]>;
@@ -57,11 +57,9 @@ export const MapGenerator: GeneratorDefinitionFactory<z.ZodMap, Partial<MapOptio
 		return map;
 	};
 
-
-
 	return {
-		schema: options.schema ?? z.ZodMap as any,
+		schema: options.schema ?? (z.ZodMap as any),
 		generator: generate_map,
 		match: options.match ?? "instanceof"
-	}
-}
+	};
+};

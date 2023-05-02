@@ -22,7 +22,7 @@ export function test_schema_generation(
 			const data = zocker(schema);
 			expect(() => {
 				try {
-					schema.parse(data)
+					schema.parse(data);
 				} catch (e) {
 					console.log("Invalid Data Generated", data);
 					throw e;

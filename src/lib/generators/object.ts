@@ -2,13 +2,15 @@ import { GenerationContext, generate } from "../generate.js";
 import { GeneratorDefinitionFactory } from "../zocker.js";
 import { z } from "zod";
 
-export const ObjectGenerator: GeneratorDefinitionFactory<z.ZodObject<any>> = (options = {}) => {
+export const ObjectGenerator: GeneratorDefinitionFactory<z.ZodObject<any>> = (
+	options = {}
+) => {
 	return {
-		schema: options.schema ?? z.ZodObject as any,
+		schema: options.schema ?? (z.ZodObject as any),
 		generator: generate_object,
 		match: options.match ?? "instanceof"
-	}
-}
+	};
+};
 
 const generate_object = <T extends z.ZodRawShape>(
 	object_schema: z.ZodObject<T>,

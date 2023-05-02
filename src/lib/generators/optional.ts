@@ -6,19 +6,24 @@ import { z } from "zod";
 
 type OptionalOptions = {
 	undefined_chance: number;
-}
-
-const default_options: OptionalOptions = {
-	undefined_chance: 0.3,
 };
 
-export const OptionalGenerator: GeneratorDefinitionFactory<z.ZodOptional<any>, Partial<OptionalOptions>> = (partial_options = {}) => {
+const default_options: OptionalOptions = {
+	undefined_chance: 0.3
+};
+
+export const OptionalGenerator: GeneratorDefinitionFactory<
+	z.ZodOptional<any>,
+	Partial<OptionalOptions>
+> = (partial_options = {}) => {
 	const options = { ...default_options, ...partial_options };
 
 	return {
-		schema: options.schema ?? z.ZodOptional as any,
+		schema: options.schema ?? (z.ZodOptional as any),
 		generator: (schema, generation_context) => {
-			const should_be_undefined = weighted_random_boolean(options.undefined_chance);
+			const should_be_undefined = weighted_random_boolean(
+				options.undefined_chance
+			);
 
 			try {
 				return should_be_undefined
@@ -32,7 +37,6 @@ export const OptionalGenerator: GeneratorDefinitionFactory<z.ZodOptional<any>, P
 				}
 			}
 		},
-		match: options.match ?? "instanceof",
+		match: options.match ?? "instanceof"
 	};
 };
-
