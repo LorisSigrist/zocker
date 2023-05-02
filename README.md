@@ -11,27 +11,58 @@ npm install --save-dev zocker
 
 ## Usage
 
-Wrapping your zod-schema in `zocker()` will return mock data that's one possible output of your schema.
+Wrapping your zod-schema in `zocker()` will return mock data that matches your schema.
 
 ```typescript
 import { z } from "zod";
 import { zocker } from "zocker";
 
-const schema = z.object({
+const person_schema = z.object({
 	name: z.string(),
-	age: z.number()
+	age: z.number(),
+	emails: z.array(z.string().email()),
+	children: z.array(z.lazy(() => person_schema))
 });
 
-const mockData_1 = zocker(schema);
-const mockData_2 = zocker(schema);
-//...
+const mockData = zocker(person_schema);
+/*
+{
+	name: "John Doe",
+	age: 42,
+	emails: ["john.doe@gmail.com"],
+	children: [
+		{
+			name: "Jane Doe",
+			age: 12,
+			emails: [...]
+			children: [...]
+		},
+		...
+	]
+}
+*/
 ```
 
-### Limitations & How to work around them
+### Features & Limitations
+`zocker` is still in early development, but it already supports most schemas out of the box. It is certainly the most feature-complete library of its kind. It's easier to list the limitations than the features. All these limitations can be worked around by providing your own generator, see below.
 
-Zocker attempts to generate data that would pass validation for the given schema. But some schemas are not practically reversable. It isn't possible to generate a valid string for a schema using `refine` or `preprocess`. At least not out of the box.
+1. `z.preprocess` and `z.refine` are not supported out of the box (and probably never will be)
+2. `toUpperCase`, `toLowerCase` and `trim` only work if they are the last operation in the chain
+3. `z.function` is not supported
+4. `z.transform` is only supported if it's the last operation in the chain
+5. `z.regex` can be used at most once per string
+6. The generation-customizatio options are very limited (ideas are welcome)
 
-You can however provide your own generator for a sub-schema. This allows you to bypass this limitation.
+### Providing a custom generator
+
+You can override any part of the Generation Process by providing your own generator. This allows you to bypass all limitation listed above.
+
+To register a custom-generator, you must provide two things:
+
+1. A function that generates data
+2. A way to instruct zocker when to use this generator
+
+Let's learn by example:
 
 ```typescript
 import { z } from "zod";
@@ -46,32 +77,29 @@ const schema = z.object({
 
 const generators = [
 	{
-		generator: () => "John Doe",
-		match: "reference",
+		//The function that returns data
+		generator: () => "John Doe", 
+
+		//The matching-configuration
+		match: "reference",	
 		schema: name_schema
 	}
 ];
 
 const data = zocker(schema, { generators });
 ```
-
-To register a custom-generator, you must provide two things:
-
-1. A function that generates data
-2. A way to instruct zocker when to use this generator
-
-Here we've told zocker to use the generator every time it encounters a schema with reference equality to `name_schema`.
+Here we've told zocker to always generate the name "John Doe" for the `name_schema`. We check equality for the name schema by using the `match: "reference"` configuration. This means that we check if the schema is the same object as the one we provided. 
 
 Alternatively, you can also use `match: "instanceof"` to match based on the type of the schema. This is useful for overriding the default generator for a specific type. Eg. `z.number()`.
 
-Generator functions recive two arguments:
+Generator functions always recive two arguments:
 
 1. The schema that they are generating data for
 2. A context object that contains information about the current generation process. This one is rarely used.
 
 ### Customizing the generation process
 
-The way to customize the generation process is to override the built-in generators. But this doesn't mean that you have to write your own generators from scratch. All built-in generators have factory-functions that generate a generator for you, with the behavior you want. For example, you could have a number generator that always generates the most extreme values possible.
+The main way to customize the generation process is to override the built-in generators. But this doesn't mean that you have to write your own generators from scratch. All built-in generators have factory-functions that generate a configuration for you, with the behavior you want. For example, you could have a number generator that always generates the most extreme values possible.
 
 ```typescript
 import { z } from "zod";
@@ -86,9 +114,7 @@ const generators = [
 const data = zocker(my_schema, { generators });
 ```
 
-Notice that you can pass the return-value directly into the `generators` field, as it comes included with the matching-configuration. This is the case for all built-in generators.
-
-You will be able to achieve most of the customization you need by using the built-in generators. But if you need to, you can also write your own generators as described above.
+Notice that you can pass the return-value directly into the `generators` field, as it comes included with the matching-configuration. This is the case for all built-in generators. If you only want the function, you can just access the `generator` field of the return-value.
 
 ### Repeatability
 
@@ -102,7 +128,7 @@ test("my repeatable test", () => {
 
 We guarantee that the same seed will always produce the same data, with the same schema and the same generator configuration. Different generator configurations might produce different data, even if the differences are never actually called.
 
-## Examples
+## Advanced Examples
 
 ### Cyclic JSON
 
