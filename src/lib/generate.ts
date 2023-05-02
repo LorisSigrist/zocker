@@ -27,7 +27,7 @@ export type GenerationContext<Z extends z.ZodSchema> = {
 	seed: number;
 };
 
-type SemanticFlag = "key" | "name" | "street" | "city" | "country";
+type SemanticFlag = "key" | "fullname" | "firstname" | "lastname" | "street" | "city" | "country";
 
 export type Generator<Z extends z.ZodSchema> = (
 	schema: Z,

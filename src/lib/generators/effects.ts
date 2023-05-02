@@ -1,6 +1,7 @@
-import { GeneratorDefinitionFactory } from "lib/zocker.js";
+import { GeneratorDefinitionFactory } from "../zocker.js";
 import { Generator, generate } from "../generate.js";
 import { z } from "zod";
+import { NoGeneratorException } from "../exceptions.js";
 
 
 export const EffectsGenerator: GeneratorDefinitionFactory<z.ZodEffects<any>> = (
@@ -18,7 +19,7 @@ const generate_effects: Generator<z.ZodEffects<any>> = (
 	generation_options
 ) => {
 	if (effects_schema._def.effect.type !== "transform") {
-		throw new Error(
+		throw new NoGeneratorException(
 			"To use refinements or preprocessors, you must supply a custom generator for your schema when calling `zocker`"
 		);
 	}

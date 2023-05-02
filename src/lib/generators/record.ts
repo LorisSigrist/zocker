@@ -35,11 +35,11 @@ export const RecordGenerator: GeneratorDefinitionFactory<z.ZodRecord, Partial<Re
 				keys.push(key);
 			}
 
-			for (let i = 0; i < size; i++) {
+			for (const key of keys) {
 				let value: Value;
 
 				try {
-					generation_context.path.push(keys[i]!);
+					generation_context.path.push(key);
 					generation_context.semantic_context.push("key");
 
 					value = generate(schema._def.valueType, generation_context) as Value;
@@ -48,7 +48,7 @@ export const RecordGenerator: GeneratorDefinitionFactory<z.ZodRecord, Partial<Re
 					generation_context.semantic_context.pop();
 				}
 
-				record[keys[i]!] = value;
+				record[key] = value;
 			}
 		} catch (error) {
 			if (error instanceof RecursionLimitReachedException) return record;

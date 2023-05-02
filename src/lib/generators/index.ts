@@ -21,4 +21,4 @@ export { EffectsGenerator } from "./effects.js";
 export { ArrayGenerator } from "./array.js";
 export { OptionalGenerator } from "./optional.js";
 export { NullableGenerator } from "./nullable.js";
-export { StringGenerator } from "./string.js";
+export { StringGenerator } from "./string/index.js";

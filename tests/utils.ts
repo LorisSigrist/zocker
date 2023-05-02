@@ -21,7 +21,14 @@ export function test_schema_generation(
 		const generate = zocker(schema);
 		for (let i = 0; i < repeats; i++) {
 			const data = generate();
-			expect(() => schema.parse(data)).not.toThrow();
+			expect(() => {
+				try {
+					schema.parse(data)
+				} catch (e) {
+					console.log("Invalid Data Generated", data);
+					throw e;
+				}
+			}).not.toThrow();
 		}
 	});
 }
