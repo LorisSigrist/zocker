@@ -98,9 +98,37 @@ You can specify a seed to make the generation process repeatable. This ensures t
 ```typescript
 const generate = zocker(schema);
 
-test("my test" , ()=>{;
+test("my test", ()=>{;
     const data = generate({ seed: 23 }); // always the same
 })
 ```
 
 We guarantee that the same seed will always produce the same data, with the same schema and the same generator configuration. Different generator configurations may produce different data, even if the differences are never actually called.
+
+## Examples
+### Cyclic JSON
+Since `zocker` supports `z.lazy`, you can use it to generate cyclic JSON data.
+
+```typescript
+const literalSchema = z.union([z.string(), z.number(), z.boolean(), z.null()]);
+const jsonSchema: z.ZodType<Json> = z.lazy(() =>
+  z.union([literalSchema, z.array(jsonSchema), z.record(jsonSchema)])
+);
+
+const generate = zocker(jsonSchema, {
+    recursion_limit: 5 // default value
+});
+const data = generate();
+```
+
+### Regular Expressions
+Zocker supports `z.string().regex()` out of the box, thanks to the amazing [randexp](https://npmjs.com/package/randexp) library. It doesn't play very well with other string validators though (e.g `min`, `length` and other formats), so try to encode as much as possible in the regex itself.
+
+```typescript
+const regex_schema = z.string().regex(/^[a-z0-9]{5,10}$/);
+const generate = zocker(regex_schema);
+const data = generate();
+```
+
+## API
+TODO
