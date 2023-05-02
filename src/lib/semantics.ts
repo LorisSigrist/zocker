@@ -26,6 +26,7 @@ export type SemanticFlag =
 	| "millisecond"
 	| "weekday"
 	| "birthday"
+	| "unique-id"
 
 const paragraph_triggers = [
 	"about",
@@ -43,12 +44,18 @@ const jobtitle_triggers = [
 	"role",
 	"occupation",
 	"profession",
-	"career"
+	"career",
 ];
 
-export function get_semantic_flag(str: string): SemanticFlag {
-	str = str.toLowerCase().trim();
+const delimiters = [",", ";", ":", "|", "/", "\\", "-", "_", " "];
 
+export function get_semantic_flag(str: string): SemanticFlag {
+	str = str.toLowerCase().trim()
+
+	for(const delimiter of delimiters) {
+		str = str.split(delimiter).join(" ")
+	}
+	
 	if (str.includes("name")) {
 		if (str.includes("first")) return "firstname";
 		if (str.includes("last")) return "lastname";
@@ -82,6 +89,6 @@ export function get_semantic_flag(str: string): SemanticFlag {
 	if (str.includes("second")) return "second";
 	if (str.includes("millisecond")) return "millisecond";
 
-
+	if(str.includes("id")) return "unique-id"
 	return "unspecified";
 }
