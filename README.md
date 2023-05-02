@@ -131,7 +131,7 @@ test("my repeatable test", () => {
 
 We guarantee that the same seed will always produce the same data, with the same schema and the same generator configuration. Different generator configurations might produce different data, even if the differences are never actually called.
 
-## Advanced Examples
+## Examples
 
 ### Cyclic JSON
 
