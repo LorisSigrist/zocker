@@ -22,3 +22,4 @@ export { ArrayGenerator } from "./array.js";
 export { OptionalGenerator } from "./optional.js";
 export { NullableGenerator } from "./nullable.js";
 export { StringGenerator } from "./string/index.js";
+export { IntersectionGenerator } from "./intersection/index.js";

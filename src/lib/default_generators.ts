@@ -26,7 +26,8 @@ import {
 	DiscriminatedUnionGenerator,
 	PromiseGenerator,
 	LazyGenerator,
-	BrandedGenerator
+	BrandedGenerator,
+	IntersectionGenerator
 } from "./generators/index.js";
 
 export const default_generators: GeneratorDefinition<any>[] = [
@@ -79,5 +80,6 @@ export const default_generators: GeneratorDefinition<any>[] = [
 		schema: z.ZodLiteral,
 		generator: (schema) => schema._def.value,
 		match: "instanceof"
-	}
+	},
+	IntersectionGenerator()
 ];
