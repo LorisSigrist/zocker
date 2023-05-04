@@ -17,32 +17,19 @@ type StringFormat =
 			offset: boolean;
 	  }
 	| {
-			kind: "email";
-	  }
-	| {
-			kind: "url";
-	  }
-	| {
-			kind: "uuid";
-	  }
-	| {
-			kind: "cuid";
-	  }
-	| {
-			kind: "cuid2";
-	  }
-	| {
-			kind: "ulid";
-	  }
-	| {
-			kind: "emoji";
+			kind:
+				| "url"
+				| "uuid"
+				| "cuid"
+				| "cuid2"
+				| "ulid"
+				| "emoji"
+				| "email"
+				| "any";
 	  }
 	| {
 			kind: "regex";
 			regex: RegExp;
-	  }
-	| {
-			kind: "any";
 	  };
 
 export type LengthConstraints = {
@@ -259,71 +246,97 @@ function content_constraints(schema: z.ZodString): ContentConstraints {
 		includes = includes.filter((include) => !ends_with.includes(include));
 	}
 
-	let format: StringFormat = {
-		kind: "any"
+	//A list of all the z.ZodStringCheck kinds that we consider to be "format" checks
+	//They are all considered to be mutually exclusive
+	const format_checks: z.ZodStringCheck["kind"][] = [
+		"uuid",
+		"email",
+		"url",
+		"regex",
+		"cuid",
+		"cuid2",
+		"ulid",
+		"emoji",
+		"ip",
+		"datetime"
+	];
+
+	const checks_to_formats: {
+		[Kind in (typeof format_checks)[number]]?: (
+			checks: Extract<z.ZodStringCheck, { kind: Kind }>[]
+		) => StringFormat;
+	} = {
+		uuid: () => ({ kind: "uuid" }),
+		email: () => ({ kind: "email" }),
+		url: () => ({ kind: "url" }),
+		regex: (checks) => {
+			if (starts_with !== null || ends_with !== null || includes.length > 0)
+				throw new NoGeneratorException(
+					"Zocker's included regex generator currently does not work together with `starts_with`, `ends_with` or `includes`. Incorperate these into your regex, or provide a custom generator."
+				);
+
+			if (checks.length > 1)
+				throw new NoGeneratorException(
+					"Zocker's included regex generator currently does support multiple regex checks on the same string. Provide a custom generator instead."
+				);
+
+			const regex = checks[0]?.regex!;
+			return { kind: "regex", regex };
+		},
+		cuid: () => ({ kind: "cuid" }),
+		cuid2: () => ({ kind: "cuid2" }),
+		ulid: () => ({ kind: "ulid" }),
+		emoji: () => ({ kind: "emoji" }),
+		ip: (checks) => {
+			let version: z.IpVersion | undefined = undefined;
+			for (const check of checks) {
+				if (check.version && version && check.version !== version) {
+					throw new InvalidSchemaException(
+						"Specified multiple incompatible versions of IP address"
+					);
+				}
+				version = check.version ?? version;
+			}
+
+			return { kind: "ip", version: version ?? null };
+		},
+		datetime: (checks) => {
+			let offset = true;
+			for (const check of checks) {
+				if (check.offset !== true) offset = false;
+			}
+			return { kind: "datetime", offset };
+		}
 	};
 
-	const uuid_checks = get_string_checks(schema, "uuid");
-	if (uuid_checks.length) format = { kind: "uuid" };
+	let format_kind: (typeof format_checks)[number] | undefined = undefined;
+	let checks = [] as Extract<
+		z.ZodStringCheck,
+		{ kind: (typeof format_checks)[number] }
+	>[];
 
-	const email_checks = get_string_checks(schema, "email");
-	if (email_checks.length) format = { kind: "email" };
-
-	const url_checks = get_string_checks(schema, "url");
-	if (url_checks.length) format = { kind: "url" };
-
-	const regex_checks = get_string_checks(schema, "regex");
-	if (regex_checks.length) {
-		if (starts_with !== null || ends_with !== null || includes.length > 0)
-			throw new NoGeneratorException(
-				"Zocker's included regex generator currently does not work together with `starts_with`, `ends_with` or `includes`. Incorperate these into your regex, or provide a custom generator."
+	for (const check of schema._def.checks) {
+		if (!format_checks.includes(check.kind)) continue;
+		if (format_kind !== check.kind && format_kind) {
+			throw new InvalidSchemaException(
+				"Multiple incompatible format constraints - The Schema cannot be satisfied"
 			);
-
-		if (regex_checks.length > 1)
-			throw new NoGeneratorException(
-				"Zocker's included regex generator currently does support multiple regex checks on the same string. Provide a custom generator instead."
-			);
-
-		const regex = regex_checks[0]?.regex!;
-		format = { kind: "regex", regex };
+		} else format_kind = check.kind;
+		checks.push(check);
 	}
 
-	const cuid_checks = get_string_checks(schema, "cuid");
-	if (cuid_checks.length) format = { kind: "cuid" };
+	if (!format_kind) {
+		const format: StringFormat = {
+			kind: "any"
+		};
 
-	const cuid2_checks = get_string_checks(schema, "cuid2");
-	if (cuid2_checks.length) format = { kind: "cuid2" };
-
-	const ulid_checks = get_string_checks(schema, "ulid");
-	if (ulid_checks.length) format = { kind: "ulid" };
-
-	const emoji_checks = get_string_checks(schema, "emoji");
-	if (emoji_checks.length) format = { kind: "emoji" };
-
-	const ip_checks = get_string_checks(schema, "ip");
-	if (ip_checks.length) {
-		let version: z.IpVersion | undefined = undefined;
-		for (const check of ip_checks) {
-			if (check.version && version && check.version !== version) {
-				throw new InvalidSchemaException(
-					"Specified multiple incompatible versions of IP address"
-				);
-			}
-			version = check.version ?? version;
-		}
-
-		format = { kind: "ip", version: version ?? null };
+		return { format, starts_with, ends_with, includes };
 	}
 
-	const datetime_checks = get_string_checks(schema, "datetime");
-	if (datetime_checks.length) {
-		let offset = true;
-		for (const check of datetime_checks) {
-			if (check.offset !== true) offset = false;
-		}
-		format = { kind: "datetime", offset };
-	}
-
+	const format_factory = checks_to_formats[format_kind];
+	const format: StringFormat = format_factory
+		? format_factory(checks as any)
+		: { kind: "any" };
 	return { format, starts_with, ends_with, includes };
 }
 

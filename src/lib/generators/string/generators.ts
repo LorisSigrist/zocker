@@ -23,8 +23,8 @@ export const uuid: StringKindGenerator = (ctx, lc, cc, td) => {
 };
 
 export const cuid: StringKindGenerator = (ctx, lc, cc, td) => {
-	if ((lc.max && lc.max < 8) || (lc.exact && lc.exact < 8))
-		throw new InvalidSchemaException("cuid length must be at least 8");
+	if ((lc.max && lc.max < 9) || (lc.exact && lc.exact < 8))
+		throw new InvalidSchemaException("cuid length must be at least 9");
 
 	let min = lc.min && lc.min >= 9 ? lc.min : 9;
 	let max = lc.max ? lc.max : 25;
