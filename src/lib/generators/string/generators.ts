@@ -138,8 +138,9 @@ export const any: StringKindGenerator = (ctx, lc, cc, td) => {
 			"color-hex": faker.internet.color,
 			weekday: faker.date.weekday,
 			"unique-id": () => faker.helpers.unique(faker.datatype.uuid),
-			"key": () => faker.random.word(),
-			"unspecified": () => faker.lorem.paragraphs(faker.datatype.number({ min: 1, max: 5 })),
+			key: () => faker.random.word(),
+			unspecified: () =>
+				faker.lorem.paragraphs(faker.datatype.number({ min: 1, max: 5 }))
 		};
 		const generator = semantic_generators[ctx.semantic_context];
 		if (!generator)
@@ -154,14 +155,14 @@ export const any: StringKindGenerator = (ctx, lc, cc, td) => {
 			);
 
 		return proposed_string;
-	} catch (e) { }
+	} catch (e) {}
 
 	const min = Math.max(
 		0,
 		lc.min ?? 0,
 		(cc.starts_with?.length ?? 0) +
-		(cc.ends_with?.length ?? 0) +
-		cc.includes.reduce((a, b) => a + b.length, 0)
+			(cc.ends_with?.length ?? 0) +
+			cc.includes.reduce((a, b) => a + b.length, 0)
 	);
 
 	const max = lc.max ?? (lc.min !== null ? lc.min + 10_000 : 10_000);

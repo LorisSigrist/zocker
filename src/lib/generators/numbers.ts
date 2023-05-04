@@ -27,26 +27,27 @@ export const NumberGenerator: GeneratorDefinitionFactory<
 			const semantic_generators: {
 				[flag in SemanticFlag]?: () => number;
 			} = {
-				"age": () => faker.datatype.number({ min: 0, max: 120 }),
-				"year": () => faker.datatype.number({ min: 1200, max: 3000 }),
-				"month": () => faker.datatype.number({ min: 1, max: 12 }),
+				age: () => faker.datatype.number({ min: 0, max: 120 }),
+				year: () => faker.datatype.number({ min: 1200, max: 3000 }),
+				month: () => faker.datatype.number({ min: 1, max: 12 }),
 				"day-of-the-month": () => faker.datatype.number({ min: 1, max: 31 }),
-				"hour": () => faker.datatype.number({ min: 0, max: 23 }),
-				"minute": () => faker.datatype.number({ min: 0, max: 59 }),
-				"second": () => faker.datatype.number({ min: 0, max: 59 }),
-				"millisecond": () => faker.datatype.number({ min: 0, max: 999 }),
-				"weekday": () => faker.datatype.number({ min: 0, max: 6 }),
-			}
+				hour: () => faker.datatype.number({ min: 0, max: 23 }),
+				minute: () => faker.datatype.number({ min: 0, max: 59 }),
+				second: () => faker.datatype.number({ min: 0, max: 59 }),
+				millisecond: () => faker.datatype.number({ min: 0, max: 999 }),
+				weekday: () => faker.datatype.number({ min: 0, max: 6 })
+			};
 
 			const generator = semantic_generators[ctx.semantic_context];
-			if(!generator) throw new Error("No generator found for semantic context - Falling back to random number");
+			if (!generator)
+				throw new Error(
+					"No generator found for semantic context - Falling back to random number"
+				);
 
 			proposed_number = generator();
 
 			return number_schema.parse(proposed_number);
-		} catch (e) {
-			
-		}
+		} catch (e) {}
 
 		let is_extreme_value = weighted_random_boolean(
 			options.extreme_value_chance

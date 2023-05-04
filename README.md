@@ -46,15 +46,16 @@ const mockData = zocker(person_schema);
 ```
 
 ### Features & Limitations
+
 `zocker` is still in early development, but it already is the most feature-complete library of its kind. It's easier to list the limitations than the features. All these limitations can be worked around by providing your own generator (see below).
 
 1. `z.preprocess` and `z.refine` are not supported out of the box (and probably never will be)
 2. `toUpperCase`, `toLowerCase` and `trim` only work if they are the last operation in the chain
 3. `z.function` is not supported
 4. `z.Intersection` is not supported
-4. `z.transform` is only supported if it's the last operation in the chain
-5. `z.regex` can be used at most once per string
-6. The generation-customization options are very limited (ideas are welcome)
+5. `z.transform` is only supported if it's the last operation in the chain
+6. `z.regex` can be used at most once per string
+7. The generation-customization options are very limited (ideas are welcome)
 
 ### Providing a custom generator
 
@@ -81,17 +82,18 @@ const schema = z.object({
 const generators = [
 	{
 		//The function that returns data
-		generator: () => "John Doe", 
+		generator: () => "John Doe",
 
 		//The matching-configuration
-		match: "reference",	
+		match: "reference",
 		schema: name_schema
 	}
 ];
 
 const data = zocker(schema, { generators });
 ```
-Here we've told zocker to always generate the name "John Doe" for the `name_schema`. We check equality for the name schema by using the `match: "reference"` configuration. This means that we check if the schema is the same object as the one we provided. 
+
+Here we've told zocker to always generate the name "John Doe" for the `name_schema`. We check equality for the name schema by using the `match: "reference"` configuration. This means that we check if the schema is the same object as the one we provided.
 
 Alternatively, you can also use `match: "instanceof"` to match based on the type of the schema. This is useful for overriding the default generator for a specific type. Eg. `z.number()`.
 
@@ -157,8 +159,8 @@ const regex_schema = z.string().regex(/^[a-z0-9]{5,10}$/);
 const data = zocker(regex_schema);
 ```
 
-
 ## The Future
-I intend to continue expanding the number of built-in generators, and make the generation process more customizable. If you have any ideas, please open an issue or a pull request - I'd love to hear your thoughts. 
+
+I intend to continue expanding the number of built-in generators, and make the generation process more customizable. If you have any ideas, please open an issue or a pull request - I'd love to hear your thoughts.
 
 Good APIs usually take a lot of iterations to get right, ideas are always welcome.

@@ -47,7 +47,7 @@ const generate_object = <T extends z.ZodRawShape>(
 	let catchall_schema: z.ZodSchema | null = object_schema._def.catchall;
 	if (catchall_schema instanceof z.ZodNever) catchall_schema = null;
 	const is_passthrough = object_schema._def.unknownKeys === "passthrough";
-	if (is_passthrough && !catchall_schema) catchall_schema = z.any()
+	if (is_passthrough && !catchall_schema) catchall_schema = z.any();
 
 	if (catchall_schema) {
 		const key_schema = z.union([z.string(), z.number(), z.symbol()]);
@@ -57,7 +57,7 @@ const generate_object = <T extends z.ZodRawShape>(
 				const prev_semantic_context = generation_context.semantic_context;
 				let key: Key;
 				try {
-					generation_context.semantic_context = "key"
+					generation_context.semantic_context = "key";
 					key = generate(key_schema, generation_context);
 				} finally {
 					generation_context.semantic_context = prev_semantic_context;
@@ -65,13 +65,12 @@ const generate_object = <T extends z.ZodRawShape>(
 
 				const value = generate(catchall_schema, generation_context);
 
-				//Prepend to mock_entries, 
+				//Prepend to mock_entries,
 				//so that the catchall keys would be overwritten by the original keys in case of a collision
 				mock_entries.unshift([key, value]);
 			}
-		} catch (e) { }
+		} catch (e) {}
 	}
-
 
 	return Object.fromEntries(mock_entries) as Shape;
 };
