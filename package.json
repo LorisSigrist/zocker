@@ -1,7 +1,7 @@
 {
 	"name": "zocker",
 	"description": "Generate realistic test-data from your Zod-Schemas",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"author": "Loris Sigrist",
 	"type": "module",
 	"main": "dist/index.js",
