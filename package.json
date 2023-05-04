@@ -16,9 +16,12 @@
 		"build": "tsc",
 		"test": "vitest --run --passWithNoTests",
 		"bench": "vitest bench --run --passWithNoTests",
-		"format": "prettier --write ."
+		"format": "prettier --write .",
+		"changeset": "changeset",
+		"release": "npm run build && changeset publish"
 	},
 	"devDependencies": {
+		"@changesets/cli": "^2.26.1",
 		"prettier": "^2.8.7",
 		"typescript": "^5.0.4",
 		"vitest": "^0.30.1"
