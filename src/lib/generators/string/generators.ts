@@ -138,6 +138,8 @@ export const any: StringKindGenerator = (ctx, lc, cc, td) => {
 			"color-hex": faker.internet.color,
 			weekday: faker.date.weekday,
 			"unique-id": () => faker.helpers.unique(faker.datatype.uuid),
+			"key": () => faker.random.word(),
+			"unspecified": () => faker.lorem.paragraphs(faker.datatype.number({ min: 1, max: 5 })),
 		};
 		const generator = semantic_generators[ctx.semantic_context];
 		if (!generator)
