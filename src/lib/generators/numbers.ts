@@ -116,9 +116,8 @@ export const NumberGenerator: GeneratorDefinitionFactory<
 		let multipleof =
 			multipleof_checks.length === 0
 				? null
-				: multipleof_checks.reduce((acc, val) => {
-						if (acc % val.value === 0) return Math.max(acc, val.value);
-						else return acc * val.value;
+				: multipleof_checks.reduce((acc, check) => {
+						return lcm(acc, check.value);
 				  }, multipleof_checks[0]?.value!);
 
 		if (multipleof !== null) {
@@ -157,4 +156,14 @@ function float_step_size(n: number) {
 		Number.MIN_VALUE,
 		2 ** Math.floor(Math.log2(n)) * Number.EPSILON
 	);
+}
+
+
+function lcm<N extends bigint | number>(a: N, b: N):N {
+	return (a * b) / gcd<N>(a, b) as N;
+}
+
+function gcd<N extends bigint | number>(a: N, b: N): N {
+	if (b === 0n || b === 0) return a;
+	return gcd<N>(b, a % b as N);
 }
