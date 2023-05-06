@@ -58,8 +58,6 @@ function get_bigint_checks<Kind extends z.ZodBigIntCheck["kind"]>(
 	return schema._def.checks.filter((check) => check.kind === kind) as Extract<z.ZodBigIntCheck, { kind: Kind }>[]
 }
 
-
-
 function lcm(a: bigint, b: bigint) {
 	return (a * b) / gcd(a, b);
 }
