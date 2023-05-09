@@ -1,5 +1,12 @@
 # zocker
 
+## 1.1.0
+
+### Minor Changes
+
+- bb882d3: Added configuration for extra properties on objects
+- bb882d3: Added customization options for `any` and `unknown` data-types
+
 ## 1.0.0
 
 ### Major Changes
