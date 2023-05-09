@@ -9,17 +9,22 @@ import { DefaultOptions } from "./generators/default.js";
 import { MapOptions } from "./generators/map.js";
 import { RecordOptions } from "./generators/record.js";
 import { SetOptions } from "./generators/set.js";
+import { AnyOptions } from "./generators/any.js";
+import { ArrayOptions } from "./generators/array.js";
+import { ObjectOptions } from "./generators/object.js";
 
 export type InstanceofGeneratorDefinition<Z extends z.ZodSchema> = {
 	schema: Z;
 	generator: Generator<Z>;
-	match: "instanceof";
+	/** @deprecated No longer used*/
+	match?: "instanceof";
 };
 
 export type ReferenceGeneratorDefinition<Z extends z.ZodSchema> = {
 	schema: Z;
 	generator: Generator<Z>;
-	match: "reference";
+	/** @deprecated No longer used*/
+	match?: "reference";
 };
 
 export function zocker<Z extends z.ZodSchema>(schema: Z) {
@@ -65,6 +70,23 @@ class Zocker<Z extends z.ZodSchema> {
 		min: 0
 	};
 
+	private any_options: AnyOptions = {
+		strategy: "true-any"
+	};
+
+	private unknown_options: AnyOptions = {
+		strategy: "true-any"
+	};
+
+	private array_options: ArrayOptions = {
+		min: 0,
+		max: 10
+	};
+
+	private object_options: ObjectOptions = {
+		generate_extra_keys: true
+	};
+
 	constructor(public schema: Z) {}
 
 	/**
@@ -95,7 +117,6 @@ class Zocker<Z extends z.ZodSchema> {
 		return next;
 	}
 
-
 	/**
 	 * Override one of the built-in generators using your own.
 	 * It will be used whenever an encoutntered Schema matches the one specified by **instance**
@@ -103,7 +124,7 @@ class Zocker<Z extends z.ZodSchema> {
 	 * @param schema - Which schema to override. E.g: `z.ZodNumber`.
 	 * @param generator - A value, or a function that generates a value that matches the schema
 	 */
-	override<Z extends  z.ZodFirstPartySchemaTypes>(
+	override<Z extends z.ZodFirstPartySchemaTypes>(
 		schema: Z,
 		generator: Generator<Z> | z.infer<Z>
 	) {
@@ -177,6 +198,30 @@ class Zocker<Z extends z.ZodSchema> {
 		return next;
 	}
 
+	any(options: Partial<AnyOptions>) {
+		const next = this.clone();
+		next.any_options = { ...next.any_options, ...options };
+		return next;
+	}
+
+	unknown(options: Partial<AnyOptions>) {
+		const next = this.clone();
+		next.unknown_options = { ...next.unknown_options, ...options };
+		return next;
+	}
+
+	array(options: Partial<ArrayOptions>) {
+		const next = this.clone();
+		next.array_options = { ...next.array_options, ...options };
+		return next;
+	}
+
+	object(options: Partial<ObjectOptions>) {
+		const next = this.clone();
+		next.object_options = { ...next.object_options, ...options };
+		return next;
+	}
+
 	generate(): z.infer<Z> {
 		const ctx: GenerationContext<Z> = {
 			reference_generators: this.reference_generators,
@@ -193,7 +238,11 @@ class Zocker<Z extends z.ZodSchema> {
 			default_options: this.default_options,
 			map_options: this.map_options,
 			record_options: this.record_options,
-			set_options: this.set_options
+			set_options: this.set_options,
+			any_options: this.any_options,
+			unknown_options: this.unknown_options,
+			array_options: this.array_options,
+			object_options: this.object_options
 		};
 
 		faker.seed(ctx.seed);
