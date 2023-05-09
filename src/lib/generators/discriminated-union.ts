@@ -2,17 +2,7 @@ import { z } from "zod";
 import { Generator, generate } from "../generate.js";
 import { faker } from "@faker-js/faker";
 import { RecursionLimitReachedException } from "../exceptions.js";
-import { GeneratorDefinitionFactory } from "../zocker.js";
-
-export const DiscriminatedUnionGenerator: GeneratorDefinitionFactory<
-	z.ZodDiscriminatedUnion<any, any>
-> = (options = {}) => {
-	return {
-		schema: options.schema ?? (z.ZodDiscriminatedUnion as any),
-		generator: generate_discriminated_union,
-		match: options.match ?? "instanceof"
-	};
-};
+import { InstanceofGeneratorDefinition } from "../zocker.js";
 
 const generate_discriminated_union: Generator<
 	z.ZodDiscriminatedUnion<string, any>
@@ -42,4 +32,12 @@ const generate_discriminated_union: Generator<
 	//If all schemas throw a RecursionLimitReachedException, then this schema cannot be generated
 	//and we should throw a RecursionLimitReachedException
 	throw new RecursionLimitReachedException();
+};
+
+export const DiscriminatedUnionGenerator: InstanceofGeneratorDefinition<
+	z.ZodDiscriminatedUnion<any, any>
+> = {
+	schema: z.ZodDiscriminatedUnion as any,
+	generator: generate_discriminated_union,
+	match: "instanceof"
 };

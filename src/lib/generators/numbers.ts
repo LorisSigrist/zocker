@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { faker } from "@faker-js/faker";
-import { GeneratorDefinitionFactory, InstanceofGeneratorDefinition } from "lib/zocker.js";
+import { InstanceofGeneratorDefinition } from "lib/zocker.js";
 import { Generator } from "../generate.js";
 import { weighted_random_boolean } from "../utils/random.js";
 import { InvalidSchemaException } from "../exceptions.js";
@@ -10,20 +10,9 @@ export type NumberGeneratorOptions = {
 	extreme_value_chance: number;
 };
 
-const default_options: NumberGeneratorOptions = {
-	extreme_value_chance: 0.3
-};
-
-export const NumberGenerator: InstanceofGeneratorDefinition<z.ZodNumber> = () => {
-	return {
-		schema: z.ZodNumber,
-		generator: generate_number,
-		match: "instanceof"
-	};
-};
-
 const generate_number: Generator<z.ZodNumber> = (number_schema, ctx) => {
-	try { //Generate semantically meaningful number
+	try {
+		//Generate semantically meaningful number
 		let proposed_number = NaN;
 
 		const semantic_generators: {
@@ -49,7 +38,7 @@ const generate_number: Generator<z.ZodNumber> = (number_schema, ctx) => {
 		proposed_number = generator();
 
 		return number_schema.parse(proposed_number);
-	} catch (e) { }
+	} catch (e) {}
 
 	let is_extreme_value = weighted_random_boolean(
 		ctx.number_options.extreme_value_chance
@@ -64,14 +53,14 @@ const generate_number: Generator<z.ZodNumber> = (number_schema, ctx) => {
 		min_checks.length === 0
 			? null
 			: min_checks.reduce((prev, curr) =>
-				prev.value > curr.value ? prev : curr
-			);
+					prev.value > curr.value ? prev : curr
+			  );
 	let max_check =
 		max_checks.length === 0
 			? null
 			: max_checks.reduce((prev, curr) =>
-				prev.value < curr.value ? prev : curr
-			);
+					prev.value < curr.value ? prev : curr
+			  );
 
 	let inclusive_min = min_check?.inclusive ?? true;
 	let inclusive_max = max_check?.inclusive ?? true;
@@ -119,8 +108,8 @@ const generate_number: Generator<z.ZodNumber> = (number_schema, ctx) => {
 		multipleof_checks.length === 0
 			? null
 			: multipleof_checks.reduce((acc, check) => {
-				return lcm(acc, check.value);
-			}, multipleof_checks[0]?.value!);
+					return lcm(acc, check.value);
+			  }, multipleof_checks[0]?.value!);
 
 	if (multipleof !== null) {
 		let next_higher = value + (multipleof - (value % multipleof));
@@ -128,7 +117,10 @@ const generate_number: Generator<z.ZodNumber> = (number_schema, ctx) => {
 
 		if (next_higher <= max) value = next_higher;
 		else if (next_lower >= min) value = next_lower;
-		else throw new InvalidSchemaException(`There exists no valid multiple of ${multipleof} between ${min} and ${max}.`);
+		else
+			throw new InvalidSchemaException(
+				`There exists no valid multiple of ${multipleof} between ${min} and ${max}.`
+			);
 	}
 
 	return value;
@@ -153,12 +145,17 @@ function float_step_size(n: number) {
 	);
 }
 
-
 function lcm<N extends bigint | number>(a: N, b: N): N {
-	return (a * b) / gcd<N>(a, b) as N;
+	return ((a * b) / gcd<N>(a, b)) as N;
 }
 
 function gcd<N extends bigint | number>(a: N, b: N): N {
 	if (b === 0n || b === 0) return a;
-	return gcd<N>(b, a % b as N);
+	return gcd<N>(b, (a % b) as N);
 }
+
+export const NumberGenerator: InstanceofGeneratorDefinition<z.ZodNumber> = {
+	schema: z.ZodNumber as any,
+	generator: generate_number,
+	match: "instanceof"
+};

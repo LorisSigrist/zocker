@@ -3,17 +3,25 @@ import {
 	NoGeneratorException,
 	RecursionLimitReachedException
 } from "./exceptions.js";
-import { GeneratorDefinition } from "./zocker.js";
+import {
+	InstanceofGeneratorDefinition,
+	ReferenceGeneratorDefinition
+} from "./zocker.js";
 import { SemanticFlag } from "./semantics.js";
 import { NumberGeneratorOptions } from "./generators/numbers.js";
 import { OptionalOptions } from "./generators/optional.js";
+import { NullableOptions } from "./generators/nullable.js";
+import { DefaultOptions } from "./generators/default.js";
+import { MapOptions } from "./generators/map.js";
+import { RecordOptions } from "./generators/record.js";
+import { SetOptions } from "./generators/set.js";
 
 /**
  * Contains all the necessary configuration to generate a value for a given schema.
  */
 export type GenerationContext<Z extends z.ZodSchema> = {
-	instanceof_generators: GeneratorDefinition<any>[];
-	reference_generators: GeneratorDefinition<any>[];
+	instanceof_generators: InstanceofGeneratorDefinition<any>[];
+	reference_generators: ReferenceGeneratorDefinition<any>[];
 
 	/** A Map that keeps count of how often we've seen a parent schema - Used for cycle detection */
 	parent_schemas: Map<z.ZodSchema, number>;
@@ -24,8 +32,20 @@ export type GenerationContext<Z extends z.ZodSchema> = {
 
 	seed: number;
 
-	number_options: NumberGeneratorOptions
-	optional_options: OptionalOptions
+	/** Options for the z.ZodNumber generator */
+	number_options: NumberGeneratorOptions;
+	/** Options for the z.ZodOptional generator */
+	optional_options: OptionalOptions;
+	/** Options for the z.ZodNullable generator */
+	nullable_options: NullableOptions;
+	/** Options for the z.ZodDefault generator */
+	default_options: DefaultOptions;
+	/** Options for the z.ZodMap generator */
+	map_options: MapOptions;
+	/** Options for the z.ZodRecord generator */
+	record_options: RecordOptions;
+	/** Options for the z.ZodSet generator */
+	set_options: SetOptions;
 };
 
 export type Generator<Z extends z.ZodSchema> = (

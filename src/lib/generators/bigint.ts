@@ -1,18 +1,8 @@
 import { faker } from "@faker-js/faker";
 import { Generator } from "../generate.js";
 import { z } from "zod";
-import { GeneratorDefinitionFactory } from "lib/zocker.js";
+import { InstanceofGeneratorDefinition } from "lib/zocker.js";
 import { InvalidSchemaException } from "../exceptions.js";
-
-export const BigintGenerator: GeneratorDefinitionFactory<z.ZodBigInt> = (
-	options = {}
-) => {
-	return {
-		schema: options.schema ?? (z.ZodBigInt as any),
-		generator: generate_bigint,
-		match: options.match ?? "instanceof"
-	};
-};
 
 const generate_bigint: Generator<z.ZodBigInt> = (bigint_schema, ctx) => {
 	const multiple_of_checks = get_bigint_checks(bigint_schema, "multipleOf");
@@ -34,7 +24,6 @@ const generate_bigint: Generator<z.ZodBigInt> = (bigint_schema, ctx) => {
 		return acc;
 	}, BigInt(Number.MAX_SAFE_INTEGER));
 
-
 	const multipleof = multiple_of_checks.reduce((acc, check) => {
 		return lcm(acc, check.value);
 	}, 1n);
@@ -43,10 +32,12 @@ const generate_bigint: Generator<z.ZodBigInt> = (bigint_schema, ctx) => {
 	const next_larger_multiple = value + (multipleof - (value % multipleof));
 	const next_smaller_multiple = value - (value % multipleof);
 
-
 	if (next_larger_multiple <= max) value = next_larger_multiple;
 	else if (next_smaller_multiple >= min) value = next_smaller_multiple;
-	else throw new InvalidSchemaException("Cannot generate a valid BigInt that satisfies the constraints");
+	else
+		throw new InvalidSchemaException(
+			"Cannot generate a valid BigInt that satisfies the constraints"
+		);
 
 	return value;
 };
@@ -55,7 +46,10 @@ function get_bigint_checks<Kind extends z.ZodBigIntCheck["kind"]>(
 	schema: z.ZodBigInt,
 	kind: Kind
 ): Extract<z.ZodBigIntCheck, { kind: Kind }>[] {
-	return schema._def.checks.filter((check) => check.kind === kind) as Extract<z.ZodBigIntCheck, { kind: Kind }>[]
+	return schema._def.checks.filter((check) => check.kind === kind) as Extract<
+		z.ZodBigIntCheck,
+		{ kind: Kind }
+	>[];
 }
 
 function lcm(a: bigint, b: bigint) {
@@ -66,3 +60,9 @@ function gcd(a: bigint, b: bigint): bigint {
 	if (b === 0n) return a;
 	return gcd(b, a % b);
 }
+
+export const BigintGenerator: InstanceofGeneratorDefinition<z.ZodBigInt> = {
+	schema: z.ZodBigInt as any,
+	generator: generate_bigint,
+	match: "instanceof"
+};

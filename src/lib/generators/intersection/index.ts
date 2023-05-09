@@ -1,20 +1,10 @@
-import { GeneratorDefinitionFactory } from "../../zocker.js";
+import { InstanceofGeneratorDefinition } from "../../zocker.js";
 import { Generator, generate } from "../../generate.js";
 import { z } from "zod";
 import {
 	InvalidSchemaException,
 	NoGeneratorException
 } from "../../exceptions.js";
-
-export const IntersectionGenerator: GeneratorDefinitionFactory<
-	z.ZodIntersection<any, any>
-> = () => {
-	return {
-		schema: z.ZodIntersection as any,
-		generator: generate_intersection,
-		match: "instanceof"
-	};
-};
 
 const generate_intersection: Generator<z.ZodIntersection<any, any>> = (
 	schema,
@@ -64,4 +54,12 @@ const merge_schema = (
 	throw new NoGeneratorException(
 		"ZodIntersections only have very limited support at the moment."
 	);
+};
+
+export const IntersectionGenerator: InstanceofGeneratorDefinition<
+	z.ZodIntersection<any, any>
+> = {
+	schema: z.ZodIntersection as any,
+	generator: generate_intersection,
+	match: "instanceof"
 };

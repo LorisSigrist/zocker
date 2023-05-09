@@ -26,7 +26,7 @@ describe("repeatability", () => {
 		const first = zocker(schema).setSeed(seed).generate();
 
 		for (let i = 0; i < 10; i++) {
-			const second = zocker(schema).setSeed(seed).generate()
+			const second = zocker(schema).setSeed(seed).generate();
 			expect(second).toEqual(first);
 		}
 	});

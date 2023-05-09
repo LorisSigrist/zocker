@@ -1,26 +1,18 @@
 import { z } from "zod";
 import { generate, Generator } from "../generate.js";
 import { pick } from "../utils/random.js";
-import { GeneratorDefinitionFactory } from "../zocker.js";
+import { InstanceofGeneratorDefinition } from "../zocker.js";
 
-export const AnyGenerator: GeneratorDefinitionFactory<z.ZodAny> = (
-	options = {}
-) => {
-	return {
-		schema: options.schema ?? (z.ZodAny as any),
-		generator: Any() as Generator<z.ZodAny>,
-		match: options.match ?? "instanceof"
-	};
+export const AnyGenerator: InstanceofGeneratorDefinition<z.ZodAny> = {
+	schema: z.ZodAny as any,
+	generator: Any("true-any"),
+	match: "instanceof"
 };
 
-export const UnknownGenerator: GeneratorDefinitionFactory<z.ZodUnknown> = (
-	options = {}
-) => {
-	return {
-		schema: options.schema ?? (z.ZodUnknown as any),
-		generator: Any() as Generator<z.ZodUnknown>,
-		match: options.match ?? "instanceof"
-	};
+export const UnknownGenerator: InstanceofGeneratorDefinition<z.ZodUnknown> = {
+	schema: z.ZodUnknown as any,
+	generator: Any(),
+	match: "instanceof"
 };
 
 /**
@@ -28,9 +20,9 @@ export const UnknownGenerator: GeneratorDefinitionFactory<z.ZodUnknown> = (
  * @param strategy - How to generate the value. "true-any" will generate any possible value, "json-compatible" will generate any JSON-compatible value, and "fast" will just return undefined, but is vastly faster.
  * @returns
  */
-function Any(
+function Any<Z extends z.ZodAny | z.ZodUnknown>(
 	strategy: "true-any" | "json-compatible" | "fast" = "true-any"
-): Generator<z.ZodAny | z.ZodUnknown> {
+): Generator<Z> {
 	if (strategy === "fast") {
 		return () => undefined;
 	}
@@ -74,10 +66,7 @@ function Any(
 		z.promise(any)
 	].map((schema) => schema.optional());
 
-	const generate_any: Generator<z.ZodAny | z.ZodUnknown> = (
-		_schema,
-		generation_context
-	) => {
+	const generate_any: Generator<Z> = (_schema, generation_context) => {
 		const schema_to_use = pick(potential_schemas);
 		const generated = generate(schema_to_use, generation_context);
 		return generated;
