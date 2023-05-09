@@ -74,22 +74,50 @@ class Zocker<Z extends z.ZodSchema> {
 	 * @param schema - The schema for which this value will be used
 	 * @param generator - A value, or a function that generates a value that matches the schema
 	 */
-	supply<Z extends z.ZodSchema>(
+	supply<Z extends z.ZodTypeAny>(
 		schema: Z,
 		generator: Generator<Z> | z.infer<Z>
 	) {
 		const next = this.clone();
 
 		const generator_function =
-			typeof generator == "function" ? generator : () => generator;
+			typeof generator === "function" ? generator : () => generator;
 
 		next.reference_generators = [
-			...next.reference_generators,
 			{
 				schema,
 				generator: generator_function,
 				match: "reference"
-			}
+			},
+			...next.reference_generators
+		];
+
+		return next;
+	}
+
+
+	/**
+	 * Override one of the built-in generators using your own.
+	 * It will be used whenever an encoutntered Schema matches the one specified by **instance**
+	 *
+	 * @param schema - Which schema to override. E.g: `z.ZodNumber`.
+	 * @param generator - A value, or a function that generates a value that matches the schema
+	 */
+	override<Z extends  z.ZodFirstPartySchemaTypes>(
+		schema: Z,
+		generator: Generator<Z> | z.infer<Z>
+	) {
+		const next = this.clone();
+		const generator_function =
+			typeof generator === "function" ? generator : () => generator;
+
+		next.instanceof_generators = [
+			{
+				schema,
+				generator: generator_function,
+				match: "instanceof"
+			},
+			...next.instanceof_generators
 		];
 
 		return next;
@@ -98,6 +126,12 @@ class Zocker<Z extends z.ZodSchema> {
 	setSeed(seed: number) {
 		const next = this.clone();
 		next.seed = seed;
+		return next;
+	}
+
+	setDepthLimit(limit: number) {
+		const next = this.clone();
+		next.recursion_limit = limit;
 		return next;
 	}
 

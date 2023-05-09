@@ -59,7 +59,7 @@ export type Generator<Z extends z.ZodSchema> = (
  *
  * @param schema - The schema to generate a value for.
  * @param ctx - The context and configuration for the generation process.
- * @returns - A random value that matches the given schema.
+ * @returns - A pseudo-random value that matches the given schema.
  */
 export function generate<Z extends z.ZodSchema>(
 	schema: Z,
