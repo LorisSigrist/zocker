@@ -9,7 +9,7 @@ describe("Transform generation", () => {
 			.length(2)
 			.transform((s) => s + s);
 		const result_schema = z.string().length(4);
-		const result = zocker(chained_schema);
+		const result = zocker(chained_schema).generate();
 		expect(() => result_schema.parse(result)).not.toThrow();
 	});
 
@@ -23,7 +23,7 @@ describe("Transform generation", () => {
 		const even_schema = z.number().int().positive().multipleOf(2);
 
 		for (let i = 0; i < 100; i++) {
-			const result = zocker(doubled);
+			const result = zocker(doubled).generate();
 			expect(() => even_schema.parse(result)).not.toThrow();
 		}
 	});

@@ -1,4 +1,4 @@
-import { GeneratorDefinitionFactory } from "../../zocker.js";
+import { InstanceofGeneratorDefinition } from "../../zocker.js";
 import { GenerationContext, Generator } from "../../generate.js";
 import { z } from "zod";
 import {
@@ -63,75 +63,52 @@ export type StringKindGenerator = <Z extends z.ZodString>(
 	td: TransformDefinition
 ) => string;
 
-export const StringGenerator: GeneratorDefinitionFactory<z.ZodString> = (
-	options = {}
-) => {
-	const cache = new WeakMap<z.ZodString, CacheEntry>();
+const generate_string: Generator<z.ZodString> = (string_schema, ctx) => {
+	const cc = content_constraints(string_schema);
+	const lc = length_constraints(string_schema);
+	const tf = transforms(string_schema);
 
-	const generate_string: Generator<z.ZodString> = (string_schema, ctx) => {
-		const cache_hit = cache.get(string_schema);
+	const generate_raw_string = () => {
+		switch (cc.format.kind) {
+			case "ip":
+				return StrGens.ip(ctx, lc, cc, tf);
 
-		const cc =
-			cache_hit?.content_constraints ?? content_constraints(string_schema);
-		const lc =
-			cache_hit?.length_constraints ?? length_constraints(string_schema);
-		const tf = cache_hit?.transform_constaints ?? transforms(string_schema);
+			case "datetime":
+				return StrGens.datetime(ctx, lc, cc, tf);
 
-		if (!cache_hit)
-			cache.set(string_schema, {
-				length_constraints: lc,
-				content_constraints: cc,
-				transform_constaints: tf
-			});
+			case "email":
+				return StrGens.email(ctx, lc, cc, tf);
+			case "url":
+				return StrGens.url(ctx, lc, cc, tf);
+			case "uuid":
+				return StrGens.uuid(ctx, lc, cc, tf);
 
-		const generate_raw_string = () => {
-			switch (cc.format.kind) {
-				case "ip":
-					return StrGens.ip(ctx, lc, cc, tf);
+			case "cuid":
+				return StrGens.cuid(ctx, lc, cc, tf);
+			case "cuid2":
+				return StrGens.cuid2(ctx, lc, cc, tf);
+			case "ulid":
+				return StrGens.ulid(ctx, lc, cc, tf);
 
-				case "datetime":
-					return StrGens.datetime(ctx, lc, cc, tf);
+			case "emoji":
+				return StrGens.emoji(ctx, lc, cc, tf);
 
-				case "email":
-					return StrGens.email(ctx, lc, cc, tf);
-				case "url":
-					return StrGens.url(ctx, lc, cc, tf);
-				case "uuid":
-					return StrGens.uuid(ctx, lc, cc, tf);
-
-				case "cuid":
-					return StrGens.cuid(ctx, lc, cc, tf);
-				case "cuid2":
-					return StrGens.cuid2(ctx, lc, cc, tf);
-				case "ulid":
-					return StrGens.ulid(ctx, lc, cc, tf);
-
-				case "emoji":
-					return StrGens.emoji(ctx, lc, cc, tf);
-
-				case "regex":
-					return StrGens.regex(ctx, lc, cc, tf);
-				case "any":
-				default:
-					return StrGens.any(ctx, lc, cc, tf);
-			}
-		};
-
-		let string = generate_raw_string();
-
-		if (tf.trim) string = string.trim();
-
-		if (tf.case === "upper") string = string.toUpperCase();
-		else if (tf.case === "lower") string = string.toLowerCase();
-
-		return string;
+			case "regex":
+				return StrGens.regex(ctx, lc, cc, tf);
+			case "any":
+			default:
+				return StrGens.any(ctx, lc, cc, tf);
+		}
 	};
 
-	return {
-		schema: options.schema ?? (z.ZodString as any),
-		generator: generate_string,
-		match: options.match ?? "instanceof"
-	};
+	let string = generate_raw_string();
+
+	if (tf.trim) string = string.trim();
+
+	if (tf.case === "upper") string = string.toUpperCase();
+	else if (tf.case === "lower") string = string.toLowerCase();
+
+	return string;
 };
 
 function get_string_checks<Kind extends z.ZodStringCheck["kind"]>(
@@ -378,3 +355,9 @@ function transforms(schema: z.ZodString): TransformDefinition {
 	}
 	return transform_definition;
 }
+
+export const StringGenerator: InstanceofGeneratorDefinition<z.ZodString> = {
+	schema: z.ZodString as any,
+	generator: generate_string,
+	match: "instanceof"
+};

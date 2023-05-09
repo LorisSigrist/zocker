@@ -1,4 +1,4 @@
-import { GeneratorDefinition } from "./zocker.js";
+import { InstanceofGeneratorDefinition } from "./zocker.js";
 import { z } from "zod";
 
 import {
@@ -30,32 +30,32 @@ import {
 	IntersectionGenerator
 } from "./generators/index.js";
 
-export const default_generators: GeneratorDefinition<any>[] = [
-	StringGenerator(),
-	NumberGenerator(),
-	BigintGenerator(),
-	BooleanGenerator(),
-	DateGenerator(),
-	SymbolGenerator(),
-	OptionalGenerator(),
-	NullableGenerator(),
-	AnyGenerator(),
-	UnknownGenerator(),
-	EffectsGenerator(),
-	ArrayGenerator(),
-	TupleGenerator(),
-	RecordGenerator(),
-	MapGenerator(),
-	SetGenerator(),
-	ObjectGenerator(),
-	UnionGenerator(),
-	NativeEnumGenerator(),
-	EnumGenerator(),
-	DefaultGenerator(),
-	DiscriminatedUnionGenerator(),
-	PromiseGenerator(),
-	LazyGenerator(),
-	BrandedGenerator(),
+export const default_generators: InstanceofGeneratorDefinition<any>[] = [
+	StringGenerator,
+	NumberGenerator,
+	BigintGenerator,
+	BooleanGenerator,
+	DateGenerator,
+	SymbolGenerator,
+	OptionalGenerator,
+	NullableGenerator,
+	AnyGenerator,
+	UnknownGenerator,
+	EffectsGenerator,
+	ArrayGenerator,
+	TupleGenerator,
+	RecordGenerator,
+	MapGenerator,
+	SetGenerator,
+	ObjectGenerator,
+	UnionGenerator,
+	NativeEnumGenerator,
+	EnumGenerator,
+	DefaultGenerator,
+	DiscriminatedUnionGenerator,
+	PromiseGenerator,
+	LazyGenerator,
+	BrandedGenerator,
 	{
 		schema: z.ZodVoid,
 		generator: () => {},
@@ -81,5 +81,5 @@ export const default_generators: GeneratorDefinition<any>[] = [
 		generator: (schema) => schema._def.value,
 		match: "instanceof"
 	},
-	IntersectionGenerator()
+	IntersectionGenerator
 ];

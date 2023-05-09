@@ -2,65 +2,56 @@ import { faker } from "@faker-js/faker";
 import { Generator, generate } from "../generate.js";
 import { z } from "zod";
 import { RecursionLimitReachedException } from "../exceptions.js";
-import { GeneratorDefinitionFactory } from "../zocker.js";
+import { InstanceofGeneratorDefinition } from "../zocker.js";
 
-type MapOptions = {
+export type MapOptions = {
 	max: number;
 	min: number;
 };
 
-const default_map_options: MapOptions = {
-	max: 10,
-	min: 0
-};
+const generate_map: Generator<z.ZodMap> = (schema, ctx) => {
+	const size = faker.datatype.number({
+		min: ctx.map_options.min,
+		max: ctx.map_options.max
+	});
 
-export const MapGenerator: GeneratorDefinitionFactory<
-	z.ZodMap,
-	Partial<MapOptions>
-> = (partial_options = {}) => {
-	const options = { ...default_map_options, ...partial_options };
+	type Key = z.infer<(typeof schema)["_def"]["keyType"]>;
+	type Value = z.infer<(typeof schema)["_def"]["valueType"]>;
 
-	const generate_map: Generator<z.ZodMap> = (schema, generation_context) => {
-		const size = faker.datatype.number({ min: options.min, max: options.max });
+	const map = new Map<Key, Value>();
 
-		type Key = z.infer<(typeof schema)["_def"]["keyType"]>;
-		type Value = z.infer<(typeof schema)["_def"]["valueType"]>;
-
-		const map = new Map<Key, Value>();
-
-		try {
-			const keys: Key[] = [];
-			for (let i = 0; i < size; i++) {
-				const key = generate(schema._def.keyType, generation_context);
-				keys.push(key);
-			}
-
-			for (const key of keys) {
-				let prev_semantic_context = generation_context.semantic_context;
-				try {
-					generation_context.path.push(key);
-					generation_context.semantic_context = "key";
-
-					const value = generate(schema._def.valueType, generation_context);
-					map.set(key, value);
-				} finally {
-					generation_context.path.pop();
-					generation_context.semantic_context = prev_semantic_context;
-				}
-			}
-		} catch (error) {
-			if (error instanceof RecursionLimitReachedException) {
-				return map;
-			}
-			throw error;
+	try {
+		const keys: Key[] = [];
+		for (let i = 0; i < size; i++) {
+			const key = generate(schema._def.keyType, ctx);
+			keys.push(key);
 		}
 
-		return map;
-	};
+		for (const key of keys) {
+			let prev_semantic_context = ctx.semantic_context;
+			try {
+				ctx.path.push(key);
+				ctx.semantic_context = "key";
 
-	return {
-		schema: options.schema ?? (z.ZodMap as any),
-		generator: generate_map,
-		match: options.match ?? "instanceof"
-	};
+				const value = generate(schema._def.valueType, ctx);
+				map.set(key, value);
+			} finally {
+				ctx.path.pop();
+				ctx.semantic_context = prev_semantic_context;
+			}
+		}
+	} catch (error) {
+		if (error instanceof RecursionLimitReachedException) {
+			return map;
+		}
+		throw error;
+	}
+
+	return map;
+};
+
+export const MapGenerator: InstanceofGeneratorDefinition<z.ZodMap> = {
+	schema: z.ZodMap as any,
+	generator: generate_map,
+	match: "instanceof"
 };

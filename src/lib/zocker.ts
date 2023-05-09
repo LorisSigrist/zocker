@@ -2,77 +2,208 @@ import { z } from "zod";
 import { GenerationContext, generate, Generator } from "./generate.js";
 import { faker } from "@faker-js/faker";
 import { default_generators } from "./default_generators.js";
+import { NumberGeneratorOptions } from "./generators/numbers.js";
+import { OptionalOptions } from "./generators/optional.js";
+import { NullableOptions } from "./generators/nullable.js";
+import { DefaultOptions } from "./generators/default.js";
+import { MapOptions } from "./generators/map.js";
+import { RecordOptions } from "./generators/record.js";
+import { SetOptions } from "./generators/set.js";
 
-/**
- * A factory function that creates a GeneratorDefinition with the given options.
- */
-export type GeneratorDefinitionFactory<
-	Z extends z.ZodSchema,
-	O extends {} = {}
-> = (
-	options?: O & {
-		match?: "instanceof" | "reference";
-		schema?: Z;
-	}
-) => GeneratorDefinition<Z>;
-
-/**
- * A definition of a generator and when it should be used.
- */
-export type GeneratorDefinition<Z extends z.ZodSchema> = {
+export type InstanceofGeneratorDefinition<Z extends z.ZodSchema> = {
 	schema: Z;
 	generator: Generator<Z>;
-	match: "instanceof" | "reference";
+	match: "instanceof";
 };
 
-export type ZockerOptions<Z extends z.ZodSchema> = {
-	/** A list of generators to use for generation. This will be appended by the built-in generators */
-	generators?: GeneratorDefinition<Z>[];
-	/** The seed to use for the random number generator */
-	seed?: number;
-
-	/** The maximum number of times a schema can be cyclically generated */
-	recursion_limit?: number;
+export type ReferenceGeneratorDefinition<Z extends z.ZodSchema> = {
+	schema: Z;
+	generator: Generator<Z>;
+	match: "reference";
 };
 
-/**
- * Generate random* valid mock-data from a Zod-Schem
- * @param schema A Zod-Schema
- * @returns A Zocker-Function that can be used to generate random data that matches the schema.
- */
-export function zocker<Z extends z.ZodSchema>(
-	schema: Z,
-	options: ZockerOptions<Z> = {}
-): z.infer<Z> {
-	//add the default generators to the list of generators
-	const generators: GeneratorDefinition<Z>[] = [
-		...(options.generators ?? []),
+export function zocker<Z extends z.ZodSchema>(schema: Z) {
+	return new Zocker(schema);
+}
+
+class Zocker<Z extends z.ZodSchema> {
+	private instanceof_generators: InstanceofGeneratorDefinition<any>[] = [
 		...default_generators
 	];
+	private reference_generators: ReferenceGeneratorDefinition<any>[] = [];
+	private seed: number | undefined = undefined;
+	private recursion_limit = 5;
 
-	//Split the generators into instanceof and reference generators
-	const reference_generators = generators.filter(
-		(g) => g.match === "reference"
-	);
-
-	const instanceof_generators = generators.filter(
-		(g) => g.match === "instanceof"
-	);
-
-	//Set the seed for the random number generator
-	const seed = options.seed ?? Math.random() * 10_000_000;
-	faker.seed(seed);
-
-	const root_generation_context: GenerationContext<Z> = {
-		reference_generators,
-		instanceof_generators,
-		recursion_limit: options.recursion_limit ?? 5,
-
-		path: [],
-		semantic_context: "unspecified",
-		parent_schemas: new Map(),
-		seed
+	private number_options: NumberGeneratorOptions = {
+		extreme_value_chance: 0.3
 	};
 
-	return generate(schema, root_generation_context);
+	private optional_options: OptionalOptions = {
+		undefined_chance: 0.3
+	};
+
+	private nullable_options: NullableOptions = {
+		null_chance: 0.3
+	};
+
+	private default_options: DefaultOptions = {
+		default_chance: 0.3
+	};
+
+	private map_options: MapOptions = {
+		max: 10,
+		min: 0
+	};
+
+	private record_options: RecordOptions = {
+		max: 10,
+		min: 0
+	};
+
+	private set_options: SetOptions = {
+		max: 10,
+		min: 0
+	};
+
+	constructor(public schema: Z) {}
+
+	/**
+	 * Supply your own value / function for generating values for a given schema
+	 * It will be used whenever the given schema matches an encountered schema by referebce
+	 *
+	 * @param schema - The schema for which this value will be used
+	 * @param generator - A value, or a function that generates a value that matches the schema
+	 */
+	supply<Z extends z.ZodTypeAny>(
+		schema: Z,
+		generator: Generator<Z> | z.infer<Z>
+	) {
+		const next = this.clone();
+
+		const generator_function =
+			typeof generator === "function" ? generator : () => generator;
+
+		next.reference_generators = [
+			{
+				schema,
+				generator: generator_function,
+				match: "reference"
+			},
+			...next.reference_generators
+		];
+
+		return next;
+	}
+
+
+	/**
+	 * Override one of the built-in generators using your own.
+	 * It will be used whenever an encoutntered Schema matches the one specified by **instance**
+	 *
+	 * @param schema - Which schema to override. E.g: `z.ZodNumber`.
+	 * @param generator - A value, or a function that generates a value that matches the schema
+	 */
+	override<Z extends  z.ZodFirstPartySchemaTypes>(
+		schema: Z,
+		generator: Generator<Z> | z.infer<Z>
+	) {
+		const next = this.clone();
+		const generator_function =
+			typeof generator === "function" ? generator : () => generator;
+
+		next.instanceof_generators = [
+			{
+				schema,
+				generator: generator_function,
+				match: "instanceof"
+			},
+			...next.instanceof_generators
+		];
+
+		return next;
+	}
+
+	setSeed(seed: number) {
+		const next = this.clone();
+		next.seed = seed;
+		return next;
+	}
+
+	setDepthLimit(limit: number) {
+		const next = this.clone();
+		next.recursion_limit = limit;
+		return next;
+	}
+
+	number(options: Partial<NumberGeneratorOptions>) {
+		const next = this.clone();
+		next.number_options = { ...next.number_options, ...options };
+		return next;
+	}
+
+	optional(options: Partial<OptionalOptions>) {
+		const next = this.clone();
+		next.optional_options = { ...next.optional_options, ...options };
+		return next;
+	}
+
+	nullable(options: Partial<NullableOptions>) {
+		const next = this.clone();
+		next.nullable_options = { ...next.nullable_options, ...options };
+		return next;
+	}
+
+	default(options: Partial<DefaultOptions>) {
+		const next = this.clone();
+		next.default_options = { ...next.default_options, ...options };
+		return next;
+	}
+
+	map(options: Partial<MapOptions>) {
+		const next = this.clone();
+		next.map_options = { ...next.map_options, ...options };
+		return next;
+	}
+
+	record(options: Partial<RecordOptions>) {
+		const next = this.clone();
+		next.record_options = { ...next.record_options, ...options };
+		return next;
+	}
+
+	set(options: Partial<SetOptions>) {
+		const next = this.clone();
+		next.set_options = { ...next.set_options, ...options };
+		return next;
+	}
+
+	generate(): z.infer<Z> {
+		const ctx: GenerationContext<Z> = {
+			reference_generators: this.reference_generators,
+			instanceof_generators: this.instanceof_generators,
+			recursion_limit: this.recursion_limit,
+			path: [],
+			semantic_context: "unspecified",
+			parent_schemas: new Map(),
+			seed: this.seed ?? Math.random() * 10_000_000,
+
+			number_options: this.number_options,
+			optional_options: this.optional_options,
+			nullable_options: this.nullable_options,
+			default_options: this.default_options,
+			map_options: this.map_options,
+			record_options: this.record_options,
+			set_options: this.set_options
+		};
+
+		faker.seed(ctx.seed);
+		return generate(this.schema, ctx);
+	}
+
+	private clone(): Zocker<Z> {
+		return Object.create(
+			Object.getPrototypeOf(this),
+			Object.getOwnPropertyDescriptors(this)
+		);
+	}
 }

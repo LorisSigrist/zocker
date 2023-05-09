@@ -23,24 +23,24 @@ const schema = z.object({
 describe("repeatability", () => {
 	it("should generate identcal values for the same seed", () => {
 		const seed = 0;
-		const first = zocker(schema, { seed });
+		const first = zocker(schema).setSeed(seed).generate();
 
 		for (let i = 0; i < 10; i++) {
-			const next = zocker(schema, { seed });
-			expect(next).toEqual(first);
+			const second = zocker(schema).setSeed(seed).generate();
+			expect(second).toEqual(first);
 		}
 	});
 
 	it("should generate different values for different seeds", () => {
-		const first = zocker(schema, { seed: 0 });
-		const second = zocker(schema, { seed: 1 });
+		const first = zocker(schema).setSeed(0).generate();
+		const second = zocker(schema).setSeed(1).generate();
 
 		expect(first).not.toEqual(second);
 	});
 
 	it("should generate different values if the seed is not specified", () => {
-		const first = zocker(schema);
-		const second = zocker(schema);
+		const first = zocker(schema).generate();
+		const second = zocker(schema).generate();
 
 		expect(first).not.toEqual(second);
 	});

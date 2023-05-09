@@ -1,30 +1,20 @@
 import { faker } from "@faker-js/faker";
 import { InvalidSchemaException } from "../exceptions.js";
 import { Generator } from "lib/generate.js";
-import { GeneratorDefinitionFactory } from "lib/zocker.js";
+import { InstanceofGeneratorDefinition } from "lib/zocker.js";
 import { z } from "zod";
 
-export const DateGenerator: GeneratorDefinitionFactory<z.ZodDate> = (
-	options = {}
-) => {
-	const generate_date: Generator<z.ZodDate> = (date_schema, options) => {
-		const min = get_date_check(date_schema, "min")?.value ?? null;
-		const max = get_date_check(date_schema, "max")?.value ?? null;
+const generate_date: Generator<z.ZodDate> = (date_schema, ctx) => {
+	const min = get_date_check(date_schema, "min")?.value ?? null;
+	const max = get_date_check(date_schema, "max")?.value ?? null;
 
-		if (min && max && max < min)
-			throw new InvalidSchemaException("max date is less than min date");
+	if (min && max && max < min)
+		throw new InvalidSchemaException("max date is less than min date");
 
-		return faker.datatype.datetime({
-			min: min ?? undefined,
-			max: max ?? undefined
-		});
-	};
-
-	return {
-		schema: options.schema ?? (z.ZodDate as any),
-		generator: generate_date,
-		match: options.match ?? "instanceof"
-	};
+	return faker.datatype.datetime({
+		min: min ?? undefined,
+		max: max ?? undefined
+	});
 };
 
 function get_date_check<Kind extends z.ZodDateCheck["kind"]>(
@@ -36,3 +26,9 @@ function get_date_check<Kind extends z.ZodDateCheck["kind"]>(
 		| undefined;
 	return check;
 }
+
+export const DateGenerator: InstanceofGeneratorDefinition<z.ZodDate> = {
+	schema: z.ZodDate as any,
+	generator: generate_date,
+	match: "instanceof"
+};

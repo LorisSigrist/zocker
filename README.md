@@ -13,7 +13,7 @@ npm install --save-dev zocker
 
 ## Usage
 
-Wrapping your zod-schema in `zocker()` will return mock data that matches your schema.
+Like `zod`, we use a fluent API to make customization easy. Get started by wrapping your schema in `zocker`, and then call `generate()` on it to generate some data.
 
 ```typescript
 import { z } from "zod";
@@ -26,7 +26,7 @@ const person_schema = z.object({
 	children: z.array(z.lazy(() => person_schema))
 });
 
-const mockData = zocker(person_schema);
+const mockData = zocker(person_schema).generate();
 /*
 {
 	name: "John Doe",
@@ -47,31 +47,22 @@ const mockData = zocker(person_schema);
 
 ### Features & Limitations
 
-`zocker` is still in early development, but it already is the most feature-complete library of its kind. It's easier to list the limitations than the features. All these limitations can be worked around by providing your own generator (see below).
+`zocker` is still in early development, but it already is the most feature-complete library of its kind. It's easier to list the limitations than the features. All these limitations can be worked around by customizing the generation process (see below).
 
 1. `z.preprocess` and `z.refine` are not supported out of the box (and probably never will be)
 2. `toUpperCase`, `toLowerCase` and `trim` only work if they are the last operation in the chain
 3. `z.function` is not supported
 4. `z.Intersection` is not supported
 5. `z.transform` is only supported if it's the last operation in the chain
-6. `z.regex` can be used at most once per string
-7. The generation-customization options are very limited (ideas are welcome)
+6. `z.string` supports at most one format (e.g regex, cuid, ip) at a time
+7. The customization for the built-in generators is still limited (suggestions welcome)
 
-### Providing a custom generator
+### Supply your own value
 
-You can override any part of the Generation Process by providing your own generator. This allows you to bypass all limitation listed above.
-
-To register a custom-generator, you must provide two things:
-
-1. A function that generates data
-2. A way to instruct zocker when to use this generator
-
+If you have a value that you would like to control explicitly, you can supply your own.
 Let's learn by example:
 
 ```typescript
-import { z } from "zod";
-import { zocker } from "zocker";
-
 const name_schema = z.string().refine((name) => name.length > 5);
 
 const schema = z.object({
@@ -79,47 +70,103 @@ const schema = z.object({
 	age: z.number()
 });
 
-const generators = [
-	{
-		//The function that returns data
-		generator: () => "John Doe",
-
-		//The matching-configuration
-		match: "reference",
-		schema: name_schema
-	}
-];
-
-const data = zocker(schema, { generators });
+const data = zocker(schema).supply(name_schema, "Jonathan").generate();
 ```
 
-Here we've told zocker to always generate the name "John Doe" for the `name_schema`. We check equality for the name schema by using the `match: "reference"` configuration. This means that we check if the schema is the same object as the one we provided.
+The `supply` method allows you to provide a value, or a function that returns a value, for a specific sub-schema.
+It will be used whenever a sub-schema is encoutnered, that matches the one you passed into `supply` by reference.
 
-Alternatively, you can also use `match: "instanceof"` to match based on the type of the schema. This is useful for overriding the default generator for a specific type. Eg. `z.number()`.
+> The supplied value is not enforced to be valid
 
-Generator functions always recive two arguments:
-
-1. The schema that they are generating data for
-2. A context object that contains information about the current generation process. This one is rarely used.
+This is the main way to work around unsupported types.
 
 ### Customizing the generation process
 
-The main way to customize the generation process is to override the built-in generators. But this doesn't mean that you have to write your own generators from scratch. All built-in generators have factory-functions that generate a configuration for you, with the behavior you want. For example, you could have a number generator that always generates the most extreme values possible.
+#### Providing Options to Built-Ins
+
+You can customize the behaviour of many built-in generators by passing options to their corresponding method on `zocker`. The methods have the same name as the datatype.
+
+You can mostly autocomplete your way through these.
 
 ```typescript
-import { z } from "zod";
-import { zocker, NumberGenerator } from "zocker";
-
-const generators = [
-	NumberGenerator({
-		extreme_value_chance: 1 //Set the chance of generating an extreme value to 100%
-	})
-];
-
-const data = zocker(my_schema, { generators });
+const data = zocker(my_schema)
+		.set({min: 2, max: 20}) //How many items should be in a set
+		.number({ extreme_value_chance: 0.3 }) //The probability that the most extreme value allowed will be generated
+		...
+		.generate()
 ```
 
-Notice that you can pass the return-value directly into the `generators` field, as it comes included with the matching-configuration. This is the case for all built-in generators. If you only want the function, you can just access the `generator` field of the return-value.
+#### Overriding Built-ins
+
+If you want to outright override one of the built-in generators (E.g `z.ZodNumber`), then you can use the `override` method. Pass it a schema and a value / function that generates a value, and it will be used whenever a schema is encountered that is an instance of the schema you provided.
+
+Let's override the number generation to only return `Infinity`, regardless of anything.
+
+```typescript
+const data = zocker(my_schema).override(z.ZodNumber, Infinity).generate();
+```
+
+> There is currently an issue, where the types don't play well when passing the classes themselves as arguments. If you get a type-error on `z.ZodNumber`, type-cast it to itself it with `z.ZodNumber as any as z.ZodNumber`. It's silly, I know. If you know how to fix it, contributions are welcome.
+
+In practice you would probably want to return different values based on the exact number-schema we are working on.
+To do that, you can provide a function to the override. It will recieve two arguments, first the schema that we are working on, and second, a generation-context. You usually only utilize the first one.
+
+```typescript
+const data = zocker(my_schema)
+	.override(z.ZodNumber, (schema, _ctx) => {
+		//Example: Return 0 if there is a minimum specified, and 1 if there isn't
+		if (schema._def.checks.some((check) => check.kind == "min")) return 0;
+		return 1;
+	})
+	.generate();
+```
+
+If you are overriding a schema with children, you might want to re-enter `zocker`'s generation. You could do this by definging a second mock generation inside your override function, but that would loose all the outside-customization you've done. Instead, use the `generate` function that is exported from the `"zocker"` module. Pass it the schema you would like to generate, as well as the generation-context.
+
+```typescript
+import { zocker, generate } from "zocker";
+
+const data = zocker(my_schema)
+	.override(z.ZodRecord, (schema, ctx) => {
+		const keys = ["one", "two", "three"];
+		const obj = {};
+		for (const key of keys) {
+			obj[key] = generate(schema._def.valueType, ctx);
+		}
+		return obj;
+	})
+	.generate();
+```
+
+`generate` is what zocker's built-in generators use aswell. This is the only point where you need to interact with it.
+
+> The generation-context is passed by reference between different generations, it is not immutable. If you mutate it (which you probably don't need to), make sure to undo the mutation before returning from your function, even if it throws.
+
+### Code Reuse
+
+When writing unit-tests, you often end up with many slightly different `zocker` setups. The might only differ in one `supply` call to force a specific edge case.
+
+To make this easier to deal with, each step in `zocker`'s fluent API is immutable, so you can reuse most of your configuration for many slight variations.
+
+E.g
+
+```typescript
+const zock = zocker(my_schema).supply(...)...setSeed(0); //Do a bunch of customization
+
+test("test 1" , ()=>{
+	const data = zock
+		.supply(my_sub_schema, 0); //Extra-customization - Does not affect `zock`
+		.generate()
+	...
+})
+
+test("test 2", ()=> {
+	const data = zock
+		.supply(my_sub_schema, 1); //Extra-customization - Does not affect `zock`
+		.generate()
+	...
+})
+```
 
 ### Repeatability
 
@@ -127,11 +174,11 @@ You can specify a seed to make the generation process repeatable. This ensures t
 
 ```typescript
 test("my repeatable test", () => {
-	const data = zocker(schema, { seed: 23 }); // always the same
+	const data = zocker(schema).setSeed(123).generate(); // always the same
 });
 ```
 
-We guarantee that the same seed will always produce the same data, with the same schema and the same generator configuration. Different generator configurations might produce different data, even if the differences are never actually called.
+We guarantee that the same seed will always produce the same data, with the same schema and same options.
 
 ## Examples
 
@@ -145,14 +192,12 @@ const jsonSchema = z.lazy(() =>
 	z.union([literalSchema, z.array(jsonSchema), z.record(jsonSchema)])
 );
 
-const data = zocker(jsonSchema, {
-	recursion_limit: 5 // default value
-});
+const data = zocker(jsonSchema).setDepthLimit(5).generate(); //defaults to 5
 ```
 
 ### Regular Expressions
 
-Zocker supports `z.string().regex()` out of the box, thanks to the amazing [randexp](https://npmjs.com/package/randexp) library. It doesn't play very well with other string validators though (e.g `min`, `length` and other formats), so try to encode as much as possible in the regex itself. If you need to, you can always override the generator for a specific schema.
+Zocker supports `z.string().regex()` out of the box, thanks to the amazing [randexp](https://npmjs.com/package/randexp) library. It doesn't play very well with other string validators though (e.g `min`, `length` and other formats), so try to encode as much as possible in the regex itself. If you need to, you can always supply your own generator.
 
 ```typescript
 const regex_schema = z.string().regex(/^[a-z0-9]{5,10}$/);
