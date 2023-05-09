@@ -78,6 +78,19 @@ It will be used whenever a sub-schema is encoutnered, that matches the one you p
 
 This is the main way to work around unsupported types.
 
+One convenient way to get a sub_schema by reference is through the `shape` property on the schema.
+
+```typescript
+const schema = z.object({
+	name: z.string(),
+	age: z.number()
+});
+
+const data = zocker(schema).supply(schema.shape.name, "Jonathan").generate();
+```
+
+This way you don't need to break out the sub-schema into a separate variable.
+
 ### Customizing the generation process
 
 #### Providing Options to Built-Ins
