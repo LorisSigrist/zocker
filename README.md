@@ -9,6 +9,18 @@ Zocker is a library that automatically generates reasonable mock data from your 
 npm install --save-dev zocker
 ```
 
+## Features & Limitations
+
+`zocker` is still in development, but it already is the most feature-complete library of its kind. It's easier to list the limitations than the features. All these limitations can be worked around by customizing the generation process (see below).
+
+1. `z.preprocess` and `z.refine` are not supported out of the box (and probably never will be)
+2. `toUpperCase`, `toLowerCase` and `trim` only work if they are the last operation on a string
+3. `z.function` is not supported
+4. `z.Intersection` is not supported (yet)
+5. `z.transform` is only supported if it's the last operation on a schema
+6. `z.string` supports at most one format (e.g regex, cuid, ip) at a time
+7. The customization for the built-in generators is still limited, but expanding rapidly (suggestions welcome)
+
 ## Usage
 
 Like `zod`, we use a fluent API to make customization easy. Get started by wrapping your schema in `zocker`, and then call `generate()` on it to generate some data.
@@ -42,18 +54,6 @@ const mockData = zocker(person_schema).generate();
 }
 */
 ```
-
-### Features & Limitations
-
-`zocker` is still in early development, but it already is the most feature-complete library of its kind. It's easier to list the limitations than the features. All these limitations can be worked around by customizing the generation process (see below).
-
-1. `z.preprocess` and `z.refine` are not supported out of the box (and probably never will be)
-2. `toUpperCase`, `toLowerCase` and `trim` only work if they are the last operation in the chain
-3. `z.function` is not supported
-4. `z.Intersection` is not supported
-5. `z.transform` is only supported if it's the last operation in the chain
-6. `z.string` supports at most one format (e.g regex, cuid, ip) at a time
-7. The customization for the built-in generators is still limited (suggestions welcome)
 
 ### Supply your own value
 
@@ -200,6 +200,143 @@ Zocker supports `z.string().regex()` out of the box, thanks to the amazing [rand
 ```typescript
 const regex_schema = z.string().regex(/^[a-z0-9]{5,10}$/);
 const data = zocker(regex_schema);
+```
+
+## API
+### `.supply`
+Allows you to supply a specific value for a specific schema. This is useful for testing edge-cases.
+
+```typescript
+const data = zocker(my_schema).supply(my_sub_schema, 0).generate();
+```
+
+The supplied value will be used if during the generation process a schema is encoutered, that matches the supplied `sub_schema` by *reference*.
+
+You can also supply a function that returns a value. The function must follow the `Generator` type.
+
+### `.override`
+Allows you to override the generator for an entire category of schemas. This is useful if you want to override the generation of `z.ZodNumber` for example.
+
+```typescript
+const data = zocker(my_schema).override(z.ZodNumber, 0).generate();
+```
+
+The supplied value will be used if during the generation process a schema is encoutered, that is an *instance* of the supplied `schema`.
+
+You can also supply a function that returns a value. The function must follow the `Generator` type.
+
+
+### `.setDepthLimit`
+Allows you to set the maximum depth of cyclic data. Defaults to 5.
+
+### `.setSeed`
+Allows you to set the seed for the random number generator. This ensures that the generation process is repeatable. If you don't set a seed, a random one will be chosen.
+
+### `.generate`
+Executes the generation process. Returns the generated data that matches the schema provided to `zocker`.
+
+
+### `.set`
+Options for the built-in `z.ZodSet` generator.
+
+```typescript
+{
+	max: 10,
+	min: 0
+}
+```
+
+### `.array`
+Options for the built-in `z.ZodArray` generator.
+
+```typescript
+{
+	max: 10,
+	min: 0
+}
+```
+
+### `.map`
+Options for the built-in `z.ZodMap` generator.
+
+```typescript
+{
+	max: 10,
+	min: 0
+}
+```
+
+
+### `.record`
+Options for the built-in `z.ZodRecord` generator.
+
+```typescript
+{
+	max: 10,
+	min: 0
+}
+```
+
+### `.object`
+Options for the built-in `z.ZodObject` generator.
+
+```typescript
+{
+	generate_extra_keys: true //extra keys will be generated if allowed by the schema
+}
+```
+
+### `.any` / `.unknown`
+Options for the built-in `z.ZodAny` and `z.ZodUnknown` generators.
+
+```typescript
+{
+	strategy: "true-any" | "json-compatible" | "fast"
+}
+```
+
+### `.optional`
+Options for the built-in `z.ZodOptional` generator.
+
+```typescript
+{
+	undefined_chance: 0.3
+}
+```
+
+### `.nullable`
+Options for the built-in `z.ZodNullable` generator.
+
+```typescript
+{
+	null_chance: 0.3
+}
+```
+
+### `.default`
+Options for the built-in `z.ZodDefault` generator.
+
+```typescript
+{
+	default_chance: 0.3
+}
+```
+
+### `.number`
+Options for the built-in `z.ZodNumber` generator.
+
+```typescript
+{
+	extreme_value_chance: 0.3
+}
+```
+
+
+## `type Generator`
+A generator is a function that takes a schema and a generation-context, and returns a value that matches the schema.
+
+```typescript
+type Generator<Z extends z.ZodTypeAny> = (schema: Z, ctx: GenerationContext) => z.infer<Z>;
 ```
 
 ## The Future
