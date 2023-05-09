@@ -1,7 +1,5 @@
 # Zocker
 
-> :warning: **This library is still in development - Expect breaking changes**
-
 Writing Mock data is the worst. It's tedious, and it always gets out of sync with your actual system.
 Zocker is a library that automatically generates reasonable mock data from your Zod schemas. That way your mock data is always up to date, and you can focus on what's important.
 
