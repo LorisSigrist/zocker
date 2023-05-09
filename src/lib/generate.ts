@@ -16,6 +16,8 @@ import { MapOptions } from "./generators/map.js";
 import { RecordOptions } from "./generators/record.js";
 import { SetOptions } from "./generators/set.js";
 import { AnyOptions } from "./generators/any.js";
+import { ArrayOptions } from "./generators/array.js";
+import { ObjectOptions } from "./generators/object.js";
 
 /**
  * Contains all the necessary configuration to generate a value for a given schema.
@@ -42,7 +44,8 @@ export type GenerationContext<Z extends z.ZodSchema> = {
 	set_options: SetOptions;
 	any_options: AnyOptions,
 	unknown_options: AnyOptions
-
+	array_options: ArrayOptions
+	object_options: ObjectOptions
 };
 
 export type Generator<Z extends z.ZodSchema> = (

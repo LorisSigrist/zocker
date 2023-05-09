@@ -10,6 +10,8 @@ import { MapOptions } from "./generators/map.js";
 import { RecordOptions } from "./generators/record.js";
 import { SetOptions } from "./generators/set.js";
 import { AnyOptions } from "./generators/any.js";
+import { ArrayOptions } from "./generators/array.js";
+import { ObjectOptions } from "./generators/object.js";
 
 export type InstanceofGeneratorDefinition<Z extends z.ZodSchema> = {
 	schema: Z;
@@ -72,6 +74,15 @@ class Zocker<Z extends z.ZodSchema> {
 
 	private unknown_options: AnyOptions = {
 		strategy: "true-any"
+	}
+
+	private array_options: ArrayOptions = {
+		min: 0,
+		max: 10
+	}
+
+	private object_options: ObjectOptions = {
+		generate_extra_keys: true
 	}
 
 	constructor(public schema: Z) {}
@@ -198,6 +209,18 @@ class Zocker<Z extends z.ZodSchema> {
 		return next;
 	}
 
+	array(options: Partial<ArrayOptions>) {
+		const next = this.clone();
+		next.array_options = { ...next.array_options, ...options };
+		return next;
+	}
+
+	object(options: Partial<ObjectOptions>) {
+		const next = this.clone();
+		next.object_options = { ...next.object_options, ...options };
+		return next;
+	}
+
 	generate(): z.infer<Z> {
 		const ctx: GenerationContext<Z> = {
 			reference_generators: this.reference_generators,
@@ -216,7 +239,9 @@ class Zocker<Z extends z.ZodSchema> {
 			record_options: this.record_options,
 			set_options: this.set_options,
 			any_options: this.any_options,
-			unknown_options: this.unknown_options
+			unknown_options: this.unknown_options,
+			array_options: this.array_options,
+			object_options: this.object_options
 		};
 
 		faker.seed(ctx.seed);
