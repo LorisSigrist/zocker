@@ -19,7 +19,7 @@ export function test_schema_generation(
 	test.concurrent.each(schema_keys)("generates valid data for %s", (key) => {
 		const schema = schemas[key];
 		for (let i = 0; i < repeats; i++) {
-			const data = zocker(schema);
+			const data = zocker(schema).generate();
 			expect(() => {
 				try {
 					schema.parse(data);

@@ -5,6 +5,8 @@ import {
 } from "./exceptions.js";
 import { GeneratorDefinition } from "./zocker.js";
 import { SemanticFlag } from "./semantics.js";
+import { NumberGeneratorOptions } from "./generators/numbers.js";
+import { OptionalOptions } from "./generators/optional.js";
 
 /**
  * Contains all the necessary configuration to generate a value for a given schema.
@@ -13,6 +15,7 @@ export type GenerationContext<Z extends z.ZodSchema> = {
 	instanceof_generators: GeneratorDefinition<any>[];
 	reference_generators: GeneratorDefinition<any>[];
 
+	/** A Map that keeps count of how often we've seen a parent schema - Used for cycle detection */
 	parent_schemas: Map<z.ZodSchema, number>;
 	recursion_limit: number;
 
@@ -20,6 +23,9 @@ export type GenerationContext<Z extends z.ZodSchema> = {
 	semantic_context: SemanticFlag;
 
 	seed: number;
+
+	number_options: NumberGeneratorOptions
+	optional_options: OptionalOptions
 };
 
 export type Generator<Z extends z.ZodSchema> = (

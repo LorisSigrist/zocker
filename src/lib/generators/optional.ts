@@ -4,7 +4,7 @@ import { generate } from "../generate.js";
 import { weighted_random_boolean } from "../utils/random.js";
 import { z } from "zod";
 
-type OptionalOptions = {
+export type OptionalOptions = {
 	undefined_chance: number;
 };
 
@@ -20,15 +20,15 @@ export const OptionalGenerator: GeneratorDefinitionFactory<
 
 	return {
 		schema: options.schema ?? (z.ZodOptional as any),
-		generator: (schema, generation_context) => {
+		generator: (schema, ctx) => {
 			const should_be_undefined = weighted_random_boolean(
-				options.undefined_chance
+				ctx.optional_options.undefined_chance
 			);
 
 			try {
 				return should_be_undefined
 					? undefined
-					: generate(schema._def.innerType, generation_context);
+					: generate(schema._def.innerType, ctx);
 			} catch (e) {
 				if (e instanceof RecursionLimitReachedException) {
 					return undefined;

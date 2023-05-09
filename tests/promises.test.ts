@@ -25,7 +25,7 @@ describe("Promise generation", () => {
 	test.each(schema_keys)("generates valid data for %s", async (key) => {
 		const schema = promise_schemas[key];
 		for (let i = 0; i < repeats; i++) {
-			const data = zocker(schema);
+			const data = zocker(schema).generate()
 			await expect(schema.parseAsync(data)).resolves.toEqual(await data);
 		}
 	});

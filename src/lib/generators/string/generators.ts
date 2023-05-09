@@ -7,7 +7,7 @@ import { faker } from "@faker-js/faker";
 import { InvalidSchemaException } from "../../exceptions.js";
 import Randexp from "randexp";
 import { pick, weighted_random_boolean } from "../../utils/random.js";
-import { SemanticFlag } from "lib/semantics.js";
+import { SemanticFlag } from "../../semantics.js";
 
 export const uuid: StringKindGenerator = (ctx, lc, cc, td) => {
 	if (lc.exact && lc.exact !== 36)

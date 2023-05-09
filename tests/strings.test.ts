@@ -72,7 +72,7 @@ describe("String generation", () => {
 			.toUpperCase();
 		const uppercase_schema = z.string().regex(/[A-Z]*/);
 
-		const generated = zocker(transformed_schema);
+		const generated = zocker(transformed_schema).generate()
 		expect(() => uppercase_schema.parse(generated)).not.toThrow();
 	});
 
@@ -83,7 +83,7 @@ describe("String generation", () => {
 			.toLowerCase();
 		const lowercase_schema = z.string().regex(/[a-z]*/);
 
-		const generated = zocker(transformed_schema);
+		const generated = zocker(transformed_schema).generate()
 		expect(() => lowercase_schema.parse(generated)).not.toThrow();
 	});
 
@@ -94,7 +94,7 @@ describe("String generation", () => {
 			.trim();
 		const trimmed_schema = z.string().regex(/foo/);
 
-		const generated = zocker(transformed_schema);
+		const generated = zocker(transformed_schema).generate()
 		expect(() => trimmed_schema.parse(generated)).not.toThrow();
 	});
 });
