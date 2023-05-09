@@ -42,10 +42,10 @@ export type GenerationContext<Z extends z.ZodSchema> = {
 	map_options: MapOptions;
 	record_options: RecordOptions;
 	set_options: SetOptions;
-	any_options: AnyOptions,
-	unknown_options: AnyOptions
-	array_options: ArrayOptions
-	object_options: ObjectOptions
+	any_options: AnyOptions;
+	unknown_options: AnyOptions;
+	array_options: ArrayOptions;
+	object_options: ObjectOptions;
 };
 
 export type Generator<Z extends z.ZodSchema> = (

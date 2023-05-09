@@ -64,15 +64,15 @@ const generate_object = <T extends z.ZodRawShape>(
 				//so that the catchall keys would be overwritten by the original keys in case of a collision
 				mock_entries.unshift([key, value]);
 			}
-		} catch (e) { }
+		} catch (e) {}
 	}
 
 	return Object.fromEntries(mock_entries) as Shape;
 };
 
 export const ObjectGenerator: InstanceofGeneratorDefinition<z.ZodObject<any>> =
-{
-	schema: z.ZodObject as any,
-	generator: generate_object,
-	match: "instanceof"
-};
+	{
+		schema: z.ZodObject as any,
+		generator: generate_object,
+		match: "instanceof"
+	};

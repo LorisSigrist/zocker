@@ -1,7 +1,10 @@
 import { faker } from "@faker-js/faker";
 import { Generator, generate } from "../generate.js";
 import { z } from "zod";
-import { InvalidSchemaException, RecursionLimitReachedException } from "../exceptions.js";
+import {
+	InvalidSchemaException,
+	RecursionLimitReachedException
+} from "../exceptions.js";
 import { InstanceofGeneratorDefinition } from "../zocker.js";
 
 export type ArrayOptions = {
@@ -16,13 +19,13 @@ const generate_array: Generator<z.ZodArray<any>> = (array_schema, ctx) => {
 
 	const min = array_schema._def.minLength
 		? array_schema._def.minLength.value
-		: ctx.array_options.min
+		: ctx.array_options.min;
 	const max = array_schema._def.maxLength
 		? array_schema._def.maxLength.value
-		: ctx.array_options.max
-	
-	
-	if (min > max) throw new InvalidSchemaException("min length is greater than max length");
+		: ctx.array_options.max;
+
+	if (min > max)
+		throw new InvalidSchemaException("min length is greater than max length");
 
 	const length =
 		exact_length !== null ? exact_length : faker.datatype.number({ min, max });

@@ -16,13 +16,15 @@ import { ObjectOptions } from "./generators/object.js";
 export type InstanceofGeneratorDefinition<Z extends z.ZodSchema> = {
 	schema: Z;
 	generator: Generator<Z>;
-	match: "instanceof";
+	/** @deprecated No longer used*/
+	match?: "instanceof";
 };
 
 export type ReferenceGeneratorDefinition<Z extends z.ZodSchema> = {
 	schema: Z;
 	generator: Generator<Z>;
-	match: "reference";
+	/** @deprecated No longer used*/
+	match?: "reference";
 };
 
 export function zocker<Z extends z.ZodSchema>(schema: Z) {
@@ -67,23 +69,23 @@ class Zocker<Z extends z.ZodSchema> {
 		max: 10,
 		min: 0
 	};
-	
+
 	private any_options: AnyOptions = {
 		strategy: "true-any"
-	}
+	};
 
 	private unknown_options: AnyOptions = {
 		strategy: "true-any"
-	}
+	};
 
 	private array_options: ArrayOptions = {
 		min: 0,
 		max: 10
-	}
+	};
 
 	private object_options: ObjectOptions = {
 		generate_extra_keys: true
-	}
+	};
 
 	constructor(public schema: Z) {}
 
@@ -115,7 +117,6 @@ class Zocker<Z extends z.ZodSchema> {
 		return next;
 	}
 
-
 	/**
 	 * Override one of the built-in generators using your own.
 	 * It will be used whenever an encoutntered Schema matches the one specified by **instance**
@@ -123,7 +124,7 @@ class Zocker<Z extends z.ZodSchema> {
 	 * @param schema - Which schema to override. E.g: `z.ZodNumber`.
 	 * @param generator - A value, or a function that generates a value that matches the schema
 	 */
-	override<Z extends  z.ZodFirstPartySchemaTypes>(
+	override<Z extends z.ZodFirstPartySchemaTypes>(
 		schema: Z,
 		generator: Generator<Z> | z.infer<Z>
 	) {
