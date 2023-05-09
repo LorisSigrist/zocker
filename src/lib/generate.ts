@@ -15,6 +15,7 @@ import { DefaultOptions } from "./generators/default.js";
 import { MapOptions } from "./generators/map.js";
 import { RecordOptions } from "./generators/record.js";
 import { SetOptions } from "./generators/set.js";
+import { AnyOptions } from "./generators/any.js";
 
 /**
  * Contains all the necessary configuration to generate a value for a given schema.
@@ -32,20 +33,16 @@ export type GenerationContext<Z extends z.ZodSchema> = {
 
 	seed: number;
 
-	/** Options for the z.ZodNumber generator */
 	number_options: NumberGeneratorOptions;
-	/** Options for the z.ZodOptional generator */
 	optional_options: OptionalOptions;
-	/** Options for the z.ZodNullable generator */
 	nullable_options: NullableOptions;
-	/** Options for the z.ZodDefault generator */
 	default_options: DefaultOptions;
-	/** Options for the z.ZodMap generator */
 	map_options: MapOptions;
-	/** Options for the z.ZodRecord generator */
 	record_options: RecordOptions;
-	/** Options for the z.ZodSet generator */
 	set_options: SetOptions;
+	any_options: AnyOptions,
+	unknown_options: AnyOptions
+
 };
 
 export type Generator<Z extends z.ZodSchema> = (

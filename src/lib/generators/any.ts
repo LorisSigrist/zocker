@@ -3,74 +3,83 @@ import { generate, Generator } from "../generate.js";
 import { pick } from "../utils/random.js";
 import { InstanceofGeneratorDefinition } from "../zocker.js";
 
+export type AnyOptions = {
+	strategy: "true-any" | "json-compatible" | "fast";
+}
+
+const literalSchema = z.union([
+	z.string(),
+	z.number(),
+	z.boolean(),
+	z.null()
+]);
+const jsonSchema: z.ZodSchema = z.lazy(() =>
+	z.union([literalSchema, z.array(jsonSchema), z.record(jsonSchema)])
+);
+
+
+//It's important to have the schemas outside the generator, so that they have reference equality accross invocations.
+//This allows us to not worry about infinite recursion, as the cyclic generation logic will protect us.
+const any = z.any();
+const potential_schemas = [
+	z.undefined(),
+	z.null(),
+	z.boolean(),
+	z.number(),
+	z.string(),
+	z.bigint(),
+	z.date(),
+	z.symbol(),
+	z.unknown(),
+	z.nan(),
+	z.record(any), //`z.object` is just a subset of this - no need for a separate case.
+	z.array(any), //Tuples are just a subset of this - no need for a separate case.
+	z.map(any, any),
+	z.set(any),
+	z.promise(any)
+].map((schema) => schema.optional());
+
+
+const generate_any: Generator<z.ZodAny> = (schema, ctx) => {
+	if (ctx.any_options.strategy === "fast") {
+		return undefined;
+	}
+
+	if (ctx.any_options.strategy === "json-compatible") {
+		const generated = generate(jsonSchema, ctx);
+		return generated;
+	}
+
+	const schema_to_use = pick(potential_schemas);
+	const generated = generate(schema_to_use, ctx);
+	return generated;
+};
+
+
+const generate_unknown: Generator<z.ZodUnknown> = (schema, ctx) => {
+	if (ctx.unknown_options.strategy === "fast") {
+		return undefined;
+	}
+
+	if (ctx.unknown_options.strategy === "json-compatible") {
+		const generated = generate(jsonSchema, ctx);
+		return generated;
+	}
+
+	const schema_to_use = pick(potential_schemas);
+	const generated = generate(schema_to_use, ctx);
+	return generated;
+}
+
 export const AnyGenerator: InstanceofGeneratorDefinition<z.ZodAny> = {
 	schema: z.ZodAny as any,
-	generator: Any("true-any"),
+	generator: generate_any,
 	match: "instanceof"
 };
 
 export const UnknownGenerator: InstanceofGeneratorDefinition<z.ZodUnknown> = {
 	schema: z.ZodUnknown as any,
-	generator: Any(),
+	generator: generate_unknown,
 	match: "instanceof"
 };
 
-/**
- * Create a Generator for the `z.any()` and `z.unknown()` schemas.
- * @param strategy - How to generate the value. "true-any" will generate any possible value, "json-compatible" will generate any JSON-compatible value, and "fast" will just return undefined, but is vastly faster.
- * @returns
- */
-function Any<Z extends z.ZodAny | z.ZodUnknown>(
-	strategy: "true-any" | "json-compatible" | "fast" = "true-any"
-): Generator<Z> {
-	if (strategy === "fast") {
-		return () => undefined;
-	}
-
-	if (strategy === "json-compatible") {
-		const literalSchema = z.union([
-			z.string(),
-			z.number(),
-			z.boolean(),
-			z.null()
-		]);
-		const jsonSchema: z.ZodSchema = z.lazy(() =>
-			z.union([literalSchema, z.array(jsonSchema), z.record(jsonSchema)])
-		);
-
-		return (_schema, generation_context) => {
-			const generated = generate(jsonSchema, generation_context);
-			return generated;
-		};
-	}
-
-	const any = z.any();
-
-	//It's important to have the schemas outside the generator, so that they have reference equality accross invocations.
-	//This allows us to not worry about infinite recursion, as the cyclic generation logic will protect us.
-	const potential_schemas = [
-		z.undefined(),
-		z.null(),
-		z.boolean(),
-		z.number(),
-		z.string(),
-		z.bigint(),
-		z.date(),
-		z.symbol(),
-		z.unknown(),
-		z.nan(),
-		z.record(any), //`z.object` is just a subset of this - no need for a separate case.
-		z.array(any), //Tuples are just a subset of this - no need for a separate case.
-		z.map(any, any),
-		z.set(any),
-		z.promise(any)
-	].map((schema) => schema.optional());
-
-	const generate_any: Generator<Z> = (_schema, generation_context) => {
-		const schema_to_use = pick(potential_schemas);
-		const generated = generate(schema_to_use, generation_context);
-		return generated;
-	};
-
-	return generate_any;
-}
