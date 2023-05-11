@@ -1,5 +1,11 @@
 # zocker
 
+## 1.2.1
+
+### Patch Changes
+
+- d7e9bd0: fix: Fixed wrong type-definitions when using supply or override
+
 ## 1.2.0
 
 ### Minor Changes
