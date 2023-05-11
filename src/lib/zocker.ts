@@ -96,9 +96,9 @@ class Zocker<Z extends z.ZodSchema> {
 	 * @param schema - The schema for which this value will be used
 	 * @param generator - A value, or a function that generates a value that matches the schema
 	 */
-	supply<Z extends z.ZodTypeAny>(
-		schema: Z,
-		generator: Generator<Z> | z.infer<Z>
+	supply<S extends z.ZodTypeAny>(
+		schema: S,
+		generator: Generator<S> | z.infer<S>
 	) {
 		const next = this.clone();
 
@@ -124,9 +124,9 @@ class Zocker<Z extends z.ZodSchema> {
 	 * @param schema - Which schema to override. E.g: `z.ZodNumber`.
 	 * @param generator - A value, or a function that generates a value that matches the schema
 	 */
-	override<Z extends z.ZodFirstPartySchemaTypes>(
-		schema: Z,
-		generator: Generator<Z> | z.infer<Z>
+	override<S extends z.ZodFirstPartySchemaTypes>(
+		schema: S,
+		generator: Generator<S> | z.infer<S>
 	) {
 		const next = this.clone();
 		const generator_function =
