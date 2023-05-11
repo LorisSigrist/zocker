@@ -1,5 +1,11 @@
 # zocker
 
+## 1.2.0
+
+### Minor Changes
+
+- 797dbc5: feat: added `generateMany` method
+
 ## 1.1.0
 
 ### Minor Changes
