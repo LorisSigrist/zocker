@@ -249,6 +249,20 @@ class Zocker<Z extends z.ZodSchema> {
 		return generate(this.schema, ctx);
 	}
 
+
+	generateMany(count: number): z.infer<Z>[] {
+		let previous_seed = this.seed;
+		const results: z.infer<Z>[] = [];
+
+		for (let i = 0; i < count; i++) {
+			if(previous_seed !== undefined) this.seed = previous_seed + i;
+			results.push(this.generate());
+		}
+
+		this.seed = previous_seed;
+		return results;
+	}
+
 	private clone(): Zocker<Z> {
 		return Object.create(
 			Object.getPrototypeOf(this),
