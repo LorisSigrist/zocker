@@ -1,5 +1,11 @@
 # zocker
 
+## 1.3.0
+
+### Minor Changes
+
+- 086fe06: feat: enable using string-names of datatypes in `.override` calls (E.g `"number"` instead if `z.ZodNumber`)
+
 ## 1.2.1
 
 ### Patch Changes
