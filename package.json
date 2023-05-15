@@ -3,6 +3,11 @@
 	"description": "Generate realistic test-data from your Zod-Schemas",
 	"version": "1.2.1",
 	"author": "Loris Sigrist",
+	"license": "MIT",
+	"keywords": [
+		"mock-data",
+		"zod"
+	],
 	"type": "module",
 	"main": "dist/index.js",
 	"module": "dist/index.js",
