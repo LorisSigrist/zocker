@@ -234,7 +234,7 @@ Allows you to override the generator for an entire category of schemas. This is 
 const data = zocker(my_schema).override(z.ZodNumber, 0).generate();
 ```
 
-The supplied value will be used if during the generation process a schema is encoutered, that is an *instance* of the supplied `schema`.
+The supplied value will be used if during the generation process a schema is encoutered, that is an *instance* of the supplied `schema`. Alternatively, you can also provide the name of the datatype you want to override as a string. (e.g `"number"`). Intellisense will help you out here.
 
 You can also supply a function that returns a value. The function must follow the `Generator` type.
 
