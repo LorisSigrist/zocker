@@ -1,5 +1,11 @@
 # zocker
 
+## 1.4.0
+
+### Minor Changes
+
+- 9467b9c: Support zod 3.22 and it's new `readonly` schemas
+
 ## 1.3.0
 
 ### Minor Changes
