@@ -27,7 +27,8 @@ import {
 	PromiseGenerator,
 	LazyGenerator,
 	BrandedGenerator,
-	IntersectionGenerator
+	IntersectionGenerator,
+	ReadonlyGenerator
 } from "./generators/index.js";
 
 export const default_generators: InstanceofGeneratorDefinition<any>[] = [
@@ -56,6 +57,7 @@ export const default_generators: InstanceofGeneratorDefinition<any>[] = [
 	PromiseGenerator,
 	LazyGenerator,
 	BrandedGenerator,
+	ReadonlyGenerator,
 	{
 		schema: z.ZodVoid,
 		generator: () => {},
