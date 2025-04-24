@@ -61,7 +61,7 @@ export type Generator<Z extends z.$ZodType> = (
  * @param ctx - The context and configuration for the generation process.
  * @returns - A pseudo-random value that matches the given schema.
  */
-export function generate<Z extends z.ZodSchema>(
+export function generate<Z extends z.$ZodType>(
 	schema: Z,
 	ctx: GenerationContext<Z>
 ): z.infer<Z> {
@@ -73,7 +73,7 @@ export function generate<Z extends z.ZodSchema>(
 	}
 }
 
-const generate_value: Generator<z.ZodSchema> = (schema, generation_context) => {
+const generate_value: Generator<z.$ZodType> = (schema, generation_context) => {
 	//Check if a reference generator is available for this schema
 	const reference_generator = generation_context.reference_generators.find(
 		(g) => g.schema === schema
@@ -93,7 +93,7 @@ const generate_value: Generator<z.ZodSchema> = (schema, generation_context) => {
 	);
 };
 
-function increment_recursion_count<Z extends z.ZodSchema>(
+function increment_recursion_count<Z extends z.$ZodType>(
 	schema: Z,
 	ctx: GenerationContext<Z>
 ) {
@@ -107,7 +107,7 @@ function increment_recursion_count<Z extends z.ZodSchema>(
 	ctx.parent_schemas.set(schema, current_depth);
 }
 
-function decrement_recursion_count<Z extends z.ZodSchema>(
+function decrement_recursion_count<Z extends z.$ZodType>(
 	schema: Z,
 	ctx: GenerationContext<Z>
 ) {

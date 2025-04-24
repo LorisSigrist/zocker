@@ -1,5 +1,5 @@
 import { InstanceofGeneratorDefinition } from "./zocker.js";
-import { z } from "zod";
+import * as z from "@zod/core"
 
 import {
 	StringGenerator,
@@ -42,7 +42,7 @@ export const default_generators: InstanceofGeneratorDefinition<any>[] = [
 	NullableGenerator,
 	AnyGenerator,
 	UnknownGenerator,
-	EffectsGenerator,
+	// EffectsGenerator, -- TODO: Effects changed in zod 4
 	ArrayGenerator,
 	TupleGenerator,
 	RecordGenerator,
@@ -50,37 +50,37 @@ export const default_generators: InstanceofGeneratorDefinition<any>[] = [
 	SetGenerator,
 	ObjectGenerator,
 	UnionGenerator,
-	NativeEnumGenerator,
+// NativeEnumGenerator, -- removed in zod 4
 	EnumGenerator,
 	DefaultGenerator,
 	DiscriminatedUnionGenerator,
 	PromiseGenerator,
 	LazyGenerator,
-	BrandedGenerator,
+// 	BrandedGenerator, -- Branded is no longer a separate Type in zod's internal data-structure. We don't need to handle branded values separately
 	ReadonlyGenerator,
 	{
-		schema: z.ZodVoid,
+		schema: z.$ZodVoid,
 		generator: () => {},
 		match: "instanceof"
 	},
 	{
-		schema: z.ZodUndefined,
+		schema: z.$ZodUndefined,
 		generator: () => undefined,
 		match: "instanceof"
 	},
 	{
-		schema: z.ZodNull,
+		schema: z.$ZodNull,
 		generator: () => null,
 		match: "instanceof"
 	},
 	{
-		schema: z.ZodNaN,
+		schema: z.$ZodNaN,
 		generator: () => NaN,
 		match: "instanceof"
 	},
 	{
-		schema: z.ZodLiteral,
-		generator: (schema) => schema._def.value,
+		schema: z.$ZodLiteral,
+		generator: (schema: z.$ZodLiteral) => schema._zod.def.values[0],
 		match: "instanceof"
 	},
 	IntersectionGenerator
