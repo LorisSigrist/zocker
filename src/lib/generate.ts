@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "@zod/core";
 import {
 	NoGeneratorException,
 	RecursionLimitReachedException
@@ -22,12 +22,12 @@ import { ObjectOptions } from "./generators/object.js";
 /**
  * Contains all the necessary configuration to generate a value for a given schema.
  */
-export type GenerationContext<Z extends z.ZodSchema> = {
+export type GenerationContext<Z extends z.$ZodType> = {
 	instanceof_generators: InstanceofGeneratorDefinition<any>[];
 	reference_generators: ReferenceGeneratorDefinition<any>[];
 
 	/** A Map that keeps count of how often we've seen a parent schema - Used for cycle detection */
-	parent_schemas: Map<z.ZodSchema, number>;
+	parent_schemas: Map<z.$ZodType, number>;
 	recursion_limit: number;
 
 	path: (string | number | symbol)[];
@@ -48,7 +48,7 @@ export type GenerationContext<Z extends z.ZodSchema> = {
 	object_options: ObjectOptions;
 };
 
-export type Generator<Z extends z.ZodSchema> = (
+export type Generator<Z extends z.$ZodType> = (
 	schema: Z,
 	ctx: GenerationContext<Z>
 ) => z.infer<Z>;
