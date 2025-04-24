@@ -1,5 +1,5 @@
 import { test, expect } from "vitest";
-import { z } from "zod";
+import type * as z from "@zod/core"
 import { zocker } from "../src";
 
 /**
@@ -9,7 +9,7 @@ import { zocker } from "../src";
  * @param repeats - How many times should each test be repeated? (default: 100)
  */
 export function test_schema_generation(
-	schemas: Record<string, z.ZodSchema>,
+	schemas: Record<string, z.$ZodType>,
 	repeats: number = 100
 ) {
 	const schema_keys = Object.keys(
@@ -22,7 +22,7 @@ export function test_schema_generation(
 			const data = zocker(schema).generate();
 			expect(() => {
 				try {
-					schema.parse(data);
+					schema["~standard"].validate(data);
 				} catch (e) {
 					console.log("Invalid Data Generated", data);
 					throw e;
