@@ -26,13 +26,14 @@ import {
 	DiscriminatedUnionGenerator,
 	PromiseGenerator,
 	LazyGenerator,
-	BrandedGenerator,
 	IntersectionGenerator,
-	ReadonlyGenerator
+	ReadonlyGenerator,
+	Zod4StringGenerator
 } from "./generators/index.js";
 
 export const default_generators: InstanceofGeneratorDefinition<any>[] = [
-	StringGenerator,
+	// StringGenerator,
+	Zod4StringGenerator,
 	NumberGenerator,
 	BigintGenerator,
 	BooleanGenerator,

@@ -45,7 +45,7 @@ const generate_number: Generator<z.$ZodNumber> = (number_schema, ctx) => {
 
 		proposed_number = generator();
 
-		return number_schema["~standard"].parse(proposed_number); // TODO: Switch to "~standard"
+		return number_schema.parse(proposed_number); // TODO: Switch to "~standard"
 	} catch (e) { }
 
 	let is_extreme_value = weighted_random_boolean(

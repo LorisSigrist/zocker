@@ -1,6 +1,6 @@
 import { InstanceofGeneratorDefinition } from "../../zocker.js";
 import { GenerationContext, Generator } from "../../generate.js";
-import { z } from "zod";
+import * as z from "@zod/core";
 import {
 	InvalidSchemaException,
 	NoGeneratorException
@@ -56,14 +56,14 @@ type CacheEntry = {
 	transform_constaints: TransformDefinition;
 };
 
-export type StringKindGenerator = <Z extends z.ZodString>(
+export type StringKindGenerator = <Z extends z.$ZodString>(
 	ctx: GenerationContext<Z>,
 	lc: LengthConstraints,
 	cc: ContentConstraints,
 	td: TransformDefinition
 ) => string;
 
-const generate_string: Generator<z.ZodString> = (string_schema, ctx) => {
+const generate_string: Generator<z.$ZodString> = (string_schema, ctx) => {
 	const cc = content_constraints(string_schema);
 	const lc = length_constraints(string_schema);
 	const tf = transforms(string_schema);
@@ -356,8 +356,8 @@ function transforms(schema: z.ZodString): TransformDefinition {
 	return transform_definition;
 }
 
-export const StringGenerator: InstanceofGeneratorDefinition<z.ZodString> = {
-	schema: z.ZodString as any,
+export const StringGenerator: InstanceofGeneratorDefinition<z.$ZodString> = {
+	schema: z.$ZodString as any,
 	generator: generate_string,
 	match: "instanceof"
 };

@@ -9,7 +9,9 @@ enum NativeEnum {
 
 const enum_schemas = {
 	enum: z.enum(["hello", "world"]),
-	"native enum": z.nativeEnum(NativeEnum)
+	"native enum": z.enum(NativeEnum),
+	"enum exclude": z.enum(["hello", "world"]).exclude(["hello"]),
+	"native enum exclude": z.enum(NativeEnum).exclude(["hello"])
 } as const;
 
 describe("Enum generation", () => {
