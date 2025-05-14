@@ -34,11 +34,13 @@ import {
 	IPv4Generator,
 	IPv6Generator,
 	UUIDGenerator,
-	E164Generator
+	E164Generator,
+	EmailGenerator
 } from "./generators/index.js";
 
 export const default_generators: InstanceofGeneratorDefinition<any>[] = [
 	// StringGenerator,
+	EmailGenerator,
 	E164Generator,
 	UUIDGenerator,
 	IPv4Generator,
