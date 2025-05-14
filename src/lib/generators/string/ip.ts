@@ -83,23 +83,23 @@ const ipv6_generator: Generator<z.$ZodIPv6> = (schema, ctx) => {
     // How many segments the IPv6 address should have
     // If this is less than 8, we're using the double colon syntax
     const should_use_double_colon = ipv6ShouldUseDoubleColon(length);
-    console.log("Should use double colon", length, should_use_double_colon);
-    const num_segments = determinNumberOfIpv6Segments(length, should_use_double_colon);
-    console.log("Number of segments", length, should_use_double_colon, num_segments);
+    const num_segments = choseNumberOfIPv6Segments(length, should_use_double_colon);
 
-    const lengthWithoutColons = length - (num_segments - 1) - (should_use_double_colon ? 2 : 0);
-    console.log("Length without colons", lengthWithoutColons);
+    if (!should_use_double_colon) {
+        const lengthWithoutColons = length - 7;
+        const segment_lengths = partition(lengthWithoutColons, num_segments, 1, 4);
+        const segments = segment_lengths.map(length => generateIPv6Segment(length));
+        return segments.join(":");
+    }
+
+    // With double colon
+    const lengthWithoutColons = length - (num_segments - 1) - 2; // -2 for double colon at the start
     const segment_lengths = partition(lengthWithoutColons, num_segments, 1, 4);
-    console.log("Segment lengths", segment_lengths);
-
     const segments = segment_lengths.map(length => generateIPv6Segment(length));
 
-    // TODO: Handle double colon
+    // TODO: Support the :: in positions other than the first
 
-    const ip = (should_use_double_colon ? "::" : "") +  segments.join(":");
-    console.log(JSON.stringify(ip));
-
-    return ip;
+    return "::" + segments.join(":");
 }
 
 export const IPv4Generator: InstanceofGeneratorDefinition<z.$ZodIPv4> = {
@@ -166,7 +166,7 @@ function ipv6ShouldUseDoubleColon(length: number): boolean {
  * 
  * @param length 
  */
-function determinNumberOfIpv6Segments(length: number, shouldUseDoubleColon: boolean): number {
+function choseNumberOfIPv6Segments(length: number, shouldUseDoubleColon: boolean): number {
     if (shouldUseDoubleColon == false) return 8;
 
     // The maximum number of segments we have space for with the remaining characters
@@ -175,12 +175,8 @@ function determinNumberOfIpv6Segments(length: number, shouldUseDoubleColon: bool
     // the minimum number of segments we have space for with the remaining characterss
     const min_segments = Math.max(Math.ceil((length - 1) / 5), 1);
 
-    console.log(`length: ${length}, min_segments: ${min_segments}, max_segments: ${max_segments}`);
-
     return faker.datatype.number({ min: min_segments, max: max_segments });
 }
-
-// ::1111
 
 /**
  * Partitions a total number into a specified number of partitions,
