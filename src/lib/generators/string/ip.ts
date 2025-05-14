@@ -49,12 +49,10 @@ const ipv4_generator: Generator<z.$ZodIPv4> = (schema, ctx) => {
     // TODO: Support content_constraints
 
     // How many characters are numbers in the final IP?
-    const num_numbers_in_ip = length - IPV4_NUM_DOTS;
-    const segment_lengths = partition(num_numbers_in_ip, 4, 1, 3);
-
-    const segments = segment_lengths.map(length => generateIPv4Segment(length));
-    return segments.join(".");
+    return generateIPv4OfLength(length);
 }
+
+
 const ipv6_generator: Generator<z.$ZodIPv6> = (schema, ctx) => {
     const length_constraints = getLengthConstraints(schema);
     const content_constraints = getContentConstraints(schema);
@@ -113,6 +111,20 @@ export const IPv6Generator: InstanceofGeneratorDefinition<z.$ZodIPv6> = {
     generator: ipv6_generator,
     match: "instanceof"
 };
+
+/**
+ * Generates an IPv4 Address of the given length. The length must be such that
+ * an IPv4 address can be made.
+ * 
+ * @param length 
+ */
+export function generateIPv4OfLength(length: number) {
+    const num_numbers_in_ip = length - IPV4_NUM_DOTS;
+    const segment_lengths = partition(num_numbers_in_ip, 4, 1, 3);
+
+    const segments = segment_lengths.map(length => generateIPv4Segment(length));
+    return segments.join(".");
+}
 
 /**
  * Generates an IPv4 segment (0-255) of the given length
