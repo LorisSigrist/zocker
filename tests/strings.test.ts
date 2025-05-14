@@ -11,10 +11,6 @@ const string_schemas = {
 	"string with multiple min and max length": z.string().min(2).min(4).max(5).max(10),
 	"string with exact length": z.string().length(10),
 	"string with min and max length": z.string().min(1_000).max(2_000),
-	//	uuid: z.uuid(),
-	//	"uuid-v4": z.uuidv4(),
-	//	"uuid-v6": z.uuidv6(),
-	//	"uuid-v7": z.uuidv7(),
 	//	url: z.url(),
 	//	regex: z.string().regex(/<([a-z]\w{0,20})>foo<\1>/),
 	//	"regex with flags": z
