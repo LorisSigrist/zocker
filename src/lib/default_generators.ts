@@ -33,11 +33,13 @@ import {
 	CUID2Generator,
 	IPv4Generator,
 	IPv6Generator,
-	UUIDGenerator
+	UUIDGenerator,
+	E164Generator
 } from "./generators/index.js";
 
 export const default_generators: InstanceofGeneratorDefinition<any>[] = [
 	// StringGenerator,
+	E164Generator,
 	UUIDGenerator,
 	IPv4Generator,
 	IPv6Generator,
