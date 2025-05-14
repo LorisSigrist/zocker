@@ -78,26 +78,7 @@ const ipv6_generator: Generator<z.$ZodIPv6> = (schema, ctx) => {
         max: Math.min(length_constraints.max, IPV6_MAX_LENGTH)
     });
 
-    // How many segments the IPv6 address should have
-    // If this is less than 8, we're using the double colon syntax
-    const should_use_double_colon = ipv6ShouldUseDoubleColon(length);
-    const num_segments = choseNumberOfIPv6Segments(length, should_use_double_colon);
-
-    if (!should_use_double_colon) {
-        const lengthWithoutColons = length - 7;
-        const segment_lengths = partition(lengthWithoutColons, num_segments, 1, 4);
-        const segments = segment_lengths.map(length => generateIPv6Segment(length));
-        return segments.join(":");
-    }
-
-    // With double colon
-    const lengthWithoutColons = length - (num_segments - 1) - 2; // -2 for double colon at the start
-    const segment_lengths = partition(lengthWithoutColons, num_segments, 1, 4);
-    const segments = segment_lengths.map(length => generateIPv6Segment(length));
-
-    // TODO: Support the :: in positions other than the first
-
-    return "::" + segments.join(":");
+    return generateIPv6OfLength(length);
 }
 
 export const IPv4Generator: InstanceofGeneratorDefinition<z.$ZodIPv4> = {
@@ -124,6 +105,35 @@ export function generateIPv4OfLength(length: number) {
 
     const segments = segment_lengths.map(length => generateIPv4Segment(length));
     return segments.join(".");
+}
+
+/**
+ * Generates an IPv6 Address of the given length. The length must be such that
+ * an IPv6 address can be made.
+ * 
+ * @param length 
+ */
+export function generateIPv6OfLength(length: number) {
+    // How many segments the IPv6 address should have
+    // If this is less than 8, we're using the double colon syntax
+    const should_use_double_colon = ipv6ShouldUseDoubleColon(length);
+    const num_segments = choseNumberOfIPv6Segments(length, should_use_double_colon);
+
+    if (!should_use_double_colon) {
+        const lengthWithoutColons = length - 7;
+        const segment_lengths = partition(lengthWithoutColons, num_segments, 1, 4);
+        const segments = segment_lengths.map(length => generateIPv6Segment(length));
+        return segments.join(":");
+    }
+
+    // With double colon
+    const lengthWithoutColons = length - (num_segments - 1) - 2; // -2 for double colon at the start
+    const segment_lengths = partition(lengthWithoutColons, num_segments, 1, 4);
+    const segments = segment_lengths.map(length => generateIPv6Segment(length));
+
+    // TODO: Support the :: in positions other than the first
+
+    return "::" + segments.join(":");
 }
 
 /**
@@ -164,7 +174,7 @@ function generateIPv6Segment(length: number) {
  * @param length The length of the IPv6 address.
  */
 function ipv6ShouldUseDoubleColon(length: number): boolean {
-    if (length < IPV6_MIN_LENGTH || length > IPV6_MAX_LENGTH || !Number.isInteger(length)) throw new TypeError("IPv6 addresses must be between 16 and 39 characters long");
+    if (length < IPV6_MIN_LENGTH || length > IPV6_MAX_LENGTH || !Number.isInteger(length)) throw new TypeError(`Pv6 addresses must be between ${IPV6_MIN_LENGTH} and ${IPV6_MAX_LENGTH} characters long, ${length} given`);
 
     if (length < IPV6_MIN_LENGTH_WITHOUT_DOUBLE_COLON) return true;
     if (length > IPV6_MAX_LENGTH_WITH_DOUBLE_COLON) return false;
