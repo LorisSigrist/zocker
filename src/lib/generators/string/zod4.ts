@@ -56,6 +56,7 @@ const generate_string: Generator<z.$ZodString> = (string_schema, ctx) => {
         contentConstraints.ends_with.length -
         contentConstraints.includes.reduce((a, b) => a + b.length, 0);
 
+   
     return (
         contentConstraints.starts_with +
         faker.datatype.string(generated_length) +

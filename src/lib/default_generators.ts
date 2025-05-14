@@ -28,11 +28,13 @@ import {
 	LazyGenerator,
 	IntersectionGenerator,
 	ReadonlyGenerator,
-	Zod4StringGenerator
+	Zod4StringGenerator,
+	CUIDGenerator
 } from "./generators/index.js";
 
 export const default_generators: InstanceofGeneratorDefinition<any>[] = [
 	// StringGenerator,
+	CUIDGenerator,
 	Zod4StringGenerator,
 	NumberGenerator,
 	BigintGenerator,
