@@ -1,15 +1,16 @@
-import { InstanceofGeneratorDefinition } from "lib/zocker.js";
-import { Generator, generate } from "../generate.js";
+import { InstanceofGeneratorDefinition } from "../../zocker.js";
+import { Generator, generate } from "../../generate.js";
 import * as z from "@zod/core";
-import { getLengthConstraints } from "./string/length-constraints.js";
-import { InvalidSchemaException } from "../exceptions.js";
-import { getContentConstraints } from "./string/content-constraints.js";
+import { getLengthConstraints } from "./length-constraints.js";
+import { InvalidSchemaException } from "../../exceptions.js";
+import { getContentConstraints } from "./content-constraints.js";
 import { faker } from "@faker-js/faker";
 
+// const CUID_REGEX = /^c[^\s-]{8,}$/i;
 const CUID_MIN_LENGTH = 9;
 const CUID_COMMON_LENGHT = 25; // Most CUIDs are around 25 characters long
 
-const CUID2_REGEX = /^[a-z][0-9a-z]+$/;
+// const CUID2_REGEX = /^[a-z][0-9a-z]+$/;
 const CUID2_MIN_LENGTH = 2;
 const CUID2_COMMON_LENGTH = 24;
 
