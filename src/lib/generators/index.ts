@@ -26,3 +26,4 @@ export { IntersectionGenerator } from "./intersection/index.js";
 export { ReadonlyGenerator } from "./readonly.js";
 export { StringGenerator as Zod4StringGenerator } from "./string/zod4.js"
 export { CUIDGenerator, CUID2Generator } from "./string/cuid.js"
+export { IPv4Generator, IPv6Generator } from "./string/ip.js"

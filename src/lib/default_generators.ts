@@ -30,11 +30,15 @@ import {
 	ReadonlyGenerator,
 	Zod4StringGenerator,
 	CUIDGenerator,
-	CUID2Generator
+	CUID2Generator,
+	IPv4Generator,
+	IPv6Generator
 } from "./generators/index.js";
 
 export const default_generators: InstanceofGeneratorDefinition<any>[] = [
 	// StringGenerator,
+	IPv4Generator,
+	IPv6Generator,
 	CUID2Generator,
 	CUIDGenerator,
 	Zod4StringGenerator,
