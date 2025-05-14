@@ -25,8 +25,6 @@ const string_schemas = {
 //	email: z.email(),
 //	"email-with-pattern": z.email("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"),
 //	"ISO datetime": z.iso.datetime(),
-//	cuid: z.cuid(),
-//	cuid2: z.cuid2(),
 //	ulid: z.ulid(),
 //	emoji: z.emoji(),
 //	"emoji with min-length": z.emoji().min(5),

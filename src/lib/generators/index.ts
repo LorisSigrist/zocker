@@ -25,4 +25,4 @@ export { StringGenerator } from "./string/index.js";
 export { IntersectionGenerator } from "./intersection/index.js";
 export { ReadonlyGenerator } from "./readonly.js";
 export { StringGenerator as Zod4StringGenerator } from "./string/zod4.js"
-export { CUIDGenerator } from "./cuid.js"
+export { CUIDGenerator, CUID2Generator } from "./cuid.js"

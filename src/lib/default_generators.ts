@@ -29,11 +29,13 @@ import {
 	IntersectionGenerator,
 	ReadonlyGenerator,
 	Zod4StringGenerator,
-	CUIDGenerator
+	CUIDGenerator,
+	CUID2Generator
 } from "./generators/index.js";
 
 export const default_generators: InstanceofGeneratorDefinition<any>[] = [
 	// StringGenerator,
+	CUID2Generator,
 	CUIDGenerator,
 	Zod4StringGenerator,
 	NumberGenerator,
