@@ -16,8 +16,6 @@ const string_schemas = {
 	//	"regex with flags": z
 	//		.string()
 	//		.regex(new RegExp("(sun|mon|tue|wednes|thurs|fri|satur)day", "i")),
-	//	email: z.email(),
-	//	"email-with-pattern": z.email("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"),
 	//	"ISO datetime": z.iso.datetime(),
 	//	ulid: z.ulid(),
 	//	emoji: z.emoji(),

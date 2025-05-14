@@ -35,11 +35,19 @@ import {
 	IPv6Generator,
 	UUIDGenerator,
 	E164Generator,
-	EmailGenerator
+	EmailGenerator,
+	ISODateGenerator,
+	ISODateTimeGenerator,
+	ISOTimeGenerator,
+	ISODurationGenerator
 } from "./generators/index.js";
 
 export const default_generators: InstanceofGeneratorDefinition<any>[] = [
 	// StringGenerator,
+	ISODateGenerator,
+	ISODateTimeGenerator,
+	ISOTimeGenerator,
+	ISODurationGenerator,
 	EmailGenerator,
 	E164Generator,
 	UUIDGenerator,
