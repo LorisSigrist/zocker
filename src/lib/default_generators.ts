@@ -40,11 +40,13 @@ import {
 	ISODateTimeGenerator,
 	ISOTimeGenerator,
 	ISODurationGenerator,
-	NanoIDGenerator
+	NanoIDGenerator,
+	ULIDGenerator
 } from "./generators/index.js";
 
 export const default_generators: InstanceofGeneratorDefinition<any>[] = [
 	// StringGenerator,
+	ULIDGenerator,
 	NanoIDGenerator,
 	ISODateGenerator,
 	ISODateTimeGenerator,
