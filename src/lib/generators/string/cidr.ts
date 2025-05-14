@@ -40,9 +40,8 @@ const cidrv4_generator: Generator<z.$ZodCIDRv4> = (schema, ctx) => {
     else mask_length = faker.datatype.number({ min: 1, max: 2 })
 
 
-    const mask : number = mask_length == 1 ? faker.datatype.number({ min: 0, max: 9}) :  faker.datatype.number({ min: 0, max: 32 });
+    const mask : number = mask_length == 1 ? faker.datatype.number({ min: 0, max: 9}) :  faker.datatype.number({ min: 10, max: 32 });
     const ipv4_length = length - mask_length -1;
-   
     const ipv4_address = generateIPv4OfLength(ipv4_length);
 
     return `${ipv4_address}/${mask}`;
