@@ -16,12 +16,8 @@ const url_generator: Generator<z.$ZodURL> = (schema, ctx) => {
     const content_constraints = getContentConstraints(schema);
 
     const generated_url = new URL(faker.internet.url());
-    if (hostnameRegex !== undefined) {
-        const generated_hostname = generateStringForRegex(hostnameRegex);
-        generated_url.hostname = generated_hostname;
-         console.log(generated_url, hostnameRegex, generated_hostname);
-    }
-    if (protocolRegex !== undefined) generated_url.protocol = generateStringForRegex(protocolRegex);
+    if (hostnameRegex !== undefined) generated_url.hostname = generateURLSafeStringForRegex(hostnameRegex);
+    if (protocolRegex !== undefined) generated_url.protocol = generateURLSafeStringForRegex(protocolRegex);
 
     return generated_url.href;
 };
@@ -32,10 +28,16 @@ export const URLGenerator: InstanceofGeneratorDefinition<z.$ZodURL> = {
     generator: url_generator
 }
 
-
-
-function generateStringForRegex(regex: RegExp): string {
+function generateURLSafeStringForRegex(regex: RegExp): string {
     const randexp = new RandExp(regex);
+
+    // Disallow invalid characters
+    randexp.defaultRange.subtract(0, 127);
+    randexp.defaultRange.add(97, 122); // a-z
+    randexp.defaultRange.add(48, 57); // 0-9
+    randexp.defaultRange.add(45, 45); // -
+    randexp.defaultRange.add(65, 90); // A-Z
+
     randexp.randInt = (min: number, max: number ) =>
         faker.datatype.number({ min, max, precision: 1 });
     return randexp.gen();
