@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker";
 import { InvalidSchemaException } from "../exceptions.js";
 import { Generator } from "lib/generate.js";
 import { InstanceofGeneratorDefinition } from "lib/zocker.js";
-import * as z from "@zod/core";
+import * as z from "zod/v4/core";
 
 // The minimum & maximum date 
 // according to https://262.ecma-international.org/5.1/#sec-15.9.1.1

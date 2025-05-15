@@ -2,7 +2,7 @@ import { InstanceofGeneratorDefinition } from "../zocker.js";
 import { RecursionLimitReachedException } from "../exceptions.js";
 import { Generator, generate } from "../generate.js";
 import { weighted_random_boolean } from "../utils/random.js";
-import * as z from "@zod/core";
+import * as z from "zod/v4/core";
 
 export type NullableOptions = {
 	null_chance: number;

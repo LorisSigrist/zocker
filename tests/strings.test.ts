@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { zocker } from "../src";
 import { test_schema_generation } from "./utils";
 
@@ -11,7 +11,6 @@ const string_schemas = {
 	"string with multiple min and max length": z.string().min(2).min(4).max(5).max(10),
 	"string with exact length": z.string().length(10),
 	"string with min and max length": z.string().min(1_000).max(2_000),
-	//	url: z.url(),
 	//	regex: z.string().regex(/<([a-z]\w{0,20})>foo<\1>/),
 	//	"regex with flags": z
 	//		.string()
@@ -21,30 +20,29 @@ const string_schemas = {
 	//	emoji: z.emoji(),
 	//	"emoji with min-length": z.emoji().min(5),
 	"ends with": z.string().endsWith("foo"),
-	//	"starts with": z.string().startsWith("foo"),
-	//	includes: z.string().includes("foo").includes("bar"),
-	//	"multiple starts with": z
-	//		.string()
-	//		.startsWith("some_string")
-	//		.startsWith("some_string_that_is_longer"),
-	//	"multiple ends with": z
-	//		.string()
-	//		.endsWith("a_string")
-	//		.endsWith("this_is_a_string"),
-	//	"starts with and length": z.string().startsWith("foo").length(3),
-	//	"ends with and length": z.string().endsWith("foo").length(3),
-	//	"starts with and includes with length": z
-	//		.string()
-	//		.startsWith("foo")
-	//		.includes("oo")
-	//		.length(3),
-	//	"ends with and includes with length": z
-	//		.string()
-	//		.endsWith("foo")
-	//		.includes("oo")
-	//		.length(3),
-	//	"date with offset": z.iso.datetime({ offset: true }),
-	//	"regex with no whitespace": z.string().regex(/^[^\s-]$/)
+	"starts with": z.string().startsWith("foo"),
+	"includes": z.string().includes("foo").includes("bar"),
+		"multiple starts with": z
+			.string()
+			.startsWith("some_string")
+			.startsWith("some_string_that_is_longer"),
+		"multiple ends with": z
+			.string()
+			.endsWith("a_string")
+			.endsWith("this_is_a_string"),
+		"starts with and length": z.string().startsWith("foo").length(3),
+		"ends with and length": z.string().endsWith("foo").length(3),
+		"starts with and includes with length": z
+			.string()
+			.startsWith("foo")
+			.includes("oo")
+			.length(3),
+		"ends with and includes with length": z
+			.string()
+			.endsWith("foo")
+			.includes("oo")
+			.length(3),
+		"regex with no whitespace": z.string().regex(/^[^\s-]$/)
 } as const;
 
 describe("String generation", () => {

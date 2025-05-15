@@ -1,5 +1,5 @@
 import { InvalidSchemaException } from "../../exceptions.js";
-import * as z from "@zod/core"
+import * as z from "zod/v4/core"
 
 /**
  * Represents the constraints that apply to the _content_ of a string

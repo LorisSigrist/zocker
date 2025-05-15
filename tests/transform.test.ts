@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { zocker } from "../src";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 describe("Transform generation", () => {
 	it("Generates valid data for strings with transforms", () => {

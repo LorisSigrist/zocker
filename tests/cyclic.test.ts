@@ -1,6 +1,6 @@
 import { describe } from "vitest";
 import { test_schema_generation } from "./utils";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 const Person = z.object({
 	name: z.string(),

@@ -1,4 +1,4 @@
-import * as z from "@zod/core"
+import * as z from "zod/v4/core"
 import { InvalidSchemaException } from "../../exceptions.js";
 
 export type LengthConstraints = {

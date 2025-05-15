@@ -1,5 +1,5 @@
 
-import * as z from "@zod/core";
+import * as z from "zod/v4/core";
 import { InstanceofGeneratorDefinition } from "../../zocker.js";
 import { Generator } from "../../generate.js";
 import { faker } from "@faker-js/faker";

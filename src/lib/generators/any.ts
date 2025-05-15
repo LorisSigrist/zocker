@@ -1,4 +1,4 @@
-import * as z from "@zod/core";
+import * as z from "zod/v4/core";
 import * as zod from "zod";
 import { generate, Generator } from "../generate.js";
 import { pick } from "../utils/random.js";

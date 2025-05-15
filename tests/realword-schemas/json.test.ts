@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { describe } from "vitest";
 import { test_schema_generation } from "../utils";
 

@@ -1,5 +1,5 @@
 import { z as m } from "@zod/mini";
-import { z as f } from "zod";
+import { z as f } from "zod/v4";
 
 const miniSchema = m.object({
     name: m.string().check(

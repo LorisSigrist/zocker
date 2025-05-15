@@ -11,9 +11,6 @@ importers:
       '@faker-js/faker':
         specifier: ^7.6.0
         version: 7.6.0
-      '@zod/core':
-        specifier: ^0.9.0
-        version: 0.9.0
       '@zod/mini':
         specifier: 4.0.0-beta.0
         version: 4.0.0-beta.0
@@ -21,8 +18,8 @@ importers:
         specifier: ^0.5.3
         version: 0.5.3
       zod:
-        specifier: ^4.0.0-beta.20250505T195954
-        version: 4.0.0-beta.20250505T195954
+        specifier: 3.25.0-beta.20250515T085033
+        version: 3.25.0-beta.20250515T085033
     devDependencies:
       '@changesets/cli':
         specifier: ^2.29.4
@@ -286,12 +283,6 @@ packages:
 
   '@zod/core@0.1.0':
     resolution: {integrity: sha512-hSXsufqjH7u8DiJPT0KY1rFWIhjkdXGM8MhMLwzaeOMhxMA4bzjWLQwSoAToJunUTVrpmfdo4dUFzNaU219+VQ==}
-
-  '@zod/core@0.11.6':
-    resolution: {integrity: sha512-03Bv82fFSfjDAvMfdHHdGSS6SOJs0iCcJlWJv1kJHRtoTT02hZpyip/2Lk6oo4l4FtjuwTrsEQTwg/LD8I7dJA==}
-
-  '@zod/core@0.9.0':
-    resolution: {integrity: sha512-bVfPiV2kDUkAJ4ArvV4MHcPZA8y3xOX6/SjzSy2kX2ACopbaaAP4wk6hd/byRmfi9MLNai+4SFJMmcATdOyclg==}
 
   '@zod/mini@4.0.0-beta.0':
     resolution: {integrity: sha512-ux1pJYQJO0S/uAldc0KGKiBFvqPpQqfC8vXbBJ3tDrcWCCa6/QBQPexZFn/cHscTxA/SnEJEAxa7qGTwPQC5Tg==}
@@ -864,8 +855,8 @@ packages:
     resolution: {integrity: sha512-AyeEbWOu/TAXdxlV9wmGcR0+yh2j3vYPGOECcIj2S7MkrLyC7ne+oye2BKTItt0ii2PHk4cDy+95+LshzbXnGg==}
     engines: {node: '>=12.20'}
 
-  zod@4.0.0-beta.20250505T195954:
-    resolution: {integrity: sha512-iB8WvxkobVIXMARvQu20fKvbS7mUTiYRpcD8OQV1xjRhxO0EEpYIRJBk6yfBzHAHEdOSDh3SxDITr5Eajr2vtg==}
+  zod@3.25.0-beta.20250515T085033:
+    resolution: {integrity: sha512-ze+cJjTCLg0n0gBForcQ7NFp8SALcTasTQqeUjARkjAmcsF0mDhVdtwHQX4NqeTSlSi+IvZVJ/fpR2yDGa48/Q==}
 
 snapshots:
 
@@ -1153,10 +1144,6 @@ snapshots:
       pretty-format: 27.5.1
 
   '@zod/core@0.1.0': {}
-
-  '@zod/core@0.11.6': {}
-
-  '@zod/core@0.9.0': {}
 
   '@zod/mini@4.0.0-beta.0':
     dependencies:
@@ -1669,6 +1656,4 @@ snapshots:
 
   yocto-queue@1.2.1: {}
 
-  zod@4.0.0-beta.20250505T195954:
-    dependencies:
-      '@zod/core': 0.11.6
+  zod@3.25.0-beta.20250515T085033: {}

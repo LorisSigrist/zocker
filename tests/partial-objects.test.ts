@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { zocker } from "../src";
 
 const object_schema = z.object({

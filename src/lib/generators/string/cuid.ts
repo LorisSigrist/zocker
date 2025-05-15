@@ -1,6 +1,6 @@
 import { InstanceofGeneratorDefinition } from "../../zocker.js";
 import { Generator, generate } from "../../generate.js";
-import * as z from "@zod/core";
+import * as z from "zod/v4/core";
 import { getLengthConstraints } from "./length-constraints.js";
 import { InvalidSchemaException } from "../../exceptions.js";
 import { getContentConstraints } from "./content-constraints.js";

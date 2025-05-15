@@ -1,5 +1,5 @@
 import { describe, expect, it, test } from "vitest";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { test_schema_generation } from "./utils";
 
 const repeats = 100; //How many times should each test be repeated?

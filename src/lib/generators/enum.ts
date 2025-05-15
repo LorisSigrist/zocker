@@ -1,7 +1,7 @@
 import { InstanceofGeneratorDefinition } from "../zocker.js";
 import { Generator } from "../generate.js";
 import { pick } from "../utils/random.js";
-import * as z from "@zod/core";
+import * as z from "zod/v4/core";
 
 const generate_enum: Generator<z.$ZodEnum<any>> = (schema, ctx) => {
 	const values = schema._zod.def.entries;

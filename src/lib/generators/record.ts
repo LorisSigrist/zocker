@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker";
 import { GenerationContext, Generator, generate } from "../generate.js";
-import * as z from "@zod/core";
+import * as z from "zod/v4/core";
 import { RecursionLimitReachedException } from "../exceptions.js";
 import { InstanceofGeneratorDefinition } from "../zocker.js";
 

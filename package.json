@@ -36,11 +36,10 @@
 	],
 	"peerDependencies": {
 		"@zod/mini": "4.0.0-beta.0",
-		"zod": "^4.0.0-beta.20250505T195954"
+				"zod": "3.25.0-beta.20250515T085033"
 	},
 	"dependencies": {
 		"@faker-js/faker": "^7.6.0",
-		"@zod/core": "^0.9.0",
 		"randexp": "^0.5.3"
 	}
 }
