@@ -41,24 +41,18 @@ const merge_schema = (
 
 	if (schema_1 instanceof zCore.$ZodLiteral && schema_2 instanceof zCore.$ZodLiteral) {
 
-		// check if the arrays are the same
-		const values_1 = schema_1._zod.def.values;
-		const values_2 = schema_2._zod.def.values;
-		if (values_1.length !== values_2.length) {
+		const common_values = setIntersection(
+			new Set(schema_1._zod.def.values),
+			new Set(schema_2._zod.def.values)
+		);
+
+		if(common_values.size === 0) {
 			throw new InvalidSchemaException(
-				"There is no intersection between two literals with different values."
+				"Cannot generate intersection of literal schemas with no common values"
 			);
 		}
 
-		for (let i = 0; i < values_1.length; i++) {
-			if (values_1[i] !== values_2[i]) {
-				throw new InvalidSchemaException(
-					"There is no intersection between two literals with different values."
-				);
-			}
-		}
-
-		return schema_1;
+		return z4.literal(Array.from(common_values));
 	}
 
 	if (schema_1 instanceof zCore.$ZodSymbol && schema_2 instanceof zCore.$ZodType) {
@@ -77,3 +71,8 @@ export const IntersectionGenerator: InstanceofGeneratorDefinition<
 	generator: generate_intersection,
 	match: "instanceof"
 };
+
+
+function setIntersection(a: Set<any>, b: Set<any>) {
+	return new Set([...a].filter((x) => b.has(x)));
+}

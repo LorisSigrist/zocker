@@ -20,6 +20,10 @@ const intersection_schemas = {
 	"intersection of two strings, one with regex": z.intersection(
 		z.string().max(10),
 		z.string().regex(/abc/)
+	),
+	"intersection of multiple literals": z.intersection(
+		z.literal(["red", "green", "blue"]),
+		z.literal(["blue"]),
 	)
 } as const;
 
