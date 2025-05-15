@@ -32,7 +32,6 @@ export type ContentConstraints = {
 };
 
 const generate_string: Generator<z.$ZodString> = (string_schema, ctx) => {
-    console.log(string_schema._zod.def);
 
     const lengthConstraints = getLengthConstraints(string_schema);
     const contentConstraints = getContentConstraints(string_schema);

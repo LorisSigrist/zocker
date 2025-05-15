@@ -9,8 +9,6 @@ export type NullableOptions = {
 };
 
 const generator: Generator<z.$ZodNullable<z.$ZodType>> = (schema, ctx) => {
-	console.log(schema);
-	
 	const should_be_null = weighted_random_boolean(
 		ctx.nullable_options.null_chance
 	);
