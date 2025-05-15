@@ -89,7 +89,7 @@ const generate_value: Generator<z.$ZodType> = (schema, generation_context) => {
 		return instanceof_generator.generator(schema, generation_context);
 
 	throw new NoGeneratorException(
-		`No generator for schema ${schema} - You can provide a custom generator in the zocker options`
+		`No generator for schema ${schema._zod.def.type} - You can provide a custom generator in the zocker options`
 	);
 };
 

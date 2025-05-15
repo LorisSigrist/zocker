@@ -43,11 +43,13 @@ import {
 	NanoIDGenerator,
 	ULIDGenerator,
 	CIDRv4Generator,
-	CIDRv6Generator
+	CIDRv6Generator,
+	URLGenerator
 } from "./generators/index.js";
 
 export const default_generators: InstanceofGeneratorDefinition<any>[] = [
 	// StringGenerator,
+	URLGenerator,
 	CIDRv4Generator,
 	CIDRv6Generator,
 	ULIDGenerator,

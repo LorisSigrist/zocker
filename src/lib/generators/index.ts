@@ -33,4 +33,5 @@ export { EmailGenerator } from "./string/email.js"
 export { ISODateGenerator, ISODateTimeGenerator, ISOTimeGenerator, ISODurationGenerator } from "./string/iso.js"
 export { NanoIDGenerator } from "./string/nanoid.js"
 export { ULIDGenerator } from "./string/ulid.js"
-export { CIDRv4Generator, CIDRv6Generator} from './string/cidr.js';
+export { CIDRv4Generator, CIDRv6Generator } from './string/cidr.js';
+export { URLGenerator } from "./string/url.js"
