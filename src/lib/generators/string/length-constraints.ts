@@ -15,7 +15,7 @@ export type LengthConstraints = {
  * @returns The length constraints
  * @throws InvalidSchemaException if the length constraints are impossible to satisfy (eg: min > max)
  */
-export function getLengthConstraints(string_schema: z.$ZodString): LengthConstraints {
+export function getLengthConstraints(string_schema: z.$ZodType): LengthConstraints {
     const min_length_checks = string_schema._zod.def.checks?.filter(c => c instanceof z.$ZodCheckMinLength) ?? [];
     const max_length_checks = string_schema._zod.def.checks?.filter(c => c instanceof z.$ZodCheckMaxLength) ?? [];
     const exact_length_checks = string_schema._zod.def.checks?.filter(c => c instanceof z.$ZodCheckLengthEquals) ?? [];
