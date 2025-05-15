@@ -43,7 +43,7 @@ const generate_array: Generator<z.$ZodArray<any>> = (array_schema, ctx) => {
 		//If we hit the recursion limit, and there is no minimum length, return an empty array
 		if (!(error instanceof RecursionLimitReachedException)) throw error;
 		if (min !== 0) throw error;
-		if (exact_length !== null && exact_length !== 0) throw error;
+		if (length_constraints.exact !== null && length_constraints.exact !== 0) throw error;
 		return [];
 	}
 };
