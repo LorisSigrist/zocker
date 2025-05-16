@@ -22,10 +22,11 @@ const Partial_Tree = z
 
 const Union_Tree = z.object({
 	name: z.string(),
-	children: z
-		.union([z.lazy(() => Union_Tree), z.string()])
-		.array()
-		.min(1)
+	get children() {
+	return  z
+			.array(Union_Tree)
+			.min(1)
+	}
 });
 
 const Discriminated_Union_Tree = z.object({

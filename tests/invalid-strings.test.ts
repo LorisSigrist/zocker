@@ -3,7 +3,7 @@ import { z } from "zod/v4";
 import { zocker } from "../src";
 
 const invalid_string_schemas = {
-	"string with min > max": z.string().min(10).max(5),
+	// "string with min > max": z.string().min(10).max(5), - Zod already throws an error here
 	"string with incompatible starts_with values": z
 		.string()
 		.startsWith("foo")
@@ -12,10 +12,6 @@ const invalid_string_schemas = {
 		.string()
 		.endsWith("foo")
 		.endsWith("bar"),
-	"multiple incompatible ip versions": z
-		.string()
-		.ip({ version: "v4" })
-		.ip({ version: "v6" }),
 	"multiple different regexes": z.string().regex(/foo/).regex(/foo2/),
 	"regex with starts_with": z.string().regex(/foo/).startsWith("foo"),
 	"regex with ends_with": z.string().regex(/foo/).endsWith("foo"),
