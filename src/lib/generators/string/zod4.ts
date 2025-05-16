@@ -3,7 +3,10 @@ import * as z from "zod/v4/core";
 import { InstanceofGeneratorDefinition } from "../../zocker.js";
 import { Generator } from "../../generate.js";
 import { faker } from "@faker-js/faker";
-import { InvalidSchemaException } from "../../exceptions.js";
+import {  NoGeneratorException } from "../../exceptions.js";
+import { getContentConstraints } from "./content-constraints.js";
+import { getLengthConstraints } from "./length-constraints.js";
+import Randexp from "randexp";
 
 /**
  * Represents the constraints that apply to the _length_ of a string
@@ -35,6 +38,28 @@ const generate_string: Generator<z.$ZodString> = (string_schema, ctx) => {
 
     const lengthConstraints = getLengthConstraints(string_schema);
     const contentConstraints = getContentConstraints(string_schema);
+    const regexConstraints = getRegexConstraints(string_schema);
+
+    if (regexConstraints.length > 0) {
+        if (regexConstraints.length > 1) throw new NoGeneratorException(
+            "Zocker's included regex generator currently does support multiple regex checks on the same string. Provide a custom generator instead."
+        );
+
+        if(lengthConstraints.exact !== null) throw new NoGeneratorException(
+            "Zocker's included regex generator currently does not work together with length constraints (minLength, maxLength, length). Provide a custom generator instead."
+        )
+
+        if(contentConstraints.starts_with != "" || contentConstraints.ends_with != "" || contentConstraints.includes.length > 0) throw new NoGeneratorException(
+            "Zocker's included regex generator currently does not work together with startWith, endsWith or includes constraints. Provide a custom generator instead."
+        )
+
+        const regex = regexConstraints[0]!;
+        
+        const randexp = new Randexp(regex);
+        randexp.randInt = (min: number, max: number) =>
+            faker.datatype.number({ min, max, precision: 1 });
+        return randexp.gen();
+    }
 
     // update the min-length
     lengthConstraints.min = Math.max(
@@ -57,7 +82,7 @@ const generate_string: Generator<z.$ZodString> = (string_schema, ctx) => {
         contentConstraints.ends_with.length -
         contentConstraints.includes.reduce((a, b) => a + b.length, 0);
 
-   
+
     return (
         contentConstraints.starts_with +
         faker.datatype.string(generated_length) +
@@ -74,90 +99,12 @@ export const StringGenerator: InstanceofGeneratorDefinition<z.$ZodString> = {
 
 
 /**
- * Returns the constraints on the _content_ of a string.
+ * Takes in a ZodType & Returns a list of 0 or more regexes it has to fulfill.
  * 
- * @param string_schema 
+ * @example `z.string().regex(/abc/) -> [/abc/]`
+ * @param schema 
  */
-function getContentConstraints(string_schema: z.$ZodString): ContentConstraints {
-    const starts_with_checks = string_schema._zod.def.checks?.filter(c => c instanceof z.$ZodCheckStartsWith) ?? [];
-    const ends_with_checks = string_schema._zod.def.checks?.filter(c => c instanceof z.$ZodCheckEndsWith) ?? [];
-    const includes_checks = string_schema._zod.def.checks?.filter(c => c instanceof z.$ZodCheckIncludes) ?? [];
-
-    const starts_with = starts_with_checks.reduce((acc, check) => {
-        const suggested_starts_with = check._zod.def.prefix;
-
-        const longer = suggested_starts_with.length > acc.length ? suggested_starts_with : acc;
-        const shorter = suggested_starts_with.length < acc.length ? suggested_starts_with : acc;
-
-        if (!longer.startsWith(shorter)) throw new InvalidSchemaException("startsWith constraints are not compatible - The Schema cannot be satisfied");
-        return longer;
-    }, "");
-
-    const ends_with = ends_with_checks.reduce((acc, check) => {
-        const suggested_ends_with = check._zod.def.suffix;
-
-        const longer = suggested_ends_with.length > acc.length ? suggested_ends_with : acc;
-        const shorter = suggested_ends_with.length < acc.length ? suggested_ends_with : acc;
-
-        if (!longer.endsWith(shorter)) throw new InvalidSchemaException("endsWith constraints are not compatible - The Schema cannot be satisfied");
-        return longer;
-    }, "");
-
-    const includes = includes_checks.map(c => c._zod.def.includes)
-        .filter(include => !starts_with.includes(include))  // filter out trivial includes
-        .filter(include => !ends_with.includes(include));   // filter out trivial includes
-
-    return {
-        starts_with,
-        ends_with,
-        includes
-    }
-}
-
-
-
-/**
- * Returns the length constraints that apply for a given schema. If multiple constraints
- * are specified (eg. multiple min-lengths), the most restrictive is applied
- * 
- * @param string_schema The schema to get length constraints for
- * @returns The length constraints
- */
-function getLengthConstraints(string_schema: z.$ZodString): LengthConstraints {
-    const min_length_checks = string_schema._zod.def.checks?.filter(c => c instanceof z.$ZodCheckMinLength) ?? [];
-    const max_length_checks = string_schema._zod.def.checks?.filter(c => c instanceof z.$ZodCheckMaxLength) ?? [];
-    const exact_length_checks = string_schema._zod.def.checks?.filter(c => c instanceof z.$ZodCheckLengthEquals) ?? [];
-
-    const min_length = min_length_checks.reduce((acc, check) => {
-        const value = check._zod.def.minimum;
-        return value > acc ? value : acc;
-    }, 0);
-
-    const max_length = max_length_checks.reduce((acc, check) => {
-        const value = check._zod.def.maximum;
-        return value < acc ? value : acc;
-    }, Infinity);
-
-    // Make sure min & max don't conflict
-    if (min_length > max_length) throw new InvalidSchemaException("min length is greater than max length");
-
-    // if there are multiple 
-    let exact_length = null;
-    for (const exact_length_check of exact_length_checks) {
-        const suggested_length = exact_length_check._zod.def.length;
-        if (exact_length == null) exact_length = suggested_length;
-        else if (suggested_length != exact_length) throw new InvalidSchemaException("Cannot generate a string with conflictung exact length constraints");
-    }
-
-    // If there is an exact length constraint, make sure it doesn't conflict with min/max length constraints
-    if (exact_length !== null) {
-        if (min_length > exact_length) throw new InvalidSchemaException("min length is greater than exact length");
-        if (max_length < exact_length) throw new InvalidSchemaException("max length is less than exact length");
-    }
-
-    return {
-        min: min_length,
-        max: max_length,
-        exact: exact_length
-    }
+function getRegexConstraints(schema: z.$ZodType): RegExp[] {
+    const regex_checks = schema._zod.def.checks?.filter(c => c instanceof z.$ZodCheckRegex) ?? [];
+    return regex_checks.map(check => check._zod.def.pattern);
 }
