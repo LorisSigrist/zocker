@@ -13,7 +13,6 @@ export { PromiseGenerator } from "./promise.js";
 export { BrandedGenerator } from "./branded.js";
 export { LazyGenerator } from "./lazy.js";
 export { SymbolGenerator } from "./symbol.js";
-export { NativeEnumGenerator } from "./native-enum.js";
 export { EnumGenerator } from "./enum.js";
 export { BooleanGenerator } from "./boolean.js";
 export { DiscriminatedUnionGenerator } from "./discriminated-union.js";

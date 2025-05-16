@@ -24,7 +24,10 @@ export function test_schema_generation(
 				try {
 					schema.parse(data);
 				} catch (e) {
-					console.log("Invalid Data Generated", data);
+					if(e instanceof z.ZodError)
+					{
+						console.log("Invalid Data Generated", data, z.prettifyError(e));
+					}
 					throw e;
 				}
 			}).not.toThrow();

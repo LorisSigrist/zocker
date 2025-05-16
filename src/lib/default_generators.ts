@@ -19,7 +19,6 @@ import {
 	SetGenerator,
 	ObjectGenerator,
 	UnionGenerator,
-	NativeEnumGenerator,
 	EnumGenerator,
 	DefaultGenerator,
 	DiscriminatedUnionGenerator,
@@ -75,7 +74,6 @@ export const default_generators: InstanceofGeneratorDefinition<any>[] = [
 	NullableGenerator,
 	AnyGenerator,
 	UnknownGenerator,
-	// EffectsGenerator, -- TODO: Effects changed in zod 4
 	PipeGenerator,
 	ArrayGenerator,
 	TupleGenerator,
@@ -84,13 +82,11 @@ export const default_generators: InstanceofGeneratorDefinition<any>[] = [
 	SetGenerator,
 	ObjectGenerator,
 	UnionGenerator,
-// NativeEnumGenerator, -- removed in zod 4
 	EnumGenerator,
 	DefaultGenerator,
 	DiscriminatedUnionGenerator,
 	PromiseGenerator,
 	LazyGenerator,
-// 	BrandedGenerator, -- Branded is no longer a separate Type in zod's internal data-structure. We don't need to handle branded values separately
 	ReadonlyGenerator,
 
 	{
@@ -116,6 +112,11 @@ export const default_generators: InstanceofGeneratorDefinition<any>[] = [
 	{
 		schema: z.$ZodLiteral,
 		generator: (schema: z.$ZodLiteral) => schema._zod.def.values[0],
+		match: "instanceof"
+	},
+	{
+		schema: z.$ZodNever,
+		generator: () => void 0,
 		match: "instanceof"
 	},
 	IntersectionGenerator

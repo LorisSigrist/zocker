@@ -10,11 +10,6 @@ export type RecordOptions = {
 };
 
 const generate_record: Generator<z.$ZodRecord> = (schema, ctx) => {
-	const size = faker.datatype.number({
-		min: ctx.record_options.min,
-		max: ctx.record_options.max
-	});
-
 	type Key = z.infer<(typeof schema)["_zod"]["def"]["keyType"]>;
 	type Value = z.infer<(typeof schema)["_zod"]["def"]["valueType"]>;
 
@@ -58,12 +53,10 @@ function generateKeys<Z extends z.$ZodRecord>(
 ): z.infer<Z>[] {
 	const keySchema = schema._zod.def.keyType;
 
-
-	if (keySchema instanceof z.$ZodEnum) {
-		// if the key schema is an enum
-		// all enum cases must be generated
-
-		//return keySchema._zod.def.entries;
+	// Enums & other schemas with a list of values must always return ALL
+	// their values
+	if (keySchema._zod.values) {
+		return [...keySchema._zod.values] as z.infer<Z>[];
 	}
 
 	// otherwise, pick a random number of keys
@@ -73,9 +66,9 @@ function generateKeys<Z extends z.$ZodRecord>(
 	});
 
 	const keys: z.infer<Z>[] = [];
-	for (let i = 0; i < numKeys; i++) {
+	while(keys.length < numKeys) {
 		const key = generate(schema._zod.def.keyType, ctx) as unknown as z.infer<Z>;
-		keys.push(key);
+		if(key != undefined) keys.push(key);
 	}
 
 	return keys;
