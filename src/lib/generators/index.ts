@@ -17,7 +17,6 @@ export { NativeEnumGenerator } from "./native-enum.js";
 export { EnumGenerator } from "./enum.js";
 export { BooleanGenerator } from "./boolean.js";
 export { DiscriminatedUnionGenerator } from "./discriminated-union.js";
-export { EffectsGenerator } from "./effects.js";
 export { ArrayGenerator } from "./array.js";
 export { OptionalGenerator } from "./optional.js";
 export { NullableGenerator } from "./nullable.js";
@@ -35,3 +34,4 @@ export { NanoIDGenerator } from "./string/nanoid.js"
 export { ULIDGenerator } from "./string/ulid.js"
 export { CIDRv4Generator, CIDRv6Generator } from './string/cidr.js';
 export { URLGenerator } from "./string/url.js"
+export { PipeGenerator } from "./pipe.js"

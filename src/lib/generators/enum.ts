@@ -4,7 +4,7 @@ import { pick } from "../utils/random.js";
 import * as z from "zod/v4/core";
 
 const generate_enum: Generator<z.$ZodEnum<any>> = (schema, ctx) => {
-	const values = schema._zod.def.entries;
+	const values = Object.values(schema._zod.def.entries);
 	const value = pick(values);
 	return value;
 };

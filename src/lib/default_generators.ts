@@ -12,7 +12,6 @@ import {
 	NullableGenerator,
 	AnyGenerator,
 	UnknownGenerator,
-	EffectsGenerator,
 	ArrayGenerator,
 	TupleGenerator,
 	RecordGenerator,
@@ -44,7 +43,8 @@ import {
 	ULIDGenerator,
 	CIDRv4Generator,
 	CIDRv6Generator,
-	URLGenerator
+	URLGenerator,
+	PipeGenerator
 } from "./generators/index.js";
 
 export const default_generators: InstanceofGeneratorDefinition<any>[] = [
@@ -76,6 +76,7 @@ export const default_generators: InstanceofGeneratorDefinition<any>[] = [
 	AnyGenerator,
 	UnknownGenerator,
 	// EffectsGenerator, -- TODO: Effects changed in zod 4
+	PipeGenerator,
 	ArrayGenerator,
 	TupleGenerator,
 	RecordGenerator,
@@ -91,6 +92,7 @@ export const default_generators: InstanceofGeneratorDefinition<any>[] = [
 	LazyGenerator,
 // 	BrandedGenerator, -- Branded is no longer a separate Type in zod's internal data-structure. We don't need to handle branded values separately
 	ReadonlyGenerator,
+
 	{
 		schema: z.$ZodVoid,
 		generator: () => {},
