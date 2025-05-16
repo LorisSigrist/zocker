@@ -30,15 +30,26 @@ export function getContentConstraints(string_schema: z.$ZodString): ContentConst
     const starts_with = starts_with_checks.reduce((acc, check) => {
         const suggested_starts_with = check._zod.def.prefix;
 
+        if(acc.length == suggested_starts_with.length && acc != suggested_starts_with) {
+             throw new InvalidSchemaException("startsWith constraints are not compatible - The Schema cannot be satisfied");
+        }
+
         const longer = suggested_starts_with.length > acc.length ? suggested_starts_with : acc;
         const shorter = suggested_starts_with.length < acc.length ? suggested_starts_with : acc;
 
-        if (!longer.startsWith(shorter)) throw new InvalidSchemaException("startsWith constraints are not compatible - The Schema cannot be satisfied");
+        if (!longer.startsWith(shorter)) {
+            throw new InvalidSchemaException("startsWith constraints are not compatible - The Schema cannot be satisfied");
+        }
         return longer;
     }, "");
 
     const ends_with = ends_with_checks.reduce((acc, check) => {
         const suggested_ends_with = check._zod.def.suffix;
+
+
+        if(acc.length == suggested_ends_with.length && acc != suggested_ends_with) {
+             throw new InvalidSchemaException("endsWith constraints are not compatible - The Schema cannot be satisfied");
+        }
 
         const longer = suggested_ends_with.length > acc.length ? suggested_ends_with : acc;
         const shorter = suggested_ends_with.length < acc.length ? suggested_ends_with : acc;
@@ -50,6 +61,7 @@ export function getContentConstraints(string_schema: z.$ZodString): ContentConst
     const includes = includes_checks.map(c => c._zod.def.includes)
         .filter(include => !starts_with.includes(include))  // filter out trivial includes
         .filter(include => !ends_with.includes(include));   // filter out trivial includes
+
 
     return {
         starts_with,
