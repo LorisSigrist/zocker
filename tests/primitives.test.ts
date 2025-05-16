@@ -14,9 +14,7 @@ const primitive_schemas = {
 	"plain NaN": z.nan(),
 	"plain date": z.date(),
 	"plain symbol": z.symbol(),
-	"plain unknown": z.unknown(),
-	"plain any": z.any()
-	//"plain never": z.never(), - not supported
+	"plain unknown": z.unknown()
 } as const;
 
 describe("Primitive generation", () => {
