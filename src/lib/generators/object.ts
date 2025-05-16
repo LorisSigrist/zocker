@@ -1,7 +1,8 @@
 import { get_semantic_flag } from "../semantics.js";
 import { GenerationContext, generate } from "../generate.js";
 import { InstanceofGeneratorDefinition } from "../zocker.js";
-import { z } from "zod";
+import * as z from "zod/v4/core";
+import * as z4 from "zod/v4";
 import { faker } from "@faker-js/faker";
 
 export type ObjectOptions = {
@@ -9,17 +10,17 @@ export type ObjectOptions = {
 	generate_extra_keys: boolean;
 };
 
-const generate_object = <T extends z.ZodRawShape>(
-	object_schema: z.ZodObject<T>,
-	ctx: GenerationContext<z.ZodObject<T>>
-): z.infer<z.ZodObject<T>> => {
+const generate_object = <T extends z.$ZodShape>(
+	object_schema: z.$ZodObject<T>,
+	ctx: GenerationContext<z.$ZodObject<T>>
+): z.infer<z.$ZodObject<T>> => {
 	type Shape = z.infer<typeof object_schema>;
 	type Value = Shape[keyof Shape];
 	type Key = string | number | symbol;
 
 	const mock_entries = [] as [Key, Value][];
 
-	Object.entries(object_schema.shape).forEach((entry) => {
+	Object.entries(object_schema._zod.def.shape).forEach((entry) => {
 		const key = entry[0] as Key;
 		const property_schema = entry[1] as Value;
 
@@ -39,13 +40,12 @@ const generate_object = <T extends z.ZodRawShape>(
 		}
 	});
 
-	let catchall_schema: z.ZodSchema | null = object_schema._def.catchall;
-	if (catchall_schema instanceof z.ZodNever) catchall_schema = null;
+	let catchall_schema: z.$ZodType | undefined = object_schema._zod.def.catchall;
 	const is_passthrough = object_schema._def.unknownKeys === "passthrough";
-	if (is_passthrough && !catchall_schema) catchall_schema = z.any();
+	if (is_passthrough && !catchall_schema) catchall_schema = z4.any();
 
 	if (catchall_schema && ctx.object_options.generate_extra_keys) {
-		const key_schema = z.union([z.string(), z.number(), z.symbol()]);
+		const key_schema = z4.union([z4.string(), z4.number(), z4.symbol()]);
 		const num_additional_keys = faker.datatype.number({ min: 0, max: 10 });
 		try {
 			for (let i = 0; i < num_additional_keys; i++) {
@@ -70,9 +70,9 @@ const generate_object = <T extends z.ZodRawShape>(
 	return Object.fromEntries(mock_entries) as Shape;
 };
 
-export const ObjectGenerator: InstanceofGeneratorDefinition<z.ZodObject<any>> =
+export const ObjectGenerator: InstanceofGeneratorDefinition<z.$ZodObject<any>> =
 	{
-		schema: z.ZodObject as any,
+		schema: z.$ZodObject as any,
 		generator: generate_object,
 		match: "instanceof"
 	};
