@@ -34,3 +34,4 @@ export { ULIDGenerator } from "./string/ulid.js"
 export { CIDRv4Generator, CIDRv6Generator } from './string/cidr.js';
 export { URLGenerator } from "./string/url.js"
 export { PipeGenerator } from "./pipe.js"
+export { EmojiGenerator } from "./string/emoji.ts"
