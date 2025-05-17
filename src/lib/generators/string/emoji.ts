@@ -8,18 +8,22 @@ import { getContentConstraints } from "./content-constraints.js";
 const generate_emoji: Generator<z.$ZodEmoji> = (schema, ctx) => {
     
   const lengthConstraints = getLengthConstraints(schema);
-  const content_constraints = getContentConstraints(schema);
+  const contentConstraints = getContentConstraints(schema);
 
   const length = lengthConstraints.exact ?? faker.datatype.number({
     min: lengthConstraints.min,
     max: lengthConstraints.max == Infinity ? lengthConstraints.min + 50_000 : lengthConstraints.max
   });
 
-	let emojis = "";
+  const generated_length = length - contentConstraints.starts_with.length - contentConstraints.ends_with.length;
+
+	let emojis = contentConstraints.starts_with;
 	for (let i = 0; i < length; i++) {
 		emojis += faker.internet.emoji();
 	}
-	return emojis;
+  emojis += contentConstraints.ends_with;
+	
+return emojis;
 }
 
 export const EmojiGenerator: InstanceofGeneratorDefinition<z.$ZodEmoji> = {
