@@ -1,38 +1,15 @@
 
 import * as z from "zod/v4/core";
 import { InstanceofGeneratorDefinition } from "../../zocker.js";
-import { Generator } from "../../generate.js";
+import { GenerationContext, Generator } from "../../generate.js";
 import { faker } from "@faker-js/faker";
 import { NoGeneratorException } from "../../exceptions.js";
-import { getContentConstraints } from "./content-constraints.js";
-import { getLengthConstraints } from "./length-constraints.js";
+import { type ContentConstraints, getContentConstraints } from "./content-constraints.js";
+import { type LengthConstraints, getLengthConstraints } from "./length-constraints.js";
 import Randexp from "randexp";
+import { pick } from "../../utils/random.js";
+import { SemanticFlag } from "../../semantics.js";
 
-/**
- * Represents the constraints that apply to the _length_ of a string
- * 
- * @property min The minimum length of the string (0 if not specified)
- * @property max The maximum length of the string (Infinity if not specified)
- * @property exact The exact length of the string (if specified)
- */
-export type LengthConstraints = {
-  min: number;
-  max: number;
-  exact: number | null;
-};
-
-/**
- * Represents the constraints that apply to the _content_ of a string
- * 
- * @property starts_with The string that the string must start with. ("" if not specified)
- * @property ends_with The string that the string must end with. ("" if not specified)
- * @property includes An array of strings that the string must contain
- */
-export type ContentConstraints = {
-  starts_with: string;
-  ends_with: string;
-  includes: string[];
-};
 
 const generate_string: Generator<z.$ZodString> = (string_schema, ctx) => {
   const lengthConstraints = getLengthConstraints(string_schema);
@@ -59,6 +36,17 @@ const generate_string: Generator<z.$ZodString> = (string_schema, ctx) => {
       faker.datatype.number({ min, max, precision: 1 });
     return randexp.gen();
   }
+
+
+  // If there is no other format, try generating a human readable string
+  // If this fails the constraints, generate a random stirng that passes
+
+  const human_readable_string = generateStringWithoutFormat(ctx, lengthConstraints, contentConstraints);
+  if (stringMatchesConstraints(human_readable_string, lengthConstraints, contentConstraints)) {
+    return human_readable_string;
+  }
+
+  // Human Readable string generation failed. Falling back to random string
 
   // update the min-length
   lengthConstraints.min = Math.max(
@@ -96,7 +84,6 @@ export const StringGenerator: InstanceofGeneratorDefinition<z.$ZodString> = {
   match: "instanceof"
 };
 
-
 /**
  * Takes in a ZodType & Returns a list of 0 or more regexes it has to fulfill.
  * 
@@ -107,3 +94,62 @@ function getRegexConstraints(schema: z.$ZodType): RegExp[] {
   const regex_checks = schema._zod.def.checks?.filter(c => c instanceof z.$ZodCheckRegex) ?? [];
   return regex_checks.map(check => check._zod.def.pattern);
 }
+
+function generateStringWithoutFormat(ctx: GenerationContext<z.$ZodString>, lc: LengthConstraints, cc: ContentConstraints) {
+  const semantic_generators: {
+    [flag in SemanticFlag]?: () => string;
+  } = {
+    fullname: faker.name.fullName,
+    firstname: faker.name.firstName,
+    lastname: faker.name.lastName,
+    street: faker.address.street,
+    city: faker.address.city,
+    country: faker.address.country,
+    zip: faker.address.zipCode,
+    phoneNumber: faker.phone.number,
+    paragraph: faker.lorem.paragraph,
+    sentence: faker.lorem.sentence,
+    word: faker.lorem.word,
+    jobtitle: faker.name.jobTitle,
+    color: color,
+    "color-hex": faker.internet.color,
+    weekday: faker.date.weekday,
+    "unique-id": () => faker.helpers.unique(faker.datatype.uuid),
+    key: () => faker.random.word(),
+    unspecified: () =>
+      faker.lorem.paragraphs(faker.datatype.number({ min: 1, max: 5 }))
+  };
+
+  const generator = semantic_generators[ctx.semantic_context];
+  if (!generator)
+    throw new Error(
+      "No semantic generator found for context - falling back to random string"
+    );
+
+  const proposed_string = generator();
+  return proposed_string;
+};
+
+function color(): string {
+  const generators = [faker.color.human, faker.internet.color];
+  return pick(generators)();
+}
+
+function stringMatchesConstraints(
+  str: string,
+  lc: LengthConstraints,
+  cc: ContentConstraints
+): boolean {
+  if (lc.exact && str.length !== lc.exact) return false;
+  if (lc.min && str.length < lc.min) return false;
+  if (lc.max && str.length > lc.max) return false;
+
+  if (cc.starts_with && !str.startsWith(cc.starts_with)) return false;
+  if (cc.ends_with && !str.endsWith(cc.ends_with)) return false;
+  if (cc.includes.length > 0 && !cc.includes.every((i) => str.includes(i)))
+    return false;
+
+  return true;
+}
+
+
