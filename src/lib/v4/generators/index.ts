@@ -10,7 +10,6 @@ export { DateGenerator } from "./dates.js";
 export { RecordGenerator } from "./record.js";
 export { BigintGenerator } from "./bigint.js";
 export { PromiseGenerator } from "./promise.js";
-export { BrandedGenerator } from "./branded.js";
 export { LazyGenerator } from "./lazy.js";
 export { SymbolGenerator } from "./symbol.js";
 export { EnumGenerator } from "./enum.js";

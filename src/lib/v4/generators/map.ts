@@ -30,7 +30,7 @@ const generate_map: Generator<z.$ZodMap> = (schema, ctx) => {
 		for (const key of keys) {
 			let prev_semantic_context = ctx.semantic_context;
 			try {
-				ctx.path.push(key);
+				ctx.path.push(key as string|number|symbol);
 				ctx.semantic_context = "key";
 
 				const value = generate(schema._zod.def.valueType, ctx);

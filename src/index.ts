@@ -14,8 +14,8 @@ export function zocker<Z extends zCore.$ZodType | z3.ZodSchema>(schema: Z)
     : Z extends zCore.$ZodType ? ZockerV4<Z> : Z extends z3.ZodSchema ? ZockerV3<Z> : never
 {
     if ("_zod" in schema) {
-        return zockerV4(schema);
+        return zockerV4(schema) as any;
     } else {
-        return zockerV3(schema);
+        return zockerV3(schema) as any;
     }
 }
