@@ -9,8 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "zod": "3.24.4",
-    "zocker": "*"
+    "zod": "latest",
+    "zocker": "latest"
   },
   "devDependencies": {
     "typescript": "~5.8.3",

@@ -15,8 +15,8 @@ importers:
         specifier: ^0.5.3
         version: 0.5.3
       zod:
-        specifier: 3.25.0-beta.20250519T051133
-        version: 3.25.0-beta.20250519T051133
+        specifier: ^3.25.3
+        version: 3.25.3
     devDependencies:
       '@changesets/cli':
         specifier: ^2.29.4
@@ -37,11 +37,11 @@ importers:
   example:
     dependencies:
       zocker:
-        specifier: '*'
-        version: 1.4.1(zod@3.24.4)
+        specifier: latest
+        version: 1.4.1(zod@3.25.3)
       zod:
-        specifier: 3.24.4
-        version: 3.24.4
+        specifier: latest
+        version: 3.25.3
     devDependencies:
       typescript:
         specifier: ~5.8.3
@@ -1195,11 +1195,8 @@ packages:
     peerDependencies:
       zod: ^3.22.0
 
-  zod@3.24.4:
-    resolution: {integrity: sha512-OdqJE9UDRPwWsrHjLN2F8bPxvwJBK22EHLWtanu0LSYr5YqzsaaW3RMgmjwr8Rypg5k+meEJdSPXJZXE/yqOMg==}
-
-  zod@3.25.0-beta.20250519T051133:
-    resolution: {integrity: sha512-kiLlHJfDDF2JJ2RcCvxhysRDnrSEHtOuHMLtG+PESvLEScEujB8ccvZ6KgvBxS1ifwpjlL/hkjqwvDzKKoryjQ==}
+  zod@3.25.3:
+    resolution: {integrity: sha512-VGZqnyYNrl8JpEJRZaFPqeVNIuqgXNu4cXZ5cOb6zEUO1OxKbRnWB4UdDIXMmiERWncs0yDQukssHov8JUxykQ==}
 
 snapshots:
 
@@ -2213,12 +2210,10 @@ snapshots:
 
   yocto-queue@1.2.1: {}
 
-  zocker@1.4.1(zod@3.24.4):
+  zocker@1.4.1(zod@3.25.3):
     dependencies:
       '@faker-js/faker': 7.6.0
       randexp: 0.5.3
-      zod: 3.24.4
+      zod: 3.25.3
 
-  zod@3.24.4: {}
-
-  zod@3.25.0-beta.20250519T051133: {}
+  zod@3.25.3: {}
