@@ -24,7 +24,7 @@
 		"bench": "vitest bench --run --passWithNoTests",
 		"format": "prettier --write .",
 		"changeset": "changeset",
-		"release": "npm run build && changeset publish"
+		"release": "pnpm run build && pnpm publish"
 	},
 	"devDependencies": {
 		"@changesets/cli": "^2.29.4",
