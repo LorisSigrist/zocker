@@ -87,7 +87,7 @@ export function get_semantic_flag(str: string): SemanticFlag {
 	if (str.includes("hour")) return "hour";
 	if (str.includes("minute")) return "minute";
 	if (str.includes("second")) return "second";
-	if (str.includes("millisecond")) return "millisecond";
+	if (str.includes("millisecond")) return "millisecond";	
 
 	if (str.includes("id")) return "unique-id";
 	return "unspecified";

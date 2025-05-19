@@ -142,6 +142,7 @@ function generateStringWithoutFormat(
 		word: faker.lorem.word,
 		jobtitle: faker.name.jobTitle,
 		color: color,
+		gender: () => faker.name.gender(),
 		"color-hex": faker.internet.color,
 		weekday: faker.date.weekday,
 		"unique-id": () => faker.helpers.unique(faker.datatype.uuid),

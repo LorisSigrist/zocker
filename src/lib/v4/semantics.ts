@@ -26,6 +26,7 @@ export type SemanticFlag =
 	| "millisecond"
 	| "weekday"
 	| "birthday"
+	| "gender"
 	| "unique-id";
 
 const paragraph_triggers = [
@@ -88,6 +89,8 @@ export function get_semantic_flag(str: string): SemanticFlag {
 	if (str.includes("minute")) return "minute";
 	if (str.includes("second")) return "second";
 	if (str.includes("millisecond")) return "millisecond";
+
+	if(str.includes("gender") || str.includes("sex")) return "gender";
 
 	if (str.includes("id")) return "unique-id";
 	return "unspecified";
