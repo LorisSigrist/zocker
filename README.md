@@ -1,6 +1,6 @@
 # Zocker
 
-Zocker is a library that automatically generates mock data from your Zod schemas. That way your mock data is always up to date, and you can focus on what's important.
+Zocker is a library that automatically generates valid data from your Zod schemas. `zod@3.x`, `zod@4.x` and `@zod/mini` are supported.
 
 [Try it on Stackblitz](https://stackblitz.com/github/LorisSigrist/zocker/tree/main/example?file=src%2Fmain.ts)
 
@@ -34,8 +34,6 @@ mockData = {
 }
 */
 ```
-
-Zocker supports `zod@3.x`, `zod@4.x` and `@zod/mini` schemas.
 
 ## Installation
 
@@ -215,7 +213,7 @@ const data = zocker(regex_schema); // 1b3d5
 
 ## API
 
-When you use the `zocker(schema)` function you get back an object with the following methods: 
+When you use the `zocker(schema)` function you get back an object with the following methods:
 
 ### `.supply`
 
