@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { z } from "zod/v4";
-import { zocker } from "../src";
+import { zocker } from "../../src";
 
 const repeats = 100;
 

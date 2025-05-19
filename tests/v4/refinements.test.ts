@@ -1,6 +1,6 @@
 import { describe, it } from "vitest";
 import { z } from "zod/v4";
-import { zocker } from "../src";
+import { zocker } from "../../src";
 
 const refined_string = z.string().refine((s) => s.length > 5);
 const object_with_refined_string = z.object({

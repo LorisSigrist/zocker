@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { z } from "zod/v4";
-import { zocker } from "../src";
+import { zocker } from "../../src";
 
 const schema = z.object({
   name: z.string(),

@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { z } from "zod/v4";
-import { zocker } from "../src";
+import { zocker } from "../../src";
 
 const invalid_string_schemas = {
 	// "string with min > max": z.string().min(10).max(5), - Zod already throws an error here

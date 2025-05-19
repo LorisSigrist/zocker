@@ -1,6 +1,6 @@
 import { test, expect } from "vitest";
 import * as z from "zod/v4/core"
-import { zocker } from "../src";
+import { zocker } from "../../src";
 
 /**
  * Test a bunch of schemas for validity at once
