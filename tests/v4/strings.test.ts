@@ -51,7 +51,7 @@ const string_schemas = {
 describe("String generation", () => {
 	test_schema_generation(string_schemas);
 
-	it.skip("should generate Uppercase strings when toUpperCase() is used", () => {
+	it("should generate Uppercase strings when toUpperCase() is used", () => {
 		const transformed_schema = z
 			.string()
 			.regex(/[a-z]*/)
@@ -62,7 +62,7 @@ describe("String generation", () => {
 		expect(() => uppercase_schema.parse(generated)).not.toThrow();
 	});
 
-	it.skip("should generate Lowercase strings when toLowerCase() is used", () => {
+	it("should generate Lowercase strings when toLowerCase() is used", () => {
 		const transformed_schema = z
 			.string()
 			.regex(/[A-Z]*/)
@@ -73,7 +73,7 @@ describe("String generation", () => {
 		expect(() => lowercase_schema.parse(generated)).not.toThrow();
 	});
 
-	it.skip("should generate trimmed strings when trim() is used", () => {
+	it("should generate trimmed strings when trim() is used", () => {
 		const transformed_schema = z
 			.string()
 			.regex(/\W+foo\W+/)

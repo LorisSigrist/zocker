@@ -14,8 +14,9 @@ const person_schema = z.object({
 });
 
 const mockData = zocker(person_schema).generate();
+
 /*
-{
+mockData = {
 	name: "John Doe",
 	age: 42,
 	emails: ["john.doe@gmail.com"],
@@ -42,7 +43,7 @@ npm install --save-dev zocker
 
 ## Features & Limitations
 
-`zocker` is as close as you can reasonably get to supporting all possible zod schemas. It's easier to list the limitations than the features.
+The vast majority of Zod schemas just work. It's quicker to list the ones with limitations:
 
 1. `z.preprocess` and `z.refine` are ignored
 2. `toUpperCase`, `toLowerCase` and `trim` only work if they are the last operation on a string
@@ -351,9 +352,3 @@ Options for the built-in `z.ZodNumber` generator.
 	extreme_value_chance: 0.3;
 }
 ```
-
-## The Future
-
-I intend to continue expanding the number of built-in generators, and make the generation process more customizable. If you have any ideas, please open an issue or a pull request - I'd love to hear your thoughts.
-
-Good APIs usually take a lot of iterations to get right, ideas are always welcome.

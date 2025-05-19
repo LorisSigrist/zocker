@@ -1,7 +1,6 @@
 import { InstanceofGeneratorDefinition } from "../zocker.js";
 import { generate, Generator } from "../generate.js";
 import * as z from "zod/v4/core";
-import { NoGeneratorException } from "../exceptions.js";
 
 const pipe_generator: Generator<z.$ZodPipe> = (schema, ctx) => {
 	const first = schema._zod.def.in;
