@@ -24,6 +24,18 @@ const intersection_schemas = {
 	"intersection of multiple literals": z.intersection(
 		z.literal(["red", "green", "blue"]),
 		z.literal(["blue"])
+	),
+	"intersection of two unions": z.intersection(
+		z.union([z.string(), z.number()]),
+		z.union([z.string(), z.number()])
+	),
+	"intersection of two enum unions": z.intersection(
+		z.enum(["green", "blue"]),
+		z.enum(["red", "green", ]),
+	),
+	"intersection of two arrays": z.intersection(
+		z.array(z.number()),
+		z.array(z.number().int())
 	)
 } as const;
 

@@ -24,7 +24,7 @@ export function test_schema_generation(
 				try {
 					let result = schema["~standard"].validate(data);
 					result = result as Awaited<typeof result>;
-					if (result.issues) {
+					if (result.issues && result.issues.length > 0) {
 						console.log("Invalid Data Generated", data, result.issues);
 						throw new Error("Invalid Data Generated");
 					}

@@ -79,6 +79,37 @@ const merge_schema = (
 		return z4.symbol();
 	}
 
+	if(schema_1 instanceof zCore.$ZodUnion && schema_2 instanceof zCore.$ZodUnion) {
+		
+		const combined = [];
+		for(const option1 of schema_1._zod.def.options) {
+			for(const option2 of schema_2._zod.def.options) {
+				try {
+					combined.push(merge_schema(option1, option2));
+				} catch (e) { 
+					continue;
+				}
+			}
+		}
+
+		if (combined.length == 0) throw new NoGeneratorException("Could not generate intersection of unions");
+		return z4.union(combined);
+	}
+
+	if (schema_1 instanceof zCore.$ZodEnum && schema_2 instanceof zCore.$ZodEnum) {
+		// only add entries that are in **both** enums
+		const shared = setIntersection(
+			new Set(Object.values(schema_1._zod.def.entries)),
+			new Set(Object.values(schema_2._zod.def.entries))
+		)
+
+		return z4.enum(Array.from(shared));
+	}
+
+	if(schema_1 instanceof zCore.$ZodArray && schema_2 instanceof zCore.$ZodArray) {
+		return z4.array(merge_schema(schema_1._zod.def.element, schema_2._zod.def.element));
+	}
+
 	throw new NoGeneratorException(
 		"ZodIntersections only have very limited support at the moment."
 	);

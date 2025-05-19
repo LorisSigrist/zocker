@@ -14,7 +14,6 @@ export { LazyGenerator } from "./lazy.js";
 export { SymbolGenerator } from "./symbol.js";
 export { EnumGenerator } from "./enum.js";
 export { BooleanGenerator } from "./boolean.js";
-export { DiscriminatedUnionGenerator } from "./discriminated-union.js";
 export { ArrayGenerator } from "./array.js";
 export { OptionalGenerator } from "./optional.js";
 export { NullableGenerator } from "./nullable.js";
