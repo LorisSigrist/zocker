@@ -26,6 +26,7 @@ export function test_schema_generation(
 					result = result as Awaited<typeof result>;
 					if (result.issues) {
 						console.log("Invalid Data Generated", data, result.issues);
+						throw new Error("Invalid Data Generated");
 					}
 				} catch (e) {
 					throw e;

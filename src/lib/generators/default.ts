@@ -13,7 +13,7 @@ const generator: Generator<z.$ZodDefault<any>> = (schema, ctx) => {
 	);
 	const default_value = schema._zod.def.defaultValue;
 	return should_use_default
-		? default_value()
+		? default_value
 		: generate(schema._zod.def.innerType, ctx);
 };
 
