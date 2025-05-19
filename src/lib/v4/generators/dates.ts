@@ -1,7 +1,7 @@
 import { faker } from "@faker-js/faker";
 import { InvalidSchemaException } from "../exceptions.js";
-import { Generator } from "lib/generate.js";
-import { InstanceofGeneratorDefinition } from "lib/zocker.js";
+import { Generator } from "../generate.js";
+import { InstanceofGeneratorDefinition } from "../zocker.js";
 import * as z from "zod/v4/core";
 
 // The minimum & maximum date 

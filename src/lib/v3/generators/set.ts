@@ -1,4 +1,4 @@
-import * as z from "zod/v4/core";
+import { z } from "zod";
 import { faker } from "@faker-js/faker";
 import { generate, Generator } from "../generate.js";
 import { RecursionLimitReachedException } from "../exceptions.js";
@@ -9,7 +9,7 @@ export type SetOptions = {
 	min: number;
 };
 
-const generate_set: Generator<z.$ZodSet<any>> = (schema, ctx) => {
+const generate_set: Generator<z.ZodSet<any>> = (schema, ctx) => {
 	const size = faker.datatype.number({
 		min: ctx.set_options.min,
 		max: ctx.set_options.max
@@ -21,7 +21,7 @@ const generate_set: Generator<z.$ZodSet<any>> = (schema, ctx) => {
 		for (let i = 0; i < size; i++) {
 			try {
 				ctx.path.push(i);
-				const value = generate(schema._zod.def.valueType, ctx);
+				const value = generate(schema._def.valueType, ctx);
 				set.add(value);
 			} finally {
 				ctx.path.pop();
@@ -37,8 +37,8 @@ const generate_set: Generator<z.$ZodSet<any>> = (schema, ctx) => {
 	return set;
 };
 
-export const SetGenerator: InstanceofGeneratorDefinition<z.$ZodSet<any>> = {
-	schema: z.$ZodSet as any,
+export const SetGenerator: InstanceofGeneratorDefinition<z.ZodSet<any>> = {
+	schema: z.ZodSet as any,
 	generator: generate_set,
 	match: "instanceof"
 };

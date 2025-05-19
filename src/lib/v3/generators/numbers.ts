@@ -1,4 +1,4 @@
-import * as z from "zod/v4/core";
+import { z } from "zod";
 import { faker } from "@faker-js/faker";
 import { InstanceofGeneratorDefinition } from "../zocker.js";
 import { Generator } from "../generate.js";
@@ -10,15 +10,7 @@ export type NumberGeneratorOptions = {
 	extreme_value_chance: number;
 };
 
-/**
- * Represents a minimum/maximum boundary for a number.
- * Format: `[number, is_inclusive]`
- * 
- * Example: `[10, true]` 
- */
-type Boundary = [number, boolean];
-
-const generate_number: Generator<z.$ZodNumber> = (number_schema, ctx) => {
+const generate_number: Generator<z.ZodNumber> = (number_schema, ctx) => {
 	try {
 		//Generate semantically meaningful number
 		let proposed_number = NaN;
@@ -45,48 +37,36 @@ const generate_number: Generator<z.$ZodNumber> = (number_schema, ctx) => {
 
 		proposed_number = generator();
 
-		return number_schema.parse(proposed_number); // TODO: Switch to "~standard"
-	} catch (e) { }
+		return number_schema.parse(proposed_number);
+	} catch (e) {}
 
 	let is_extreme_value = weighted_random_boolean(
 		ctx.number_options.extreme_value_chance
 	);
+	let is_int = get_number_checks(number_schema, "int").length !== 0;
+	let is_finite = get_number_checks(number_schema, "finite").length !== 0;
 
-	const formatChecks: z.$ZodCheckNumberFormat[] = number_schema._zod.def.checks?.filter(c => c instanceof z.$ZodCheckNumberFormat) ?? [];
+	let min_checks = get_number_checks(number_schema, "min");
+	let max_checks = get_number_checks(number_schema, "max");
 
-	let is_int = formatChecks.reduce(
-		(acc, check) => acc
-			|| check._zod.def.format === "int32"
-			|| check._zod.def.format === "safeint"
-			|| check._zod.def.format === "uint32",
-		false);
+	let min_check =
+		min_checks.length === 0
+			? null
+			: min_checks.reduce((prev, curr) =>
+					prev.value > curr.value ? prev : curr
+			  );
+	let max_check =
+		max_checks.length === 0
+			? null
+			: max_checks.reduce((prev, curr) =>
+					prev.value < curr.value ? prev : curr
+			  );
 
-	const is_finite = true// get_number_checks(number_schema, "finite").length !== 0;
+	let inclusive_min = min_check?.inclusive ?? true;
+	let inclusive_max = max_check?.inclusive ?? true;
 
-	const min_checks = number_schema._zod.def.checks?.filter(c => c instanceof z.$ZodCheckGreaterThan) ?? [];
-	const max_checks = number_schema._zod.def.checks?.filter(c => c instanceof z.$ZodCheckLessThan) ?? [];
-
-	const min_boundary: Boundary = min_checks.reduce<Boundary>((prev, curr) => {
-		const proposedBoundary: Boundary = [
-			curr._zod.def.value as number,
-			curr._zod.def.inclusive
-		]
-		return proposedBoundary[0] > prev[0] ? proposedBoundary : prev;
-	}, [Number.MIN_SAFE_INTEGER / 2, true]);
-
-	const max_boundary: Boundary = max_checks.reduce<Boundary>((prev, curr) => {
-		const proposedBoundary: Boundary = [
-			curr._zod.def.value as number,
-			curr._zod.def.inclusive
-		]
-		return proposedBoundary[0] < prev[0] ? proposedBoundary : prev;
-	}, [Number.MAX_SAFE_INTEGER / 2, true]);
-
-	let inclusive_min = min_boundary[1];
-	let inclusive_max = max_boundary[1];
-
-	let min = min_boundary[0];
-	let max = max_boundary[0];
+	let min = min_check?.value ?? Number.MIN_SAFE_INTEGER / 2;
+	let max = max_check?.value ?? Number.MAX_SAFE_INTEGER / 2;
 
 	if (!inclusive_min) {
 		const float_step = float_step_size(min);
@@ -105,6 +85,7 @@ const generate_number: Generator<z.$ZodNumber> = (number_schema, ctx) => {
 	}
 
 	let value: number;
+
 	if (is_int) {
 		value = faker.datatype.number({ min, max });
 	} else {
@@ -122,16 +103,17 @@ const generate_number: Generator<z.$ZodNumber> = (number_schema, ctx) => {
 			"Failed to generate Number. This is a bug in the built-in generator"
 		);
 
-	const multipleof_checks = number_schema._zod.def.checks?.filter(c => c instanceof z.$ZodCheckMultipleOf) ?? [];
-	const multipleof =
-		multipleof_checks.reduce((acc, check) => {
-			const multipleOf = check._zod.def.value as number;
-			return lcm(acc, multipleOf);
-		}, Number.MIN_VALUE);
+	let multipleof_checks = get_number_checks(number_schema, "multipleOf");
+	let multipleof =
+		multipleof_checks.length === 0
+			? null
+			: multipleof_checks.reduce((acc, check) => {
+					return lcm(acc, check.value);
+			  }, multipleof_checks[0]?.value!);
 
-	if (multipleof_checks.length > 0) {
-		const next_higher = value + (multipleof - (value % multipleof));
-		const next_lower = value - (value % multipleof);
+	if (multipleof !== null) {
+		let next_higher = value + (multipleof - (value % multipleof));
+		let next_lower = value - (value % multipleof);
 
 		if (next_higher <= max) value = next_higher;
 		else if (next_lower >= min) value = next_lower;
@@ -144,6 +126,16 @@ const generate_number: Generator<z.$ZodNumber> = (number_schema, ctx) => {
 	return value;
 };
 
+//Get a check from a ZodNumber schema in a type-safe way
+function get_number_checks<Kind extends z.ZodNumberCheck["kind"]>(
+	schema: z.ZodNumber,
+	kind: Kind
+) {
+	return schema._def.checks.filter((check) => check.kind === kind) as Extract<
+		z.ZodNumberCheck,
+		{ kind: Kind }
+	>[];
+}
 
 //Calculate the step size for modifying a float value
 function float_step_size(n: number) {
@@ -162,8 +154,8 @@ function gcd<N extends bigint | number>(a: N, b: N): N {
 	return gcd<N>(b, (a % b) as N);
 }
 
-export const NumberGenerator: InstanceofGeneratorDefinition<z.$ZodNumber> = {
-	schema: z.$ZodNumber as any,
+export const NumberGenerator: InstanceofGeneratorDefinition<z.ZodNumber> = {
+	schema: z.ZodNumber as any,
 	generator: generate_number,
 	match: "instanceof"
 };
