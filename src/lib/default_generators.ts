@@ -44,11 +44,15 @@ import {
   CIDRv6Generator,
   URLGenerator,
   PipeGenerator,
-  EmojiGenerator
+  EmojiGenerator,
+  Base64Generator,
+  Base64URLGenerator
 } from "./generators/index.js";
 
 export const default_generators: InstanceofGeneratorDefinition<any>[] = [
   // StringGenerator,
+  Base64Generator,
+  Base64URLGenerator,
   EmojiGenerator,
   URLGenerator,
   CIDRv4Generator,
