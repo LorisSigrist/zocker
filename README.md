@@ -1,7 +1,8 @@
 # Zocker
 
-Writing Mock data is the worst. It's tedious, and it always gets out of sync with your actual system.
-Zocker is a library that automatically generates reasonable mock data from your Zod schemas. That way your mock data is always up to date, and you can focus on what's important.
+Writing Mock data is the worst. It's tedious, and it always gets out of sync with your actual system. Zocker is a library that automatically generates reasonable mock data from your Zod schemas. That way your mock data is always up to date, and you can focus on what's important.
+
+Zocker supports both `zod` and `@zod/mini` schemas.
 
 ## Installation
 
@@ -11,22 +12,21 @@ npm install --save-dev zocker
 
 ## Features & Limitations
 
-`zocker` is still in development, but it already is the most feature-complete library of its kind. It's easier to list the limitations than the features. All these limitations can be worked around by customizing the generation process (see below).
+`zocker` is as close as you can reasonably get to supporting all possible zod schemas. It's easier to list the limitations than the features. All these limitations can be worked around by customizing the generation process (see below).
 
 1. `z.preprocess` and `z.refine` are not supported out of the box (and probably never will be)
 2. `toUpperCase`, `toLowerCase` and `trim` only work if they are the last operation on a string
 3. `z.function` is not supported
-4. `z.Intersection` is not supported (yet)
+4. `z.intersection` is not supported (yet)
 5. `z.transform` is only supported if it's the last operation on a schema
 6. `z.string` supports at most one format (e.g regex, cuid, ip) at a time
-7. The customization for the built-in generators is still limited, but expanding rapidly (suggestions welcome)
 
 ## Usage
 
-Like `zod`, we use a fluent API to make customization easy. Get started by wrapping your schema in `zocker`, and then call `generate()` on it to generate some data.
+Wrap your schema in `zocker`, and then call `generate()` on it to generate some data. 
 
 ```typescript
-import { z } from "zod";
+import { z } from "zod/v4";
 import { zocker } from "zocker";
 
 const person_schema = z.object({
@@ -57,28 +57,7 @@ const mockData = zocker(person_schema).generate();
 
 ### Supply your own value
 
-If you have a value that you would like to control explicitly, you can supply your own.
-Let's learn by example:
-
-```typescript
-const name_schema = z.string().refine((name) => name.length > 5);
-
-const schema = z.object({
-	name: name_schema,
-	age: z.number()
-});
-
-const data = zocker(schema).supply(name_schema, "Jonathan").generate();
-```
-
-The `supply` method allows you to provide a value, or a function that returns a value, for a specific sub-schema.
-It will be used whenever a sub-schema is encoutnered, that matches the one you passed into `supply` by reference.
-
-> The supplied value is not enforced to be valid
-
-This is the main way to work around unsupported types.
-
-One convenient way to get a sub_schema by reference is through the `shape` property on the schema.
+If you have a value that you would like to set explicitly, you can `.supply` your own value.
 
 ```typescript
 const schema = z.object({
@@ -86,10 +65,16 @@ const schema = z.object({
 	age: z.number()
 });
 
-const data = zocker(schema).supply(schema.shape.name, "Jonathan").generate();
+const data = zocker(schema)
+	.supply(schema.shape.name, "Jonathan") // the `name` will always be "Jonathan"
+	.generate();
 ```
 
-This way you don't need to break out the sub-schema into a separate variable.
+`.supply` takes two arguments;
+1. A reference to the sub-schema you want to match. You can get it on `schema.shape`. 
+2. The value you want to return.
+
+> Zocker will not enforce that the supplied value is valid
 
 ### Customizing the generation process
 
@@ -101,7 +86,7 @@ You can mostly autocomplete your way through these.
 
 ```typescript
 const data = zocker(my_schema)
-		.set({min: 2, max: 20}) //How many items should be in a set
+		.set({ min: 2, max: 20 }) //How many items should be in a set
 		.number({ extreme_value_chance: 0.3 }) //The probability that the most extreme value allowed will be generated
 		...
 		.generate()
