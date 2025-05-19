@@ -40,32 +40,6 @@ const generate_object = <T extends z.$ZodShape>(
 		}
 	});
 
-	let catchall_schema: z.$ZodType | undefined = object_schema._zod.def.catchall;
-	const is_passthrough = object_schema._def.unknownKeys === "passthrough";
-	if (is_passthrough && !catchall_schema) catchall_schema = z4.any();
-
-	if (catchall_schema && ctx.object_options.generate_extra_keys) {
-		const key_schema = z4.union([z4.string(), z4.number(), z4.symbol()]);
-		const num_additional_keys = faker.datatype.number({ min: 0, max: 10 });
-		try {
-			for (let i = 0; i < num_additional_keys; i++) {
-				const prev_semantic_context = ctx.semantic_context;
-				let key: Key;
-				try {
-					ctx.semantic_context = "key";
-					key = generate(key_schema, ctx);
-				} finally {
-					ctx.semantic_context = prev_semantic_context;
-				}
-
-				const value = generate(catchall_schema, ctx);
-
-				//Prepend to mock_entries,
-				//so that the catchall keys would be overwritten by the original keys in case of a collision
-				mock_entries.unshift([key, value]);
-			}
-		} catch (e) {}
-	}
 
 	return Object.fromEntries(mock_entries) as Shape;
 };
