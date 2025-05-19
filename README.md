@@ -1,6 +1,36 @@
 # Zocker
 
-Writing Mock data is the worst. It's tedious, and it always gets out of sync with your actual system. Zocker is a library that automatically generates mock data from your Zod schemas. That way your mock data is always up to date, and you can focus on what's important.
+Zocker is a library that automatically generates mock data from your Zod schemas. That way your mock data is always up to date, and you can focus on what's important.
+
+```typescript
+import { z } from "zod/v4";
+import { zocker } from "zocker";
+
+const person_schema = z.object({
+	name: z.string(),
+	age: z.number(),
+	emails: z.array(z.email()),
+	children: z.array(z.lazy(() => person_schema))
+});
+
+const mockData = zocker(person_schema).generate();
+/*
+{
+	name: "John Doe",
+	age: 42,
+	emails: ["john.doe@gmail.com"],
+	children: [
+		{
+			name: "Jane Doe",
+			age: 12,
+			emails: [...]
+			children: [...]
+		},
+		...
+	]
+}
+*/
+```
 
 Zocker supports `zod@3.x`, `zod@4.x` and `@zod/mini` schemas.
 
@@ -14,7 +44,7 @@ npm install --save-dev zocker
 
 `zocker` is as close as you can reasonably get to supporting all possible zod schemas. It's easier to list the limitations than the features.
 
-1. `z.preprocess` and `z.refine` are not supported out of the box (and probably never will be)
+1. `z.preprocess` and `z.refine` are ignored
 2. `toUpperCase`, `toLowerCase` and `trim` only work if they are the last operation on a string
 3. `z.function` is not supported
 4. `z.intersection` is only partially supported

@@ -8,9 +8,8 @@ const pipe_generator: Generator<z.$ZodPipe> = (schema, ctx) => {
 	const second = schema._zod.def.out;
 
 	if (!(second instanceof z.$ZodTransform)) {
-		throw new NoGeneratorException(
-			"Currently only transforms are supported as the second parameter to `z.pipe`"
-		);
+		// this is likely `z.preprocess`. Generate a value for the second parameter
+		return generate(second, ctx);
 	}
 
 	const transform_function = second._zod.def.transform;
