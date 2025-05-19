@@ -2,6 +2,8 @@
 
 Zocker is a library that automatically generates mock data from your Zod schemas. That way your mock data is always up to date, and you can focus on what's important.
 
+[Try it on Stackblitz](https://stackblitz.com/github/LorisSigrist/zocker/tree/main/example?file=src%2Fmain.ts)
+
 ```typescript
 import { z } from "zod/v4";
 import { zocker } from "zocker";
