@@ -3,4 +3,3 @@
 //Every publicly exposed export is re-exported from here.
 
 export { zocker } from "./lib/zocker.js";
-export { generate } from "./lib/generate.js";
