@@ -51,22 +51,24 @@ const generate_string: Generator<z.$ZodString> = (string_schema, ctx) => {
 	// If there is no other format, try generating a human readable string
 	// If this fails the constraints, generate a random stirng that passes
 
-	const human_readable_string = generateStringWithoutFormat(
-		ctx,
-		lengthConstraints,
-		contentConstraints
-	);
-	if (
-		stringMatchesConstraints(
-			human_readable_string,
+	try {
+		const human_readable_string = generateStringWithoutFormat(
+			ctx,
 			lengthConstraints,
 			contentConstraints
-		)
-	) {
-		return human_readable_string;
+		);
+		if (
+			stringMatchesConstraints(
+				human_readable_string,
+				lengthConstraints,
+				contentConstraints
+			)
+		) {
+			return human_readable_string;
+		}
+	} catch (e) {
+		// Human Readable string generation failed. Falling back to random string
 	}
-
-	// Human Readable string generation failed. Falling back to random string
 
 	// update the min-length
 	lengthConstraints.min = Math.max(
@@ -143,6 +145,7 @@ function generateStringWithoutFormat(
 		jobtitle: faker.name.jobTitle,
 		color: color,
 		gender: () => faker.name.gender(),
+		municipality: () => faker.address.cityName(),
 		"color-hex": faker.internet.color,
 		weekday: faker.date.weekday,
 		"unique-id": () => faker.helpers.unique(faker.datatype.uuid),
