@@ -48,7 +48,7 @@ const cidrv4_generator: Generator<z.$ZodCIDRv4> = (schema, ctx) => {
 	let mask_length: 1 | 2;
 	if (must_have_single_digit_mask) mask_length = 1;
 	else if (must_have_double_digit_mask) mask_length = 2;
-	else mask_length = faker.datatype.number({ min: 1, max: 2 });
+	else mask_length = faker.datatype.number({ min: 1, max: 2 }) as 1 | 2;
 
 	const mask: number =
 		mask_length == 1
@@ -98,7 +98,7 @@ const cidrv6_generator: Generator<z.$ZodCIDRv6> = (schema, ctx) => {
 	let mask_length: 1 | 2 | 3;
 	if (must_have_single_digit_mask) mask_length = 1;
 	else if (must_have_triple_digit_mask) mask_length = 3;
-	else mask_length = faker.datatype.number({ min: 1, max: 3 });
+	else mask_length = faker.datatype.number({ min: 1, max: 3 }) as 1 | 2 | 3;
 	if (mask_length == 3 && cannot_have_triple_digit_mask) mask_length = 2;
 	if (mask_length == 1 && cannot_have_single_digit_mask) mask_length = 2;
 

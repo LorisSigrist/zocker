@@ -30,7 +30,7 @@ const generate_object = <T extends z.$ZodShape>(
 			ctx.semantic_context = semantic_flag;
 
 			//@ts-ignore
-			const generated_value = generate(property_schema, ctx);
+			const generated_value : Value = generate(property_schema, ctx);
 			mock_entries.push([key, generated_value]);
 		} finally {
 			ctx.path.pop();

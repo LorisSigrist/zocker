@@ -5,7 +5,7 @@ import { faker } from "@faker-js/faker";
 import Randexp from "randexp";
 
 const e164_generator: Generator<z.$ZodE164> = (schema, ctx) => {
-	const pattern = getRegexCheck(schema) ?? schema._zod.def.pattern;
+	const pattern = getRegexCheck(schema) ?? schema._zod.def.pattern ?? z.regexes.e164;
 
 	const randexp = new Randexp(pattern);
 	randexp.randInt = (min: number, max: number) =>

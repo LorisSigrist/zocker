@@ -103,7 +103,7 @@ export class Zocker<Z extends z.$ZodType> {
 		const next = this.clone();
 
 		const generator_function =
-			typeof generator === "function" ? generator : () => generator;
+			typeof generator === "function" ? (generator as Generator<S>) : () => generator;
 
 		next.reference_generators = [
 			{

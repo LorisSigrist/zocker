@@ -5,7 +5,7 @@ import { faker } from "@faker-js/faker";
 import Randexp from "randexp";
 
 const iso_datetime_generator: Generator<z.$ZodISODateTime> = (schema, ctx) => {
-	const pattern = schema._zod.def.pattern;
+	const pattern = schema._zod.def.pattern!;
 
 	const randexp = new Randexp(pattern);
 	randexp.randInt = (min: number, max: number) =>
@@ -21,7 +21,7 @@ export const ISODateTimeGenerator: InstanceofGeneratorDefinition<z.$ZodISODateTi
 	};
 
 const iso_date_generator: Generator<z.$ZodISODate> = (schema, ctx) => {
-	const pattern = schema._zod.def.pattern;
+	const pattern = schema._zod.def.pattern!;
 
 	const randexp = new Randexp(pattern);
 	randexp.randInt = (min: number, max: number) =>
@@ -36,7 +36,7 @@ export const ISODateGenerator: InstanceofGeneratorDefinition<z.$ZodISODate> = {
 };
 
 const iso_time_generator: Generator<z.$ZodISOTime> = (schema, ctx) => {
-	const pattern = schema._zod.def.pattern;
+	const pattern = schema._zod.def.pattern!;
 
 	const randexp = new Randexp(pattern);
 	randexp.randInt = (min: number, max: number) =>
