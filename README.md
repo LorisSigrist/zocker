@@ -13,6 +13,7 @@ npm install --save-dev zocker
 ## Features & Limitations
 
 `zocker` is as close as you can reasonably get to supporting all possible zod schemas. It's easier to list the limitations than the features.
+
 1. `z.preprocess` and `z.refine` are not supported out of the box (and probably never will be)
 2. `toUpperCase`, `toLowerCase` and `trim` only work if they are the last operation on a string
 3. `z.function` is not supported
@@ -20,11 +21,11 @@ npm install --save-dev zocker
 5. `z.transform` is only supported if it's the last operation on a schema
 6. `z.string` supports at most one format (e.g regex, cuid, ip) at a time
 
- All these limitations can be worked around by [supplying custom values](#supply-your-own-value) for the affected sub-schema.
+All these limitations can be worked around by [supplying custom values](#supply-your-own-value) for the affected sub-schema.
 
 ## Usage
 
-Wrap your schema in `zocker`, and then call `generate()` on it to generate some data. 
+Wrap your schema in `zocker`, and then call `generate()` on it to generate some data.
 
 ```typescript
 import { z } from "zod/v4";
@@ -59,7 +60,8 @@ const mockData = zocker(person_schema).generate();
 ### Supply your own value
 
 If you have a value that you would like to set explicitly, you can `.supply` your own value. `.supply` takes two arguments;
-1. A reference to the sub-schema you want to match. You can get it on `schema.shape`. 
+
+1. A reference to the sub-schema you want to match. You can get it on `schema.shape`.
 2. The value you want to return.
 
 ```typescript
@@ -152,7 +154,7 @@ test("my repeatable test", () => {
 });
 ```
 
-We guarantee that the same seed will always produce the same data, with the same schema, same options and same version. 
+We guarantee that the same seed will always produce the same data, with the same schema, same options and same version.
 
 ## Examples
 
@@ -179,40 +181,45 @@ const data = zocker(regex_schema);
 ```
 
 ## API
+
 ### `.supply`
+
 Supply a concrete value for a specific schema. This is useful for testing edge-cases.
 
 ```typescript
 const data = zocker(my_schema).supply(my_sub_schema, 0).generate();
 ```
 
-The supplied value will be used if during the generation process a schema is encoutered, that matches the supplied `sub_schema` by *reference*.
+The supplied value will be used if during the generation process a schema is encoutered, that matches the supplied `sub_schema` by _reference_.
 
 You can also supply a function that returns a value. The function must follow the `Generator` type.
 
 ### `.override`
+
 Overrides the generator for an entire category of schemas. This is useful if you want to override the generation of `z.ZodNumber` for example.
 
 ```typescript
 const data = zocker(my_schema).override(z.$ZodNumber, 0).generate();
 ```
 
-The supplied value will be used if during the generation process a schema is encoutered, that is an *instance* of the supplied `schema`. Alternatively, you can also provide the name of the datatype you want to override as a string. (e.g `"number"`). Intellisense will help you out here.
+The supplied value will be used if during the generation process a schema is encoutered, that is an _instance_ of the supplied `schema`. Alternatively, you can also provide the name of the datatype you want to override as a string. (e.g `"number"`). Intellisense will help you out here.
 
 You can also supply a function that returns a value. The function must follow the `Generator` type.
 
-
 ### `.setDepthLimit`
+
 Set the maximum depth of cyclic data. Defaults to 5.
 
 ### `.setSeed`
+
 Set the seed for the random number generator. This ensures that the generation process is repeatable. If you don't set a seed, a random one will be chosen.
 
 ### `.generate`
+
 Executes the generation process. Returns the generated data that matches the schema provided to `zocker`.
 
-
 ### `.set`
+
 Options for the built-in `z.ZodSet` generator.
 
 ```typescript
@@ -223,6 +230,7 @@ Options for the built-in `z.ZodSet` generator.
 ```
 
 ### `.array`
+
 Options for the built-in `z.ZodArray` generator.
 
 ```typescript
@@ -233,6 +241,7 @@ Options for the built-in `z.ZodArray` generator.
 ```
 
 ### `.map`
+
 Options for the built-in `z.ZodMap` generator.
 
 ```typescript
@@ -242,8 +251,8 @@ Options for the built-in `z.ZodMap` generator.
 }
 ```
 
-
 ### `.record`
+
 Options for the built-in `z.ZodRecord` generator.
 
 ```typescript
@@ -254,56 +263,62 @@ Options for the built-in `z.ZodRecord` generator.
 ```
 
 ### `.object`
+
 Options for the built-in `z.ZodObject` generator.
 
 ```typescript
 {
-	generate_extra_keys: true //extra keys will be generated if allowed by the schema
+	generate_extra_keys: true; //extra keys will be generated if allowed by the schema
 }
 ```
 
 ### `.any` / `.unknown`
+
 Options for the built-in `z.ZodAny` and `z.ZodUnknown` generators.
 
 ```typescript
 {
-	strategy: "true-any" | "json-compatible" | "fast"
+	strategy: "true-any" | "json-compatible" | "fast";
 }
 ```
 
 ### `.optional`
+
 Options for the built-in `z.ZodOptional` generator.
 
 ```typescript
 {
-	undefined_chance: 0.3
+	undefined_chance: 0.3;
 }
 ```
 
 ### `.nullable`
+
 Options for the built-in `z.ZodNullable` generator.
 
 ```typescript
 {
-	null_chance: 0.3
+	null_chance: 0.3;
 }
 ```
 
 ### `.default`
+
 Options for the built-in `z.ZodDefault` generator.
 
 ```typescript
 {
-	default_chance: 0.3
+	default_chance: 0.3;
 }
 ```
 
 ### `.number`
+
 Options for the built-in `z.ZodNumber` generator.
 
 ```typescript
 {
-	extreme_value_chance: 0.3
+	extreme_value_chance: 0.3;
 }
 ```
 

@@ -87,7 +87,7 @@ export class Zocker<Z extends z.ZodSchema> {
 		generate_extra_keys: true
 	};
 
-	constructor(public schema: Z) { }
+	constructor(public schema: Z) {}
 
 	/**
 	 * Supply your own value / function for generating values for a given schema
@@ -126,13 +126,18 @@ export class Zocker<Z extends z.ZodSchema> {
 	 */
 	override<S extends z.ZodFirstPartySchemaTypes | KNOWN_OVERRIDE_NAMES>(
 		schema: S,
-		generator: Generator<S extends KNOWN_OVERRIDE_NAMES ? OVERRIDE<S> : S> | z.infer<S extends KNOWN_OVERRIDE_NAMES ? OVERRIDE<S> : S>
+		generator:
+			| Generator<S extends KNOWN_OVERRIDE_NAMES ? OVERRIDE<S> : S>
+			| z.infer<S extends KNOWN_OVERRIDE_NAMES ? OVERRIDE<S> : S>
 	) {
 		const next = this.clone();
 		const generator_function =
 			typeof generator === "function" ? generator : () => generator;
 
-		const resolved_schema: z.ZodFirstPartySchemaTypes = typeof schema !== "string" ?  schema : OVERRIDE_NAMES[schema as KNOWN_OVERRIDE_NAMES]!;
+		const resolved_schema: z.ZodFirstPartySchemaTypes =
+			typeof schema !== "string"
+				? schema
+				: OVERRIDE_NAMES[schema as KNOWN_OVERRIDE_NAMES]!;
 		next.instanceof_generators = [
 			{
 				schema: resolved_schema,
@@ -250,7 +255,6 @@ export class Zocker<Z extends z.ZodSchema> {
 		return generate(this.schema, ctx);
 	}
 
-
 	generateMany(count: number): z.infer<Z>[] {
 		let previous_seed = this.seed;
 		const results: z.infer<Z>[] = [];
@@ -272,39 +276,39 @@ export class Zocker<Z extends z.ZodSchema> {
 	}
 }
 
-
 const OVERRIDE_NAMES = {
-	"number": z.ZodNumber as any as z.ZodNumber,
-	"string": z.ZodString as any as z.ZodString,
-	"boolean": z.ZodBoolean as any as z.ZodBoolean,
-	"bigint": z.ZodBigInt as any as z.ZodBigInt,
-	"date": z.ZodDate as any as z.ZodDate,
-	"undefined": z.ZodUndefined as any as z.ZodUndefined,
-	"null": z.ZodNull as any as z.ZodNull,
-	"any": z.ZodAny as any as z.ZodAny,
-	"unknown": z.ZodUnknown as any as z.ZodUnknown,
-	"void": z.ZodVoid as any as z.ZodVoid,
-	"never": z.ZodNever as any as z.ZodNever,
-	"array": z.ZodArray as any as z.ZodArray<any>,
-	"object": z.ZodObject as any as z.ZodObject<any>,
-	"union": z.ZodUnion as any as z.ZodUnion<any>,
-	"intersection": z.ZodIntersection as any as z.ZodIntersection<any, any>,
-	"tuple": z.ZodTuple as any as z.ZodTuple<any>,
-	"record": z.ZodRecord as any as z.ZodRecord<any>,
-	"map": z.ZodMap as any as z.ZodMap<any, any>,
-	"set": z.ZodSet as any as z.ZodSet<any>,
-	"lazy": z.ZodLazy as any as z.ZodLazy<any>,
-	"literal": z.ZodLiteral as any as z.ZodLiteral<any>,
-	"enum": z.ZodEnum as any as z.ZodEnum<any>,
-	"nativeEnum": z.ZodNativeEnum as any as z.ZodNativeEnum<any>,
-	"promise": z.ZodPromise as any as z.ZodPromise<any>,
-	"transformer": z.ZodTransformer as any as z.ZodTransformer<any, any>,
-	"optional": z.ZodOptional as any as z.ZodOptional<any>,
-	"nullable": z.ZodNullable as any as z.ZodNullable<any>,
-	"effects": z.ZodEffects as any as z.ZodEffects<any, any>,
+	number: z.ZodNumber as any as z.ZodNumber,
+	string: z.ZodString as any as z.ZodString,
+	boolean: z.ZodBoolean as any as z.ZodBoolean,
+	bigint: z.ZodBigInt as any as z.ZodBigInt,
+	date: z.ZodDate as any as z.ZodDate,
+	undefined: z.ZodUndefined as any as z.ZodUndefined,
+	null: z.ZodNull as any as z.ZodNull,
+	any: z.ZodAny as any as z.ZodAny,
+	unknown: z.ZodUnknown as any as z.ZodUnknown,
+	void: z.ZodVoid as any as z.ZodVoid,
+	never: z.ZodNever as any as z.ZodNever,
+	array: z.ZodArray as any as z.ZodArray<any>,
+	object: z.ZodObject as any as z.ZodObject<any>,
+	union: z.ZodUnion as any as z.ZodUnion<any>,
+	intersection: z.ZodIntersection as any as z.ZodIntersection<any, any>,
+	tuple: z.ZodTuple as any as z.ZodTuple<any>,
+	record: z.ZodRecord as any as z.ZodRecord<any>,
+	map: z.ZodMap as any as z.ZodMap<any, any>,
+	set: z.ZodSet as any as z.ZodSet<any>,
+	lazy: z.ZodLazy as any as z.ZodLazy<any>,
+	literal: z.ZodLiteral as any as z.ZodLiteral<any>,
+	enum: z.ZodEnum as any as z.ZodEnum<any>,
+	nativeEnum: z.ZodNativeEnum as any as z.ZodNativeEnum<any>,
+	promise: z.ZodPromise as any as z.ZodPromise<any>,
+	transformer: z.ZodTransformer as any as z.ZodTransformer<any, any>,
+	optional: z.ZodOptional as any as z.ZodOptional<any>,
+	nullable: z.ZodNullable as any as z.ZodNullable<any>,
+	effects: z.ZodEffects as any as z.ZodEffects<any, any>
 } as const satisfies {
-	[K: string]: z.ZodFirstPartySchemaTypes
-}
+	[K: string]: z.ZodFirstPartySchemaTypes;
+};
 
 type KNOWN_OVERRIDE_NAMES = keyof typeof OVERRIDE_NAMES;
-type OVERRIDE<NAME extends KNOWN_OVERRIDE_NAMES> = typeof OVERRIDE_NAMES[NAME];
+type OVERRIDE<NAME extends KNOWN_OVERRIDE_NAMES> =
+	(typeof OVERRIDE_NAMES)[NAME];

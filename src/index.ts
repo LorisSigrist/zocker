@@ -5,17 +5,19 @@
 import { zocker as zockerV4, Zocker as ZockerV4 } from "./lib/v4/zocker.js";
 import { zocker as zockerV3, Zocker as ZockerV3 } from "./lib/v3/zocker.js";
 
-
-import * as zCore from "zod/v4/core"
+import * as zCore from "zod/v4/core";
 import { z as z3 } from "zod";
 
-
-export function zocker<Z extends zCore.$ZodType | z3.ZodSchema>(schema: Z)
-    : Z extends zCore.$ZodType ? ZockerV4<Z> : Z extends z3.ZodSchema ? ZockerV3<Z> : never
-{
-    if ("_zod" in schema) {
-        return zockerV4(schema) as any;
-    } else {
-        return zockerV3(schema) as any;
-    }
+export function zocker<Z extends zCore.$ZodType | z3.ZodSchema>(
+	schema: Z
+): Z extends zCore.$ZodType
+	? ZockerV4<Z>
+	: Z extends z3.ZodSchema
+	? ZockerV3<Z>
+	: never {
+	if ("_zod" in schema) {
+		return zockerV4(schema) as any;
+	} else {
+		return zockerV3(schema) as any;
+	}
 }

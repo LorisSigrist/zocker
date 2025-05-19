@@ -5,9 +5,11 @@ import { test_schema_generation } from "./utils";
 const primitive_schemas = {
 	"readonly string": z.string().readonly(),
 	"readonly number": z.number().readonly(),
-    "readonly object": z.object({
-        foo: z.string()
-    }).readonly(),
+	"readonly object": z
+		.object({
+			foo: z.string()
+		})
+		.readonly()
 } as const;
 
 describe("Readonly generation", () => {

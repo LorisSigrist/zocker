@@ -24,7 +24,7 @@ describe("Invalid string generation", () => {
 			expect(() => {
 				// should fail
 				const value = zocker(schema).generate();
-				console.error("Expected failure, but", value, "was generated")
+				console.error("Expected failure, but", value, "was generated");
 			}).toThrow();
 		});
 	}

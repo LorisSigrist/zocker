@@ -4,23 +4,25 @@ import * as z from "zod/v4/core";
 import { NoGeneratorException } from "../exceptions.js";
 
 const pipe_generator: Generator<z.$ZodPipe> = (schema, ctx) => {
-    const first = schema._zod.def.in;
-    const second = schema._zod.def.out;
+	const first = schema._zod.def.in;
+	const second = schema._zod.def.out;
 
-    if(!(second instanceof z.$ZodTransform)) {
-        throw new NoGeneratorException("Currently only transforms are supported as the second parameter to `z.pipe`");
-    }
+	if (!(second instanceof z.$ZodTransform)) {
+		throw new NoGeneratorException(
+			"Currently only transforms are supported as the second parameter to `z.pipe`"
+		);
+	}
 
-    const transform_function = second._zod.def.transform
+	const transform_function = second._zod.def.transform;
 
-    const value = generate(first, ctx);
-    const transformed = transform_function(value, { "issues": [], value })
+	const value = generate(first, ctx);
+	const transformed = transform_function(value, { issues: [], value });
 
-    return transformed;
+	return transformed;
 };
 
 export const PipeGenerator: InstanceofGeneratorDefinition<z.$ZodPipe> = {
-    schema: z.$ZodPipe as any,
-    generator: pipe_generator,
-    match: "instanceof"
+	schema: z.$ZodPipe as any,
+	generator: pipe_generator,
+	match: "instanceof"
 };

@@ -5,10 +5,19 @@ import { InstanceofGeneratorDefinition } from "../zocker.js";
 import { InvalidSchemaException } from "../exceptions.js";
 
 const generate_bigint: Generator<z.$ZodBigInt> = (bigint_schema, ctx) => {
-	const multiple_of_checks = bigint_schema._zod.def.checks?.filter(c => c instanceof z.$ZodCheckMultipleOf) ?? [];
+	const multiple_of_checks =
+		bigint_schema._zod.def.checks?.filter(
+			(c) => c instanceof z.$ZodCheckMultipleOf
+		) ?? [];
 
-	const min_checks = bigint_schema._zod.def.checks?.filter(c => c instanceof z.$ZodCheckGreaterThan) ?? [];
-	const max_checks = bigint_schema._zod.def.checks?.filter(c => c instanceof z.$ZodCheckLessThan) ?? [];
+	const min_checks =
+		bigint_schema._zod.def.checks?.filter(
+			(c) => c instanceof z.$ZodCheckGreaterThan
+		) ?? [];
+	const max_checks =
+		bigint_schema._zod.def.checks?.filter(
+			(c) => c instanceof z.$ZodCheckLessThan
+		) ?? [];
 
 	const min = min_checks.reduce((acc, check) => {
 		const min = check._zod.def.value as bigint;
@@ -38,7 +47,6 @@ const generate_bigint: Generator<z.$ZodBigInt> = (bigint_schema, ctx) => {
 
 	return value;
 };
-
 
 function lcm(a: bigint, b: bigint) {
 	return (a * b) / gcd(a, b);

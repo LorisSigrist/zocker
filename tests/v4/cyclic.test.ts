@@ -23,8 +23,7 @@ const Partial_Tree = z
 const Union_Tree = z.object({
 	name: z.string(),
 	get children() {
-		return z.array(z.union([Union_Tree, z.string()]))
-			.min(1)
+		return z.array(z.union([Union_Tree, z.string()])).min(1);
 	}
 });
 

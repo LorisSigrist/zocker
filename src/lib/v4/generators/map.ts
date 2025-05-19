@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker";
 import { Generator, generate } from "../generate.js";
 import { RecursionLimitReachedException } from "../exceptions.js";
 import { InstanceofGeneratorDefinition } from "../zocker.js";
-import * as z from "zod/v4/core"
+import * as z from "zod/v4/core";
 
 export type MapOptions = {
 	max: number;
@@ -30,7 +30,7 @@ const generate_map: Generator<z.$ZodMap> = (schema, ctx) => {
 		for (const key of keys) {
 			let prev_semantic_context = ctx.semantic_context;
 			try {
-				ctx.path.push(key as string|number|symbol);
+				ctx.path.push(key as string | number | symbol);
 				ctx.semantic_context = "key";
 
 				const value = generate(schema._zod.def.valueType, ctx);

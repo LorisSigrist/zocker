@@ -23,7 +23,7 @@ const intersection_schemas = {
 	),
 	"intersection of multiple literals": z.intersection(
 		z.literal(["red", "green", "blue"]),
-		z.literal(["blue"]),
+		z.literal(["blue"])
 	)
 } as const;
 

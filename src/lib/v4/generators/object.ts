@@ -38,7 +38,6 @@ const generate_object = <T extends z.$ZodShape>(
 		}
 	});
 
-
 	return Object.fromEntries(mock_entries) as Shape;
 };
 

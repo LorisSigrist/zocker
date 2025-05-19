@@ -1,5 +1,5 @@
 import { test, expect } from "vitest";
-import * as z from "zod/v4/core"
+import * as z from "zod/v4/core";
 import { zocker } from "../../src";
 
 /**
@@ -22,7 +22,7 @@ export function test_schema_generation(
 			const data = zocker(schema).generate();
 			expect(() => {
 				try {
-					let result = schema['~standard'].validate(data);
+					let result = schema["~standard"].validate(data);
 					result = result as Awaited<typeof result>;
 					if (result.issues) {
 						console.log("Invalid Data Generated", data, result.issues);
