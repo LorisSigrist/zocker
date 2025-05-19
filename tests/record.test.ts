@@ -14,6 +14,12 @@ const record_schemas = {
   "record with symbol keys": z.record(z.symbol(), z.number())
 } as const;
 
+
+const partial_record_schemas = {
+  "partial record with enum": z.partialRecord(z.enum(["a", "b", "c"]), z.number()),
+}
+
 describe("Record generation", () => {
   test_schema_generation(record_schemas);
+  test_schema_generation(partial_record_schemas);
 });

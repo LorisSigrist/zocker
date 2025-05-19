@@ -29,14 +29,14 @@
 		"@changesets/cli": "^2.29.4",
 		"prettier": "^2.8.8",
 		"typescript": "^5.8.3",
-		"vitest": "^0.30.1"
+		"vitest": "^0.30.1",
+		"@zod/mini": "4.0.0-beta.0"
 	},
 	"files": [
 		"dist"
 	],
 	"peerDependencies": {
-		"@zod/mini": "4.0.0-beta.0",
-				"zod": "3.25.0-beta.20250515T085033"
+		"zod": "3.25.0-beta.20250519T051133"
 	},
 	"dependencies": {
 		"@faker-js/faker": "^7.6.0",

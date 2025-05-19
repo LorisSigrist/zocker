@@ -2,8 +2,6 @@ import { get_semantic_flag } from "../semantics.js";
 import { GenerationContext, generate } from "../generate.js";
 import { InstanceofGeneratorDefinition } from "../zocker.js";
 import * as z from "zod/v4/core";
-import * as z4 from "zod/v4";
-import { faker } from "@faker-js/faker";
 
 export type ObjectOptions = {
 	/** If extra keys should be generated on schemas that allow it. Defaults to true */

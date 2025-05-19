@@ -1,5 +1,4 @@
 import { test, expect } from "vitest";
-import { z as z4 } from "zod/v4";
 import * as z from "zod/v4/core"
 import { zocker } from "../src";
 

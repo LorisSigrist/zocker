@@ -18,8 +18,8 @@ importers:
         specifier: ^0.5.3
         version: 0.5.3
       zod:
-        specifier: 3.25.0-beta.20250515T085033
-        version: 3.25.0-beta.20250515T085033
+        specifier: 3.25.0-beta.20250519T051133
+        version: 3.25.0-beta.20250519T051133
     devDependencies:
       '@changesets/cli':
         specifier: ^2.29.4
@@ -263,8 +263,8 @@ packages:
   '@types/node@12.20.55':
     resolution: {integrity: sha512-J8xLz7q2OFulZ2cyGTLE1TbbZcjpno7FaN6zdJNrgAdrJ+DZzh/uFR6YrTb4C+nXakvud8Q4+rbhoIWlYQbUFQ==}
 
-  '@types/node@22.15.18':
-    resolution: {integrity: sha512-v1DKRfUdyW+jJhZNEI1PYy29S2YRxMV5AOO/x/SjKmW0acCIOqmbj6Haf9eHAhsPmrhlHSxEhv/1WszcLWV4cg==}
+  '@types/node@22.15.19':
+    resolution: {integrity: sha512-3vMNr4TzNQyjHcRZadojpRaD9Ofr6LsonZAoQ+HMUa/9ORTPoxVIw0e0mpqWpdjj8xybyCM+oKOUH2vwFu/oEw==}
 
   '@vitest/expect@0.30.1':
     resolution: {integrity: sha512-c3kbEtN8XXJSeN81iDGq29bUzSjQhjES2WR3aColsS4lPGbivwLtas4DNUe0jD9gg/FYGIteqOenfU95EFituw==}
@@ -855,8 +855,8 @@ packages:
     resolution: {integrity: sha512-AyeEbWOu/TAXdxlV9wmGcR0+yh2j3vYPGOECcIj2S7MkrLyC7ne+oye2BKTItt0ii2PHk4cDy+95+LshzbXnGg==}
     engines: {node: '>=12.20'}
 
-  zod@3.25.0-beta.20250515T085033:
-    resolution: {integrity: sha512-ze+cJjTCLg0n0gBForcQ7NFp8SALcTasTQqeUjARkjAmcsF0mDhVdtwHQX4NqeTSlSi+IvZVJ/fpR2yDGa48/Q==}
+  zod@3.25.0-beta.20250519T051133:
+    resolution: {integrity: sha512-kiLlHJfDDF2JJ2RcCvxhysRDnrSEHtOuHMLtG+PESvLEScEujB8ccvZ6KgvBxS1ifwpjlL/hkjqwvDzKKoryjQ==}
 
 snapshots:
 
@@ -1110,7 +1110,7 @@ snapshots:
 
   '@types/node@12.20.55': {}
 
-  '@types/node@22.15.18':
+  '@types/node@22.15.19':
     dependencies:
       undici-types: 6.21.0
 
@@ -1579,14 +1579,14 @@ snapshots:
 
   universalify@0.1.2: {}
 
-  vite-node@0.30.1(@types/node@22.15.18):
+  vite-node@0.30.1(@types/node@22.15.19):
     dependencies:
       cac: 6.7.14
       debug: 4.4.1
       mlly: 1.7.4
       pathe: 1.1.2
       picocolors: 1.1.1
-      vite: 4.5.14(@types/node@22.15.18)
+      vite: 4.5.14(@types/node@22.15.19)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -1597,20 +1597,20 @@ snapshots:
       - supports-color
       - terser
 
-  vite@4.5.14(@types/node@22.15.18):
+  vite@4.5.14(@types/node@22.15.19):
     dependencies:
       esbuild: 0.18.20
       postcss: 8.5.3
       rollup: 3.29.5
     optionalDependencies:
-      '@types/node': 22.15.18
+      '@types/node': 22.15.19
       fsevents: 2.3.3
 
   vitest@0.30.1:
     dependencies:
       '@types/chai': 4.3.20
       '@types/chai-subset': 1.3.6(@types/chai@4.3.20)
-      '@types/node': 22.15.18
+      '@types/node': 22.15.19
       '@vitest/expect': 0.30.1
       '@vitest/runner': 0.30.1
       '@vitest/snapshot': 0.30.1
@@ -1631,8 +1631,8 @@ snapshots:
       strip-literal: 1.3.0
       tinybench: 2.9.0
       tinypool: 0.4.0
-      vite: 4.5.14(@types/node@22.15.18)
-      vite-node: 0.30.1(@types/node@22.15.18)
+      vite: 4.5.14(@types/node@22.15.19)
+      vite-node: 0.30.1(@types/node@22.15.19)
       why-is-node-running: 2.3.0
     transitivePeerDependencies:
       - less
@@ -1656,4 +1656,4 @@ snapshots:
 
   yocto-queue@1.2.1: {}
 
-  zod@3.25.0-beta.20250515T085033: {}
+  zod@3.25.0-beta.20250519T051133: {}
