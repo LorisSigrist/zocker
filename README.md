@@ -43,7 +43,7 @@ npm install --save-dev zocker
 
 ## Features & Limitations
 
-The vast majority of Zod schemas just work. It's quicker to list the ones with limitations:
+The vast majority of Zod schemas just work. It's quicker to list the ones with limitations. Everything not listed here should just work.
 
 1. `z.preprocess` and `z.refine` are ignored
 2. `toUpperCase`, `toLowerCase` and `trim` only work if they are the last operation on a string
@@ -134,7 +134,7 @@ Let's override the number generation to only return `Infinity`, regardless of an
 const data = zocker(my_schema).override(z.ZodNumber, Infinity).generate();
 ```
 
-> There is currently an issue, where the types don't play well when passing the classes themselves as arguments. If you get a type-error on `z.ZodNumber`, type-cast it to itself it with `z.ZodNumber as any as z.ZodNumber`. It's silly, I know. If you know how to fix it, contributions are welcome.
+> There is currently an issue, where the types don't play well when passing the classes themselves as arguments. If you get a type-error on `z.$ZodNumber`, type-cast it to itself it with `z.$ZodNumber as any as z.$ZodNumber`. It's silly, I know. If you know how to fix it, contributions are welcome.
 
 In practice you would probably want to return different values based on the exact number-schema we are working on.
 To do that, you can provide a function to the override. It will recieve two arguments, first the schema that we are working on, and second, a generation-context. You usually only utilize the first one.
@@ -189,7 +189,7 @@ We guarantee that the same seed will always produce the same data, with the same
 
 ## Examples
 
-### Cyclic JSON
+### Cyclic Types
 
 Zocker supports `z.lazy`. You can use it to generate cyclic data.like normal
 
@@ -208,10 +208,12 @@ Zocker supports `z.string().regex()` out of the box, thanks to the amazing [rand
 
 ```typescript
 const regex_schema = z.string().regex(/^[a-z0-9]{5,10}$/);
-const data = zocker(regex_schema);
+const data = zocker(regex_schema); // 1b3d5
 ```
 
 ## API
+
+When you use the `zocker(schema)` function you get back an object with the following methods: 
 
 ### `.supply`
 
