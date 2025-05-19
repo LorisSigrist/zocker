@@ -2,7 +2,6 @@ import { InstanceofGeneratorDefinition } from "./zocker.js";
 import * as z from "zod/v4/core"
 
 import {
-  StringGenerator,
   NumberGenerator,
   BigintGenerator,
   BooleanGenerator,
@@ -26,7 +25,7 @@ import {
   LazyGenerator,
   IntersectionGenerator,
   ReadonlyGenerator,
-  Zod4StringGenerator,
+  StringGenerator,
   CUIDGenerator,
   CUID2Generator,
   IPv4Generator,
@@ -50,7 +49,6 @@ import {
 } from "./generators/index.js";
 
 export const default_generators: InstanceofGeneratorDefinition<any>[] = [
-  // StringGenerator,
   Base64Generator,
   Base64URLGenerator,
   EmojiGenerator,
@@ -70,7 +68,7 @@ export const default_generators: InstanceofGeneratorDefinition<any>[] = [
   IPv6Generator,
   CUID2Generator,
   CUIDGenerator,
-  Zod4StringGenerator,
+  StringGenerator,
   NumberGenerator,
   BigintGenerator,
   BooleanGenerator,
