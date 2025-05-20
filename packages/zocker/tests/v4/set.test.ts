@@ -1,6 +1,6 @@
 import { describe } from "vitest";
 import { z } from "zod/v4";
-import { z as zm } from "@zod/mini";
+import { z as zm } from "zod/v4-mini";
 import { test_schema_generation } from "./utils";
 
 const set_schemas = {
