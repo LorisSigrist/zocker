@@ -1,5 +1,8 @@
 name: Publish NPM Packages
 
+# This Workflow automatically publishes any NPM packages where the version has increased
+# This should usually happen as a response to Changeste's `Version Packages PR` being mergeed
+
 on:
   workflow_dispatch:
 
