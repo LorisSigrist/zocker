@@ -28,7 +28,7 @@ const generate_array: Generator<z.ZodArray<any>> = (array_schema, ctx) => {
 		throw new InvalidSchemaException("min length is greater than max length");
 
 	const length =
-		exact_length !== null ? exact_length : faker.datatype.number({ min, max });
+		exact_length !== null ? exact_length : faker.number.int({ min, max });
 
 	const generated_array = [];
 

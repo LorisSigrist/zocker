@@ -35,7 +35,7 @@ const cidrv4_generator: Generator<z.$ZodCIDRv4> = (schema, ctx) => {
 
 	const length =
 		length_constraints.exact ??
-		faker.datatype.number({
+		faker.number.int({
 			min: Math.max(length_constraints.min, CIDR_V4_MIN_LENGTH),
 			max: Math.min(length_constraints.max, CIDR_V4_MAX_LENGTH)
 		});
@@ -48,12 +48,12 @@ const cidrv4_generator: Generator<z.$ZodCIDRv4> = (schema, ctx) => {
 	let mask_length: 1 | 2;
 	if (must_have_single_digit_mask) mask_length = 1;
 	else if (must_have_double_digit_mask) mask_length = 2;
-	else mask_length = faker.datatype.number({ min: 1, max: 2 }) as 1 | 2;
+	else mask_length = faker.number.int({ min: 1, max: 2 }) as 1 | 2;
 
 	const mask: number =
 		mask_length == 1
-			? faker.datatype.number({ min: 0, max: 9 })
-			: faker.datatype.number({ min: 10, max: 32 });
+			? faker.number.int({ min: 0, max: 9 })
+			: faker.number.int({ min: 10, max: 32 });
 	const ipv4_length = length - mask_length - 1;
 	const ipv4_address = generateIPv4OfLength(ipv4_length);
 
@@ -83,7 +83,7 @@ const cidrv6_generator: Generator<z.$ZodCIDRv6> = (schema, ctx) => {
 
 	const length =
 		length_constraints.exact ??
-		faker.datatype.number({
+		faker.number.int({
 			min: Math.max(length_constraints.min, CIDR_V6_MIN_LENGTH),
 			max: Math.min(length_constraints.max, CIDR_V6_MAX_LENGTH)
 		});
@@ -98,16 +98,16 @@ const cidrv6_generator: Generator<z.$ZodCIDRv6> = (schema, ctx) => {
 	let mask_length: 1 | 2 | 3;
 	if (must_have_single_digit_mask) mask_length = 1;
 	else if (must_have_triple_digit_mask) mask_length = 3;
-	else mask_length = faker.datatype.number({ min: 1, max: 3 }) as 1 | 2 | 3;
+	else mask_length = faker.number.int({ min: 1, max: 3 }) as 1 | 2 | 3;
 	if (mask_length == 3 && cannot_have_triple_digit_mask) mask_length = 2;
 	if (mask_length == 1 && cannot_have_single_digit_mask) mask_length = 2;
 
 	const mask: number =
 		mask_length == 1
-			? faker.datatype.number({ min: 0, max: 9 })
+			? faker.number.int({ min: 0, max: 9 })
 			: mask_length == 2
-			? faker.datatype.number({ min: 10, max: 99 })
-			: faker.datatype.number({ min: 100, max: 128 });
+			? faker.number.int({ min: 10, max: 99 })
+			: faker.number.int({ min: 100, max: 128 });
 
 	const ipv6_length = length - mask_length - 1;
 	const ipv6_address = generateIPv6OfLength(ipv6_length);

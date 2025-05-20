@@ -9,7 +9,7 @@ const nanoid_generator: Generator<z.$ZodNanoID> = (schema, ctx) => {
 
 	const randexp = new Randexp(pattern);
 	randexp.randInt = (min: number, max: number) =>
-		faker.datatype.number({ min, max, precision: 1 });
+		faker.number.int({ min, max });
 	return randexp.gen();
 };
 

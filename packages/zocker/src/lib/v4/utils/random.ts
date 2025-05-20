@@ -5,16 +5,11 @@
 
 import { faker } from "@faker-js/faker";
 
+/**
+ * @deprecated Use `faker.helpers.arrayElement` directly
+ */
 export function pick<T>(array: readonly T[]): T {
-	//Generate a random index
-	const index = faker.datatype.number({
-		min: 0,
-		max: array.length - 1,
-		precision: 1
-	});
-
-	if (array.hasOwnProperty(index)) return array[index]!;
-	else throw new Error(`Index ${index} does not exist in array ${array}`);
+	return faker.helpers.arrayElement(array);
 }
 
 /**
@@ -26,13 +21,10 @@ export function weighted_pick<A, B>(
 	option_2: B,
 	probability: number
 ): A | B {
-	if (probability <= 0) return option_2;
-	if (probability >= 1) return option_1;
-	const random = faker.datatype.number({ min: 0, max: 1, precision: 0.01 });
-	if (random < probability) return option_1;
-	else return option_2;
+	const first = faker.datatype.boolean({ probability });
+	return first ? option_1 : option_2;
 }
 
 export function weighted_random_boolean(true_probability: number): boolean {
-	return weighted_pick(true, false, true_probability);
+	return faker.datatype.boolean({ probability: true_probability });
 }

@@ -10,7 +10,7 @@ export type MapOptions = {
 };
 
 const generate_map: Generator<z.ZodMap> = (schema, ctx) => {
-	const size = faker.datatype.number({
+	const size = faker.number.int({
 		min: ctx.map_options.min,
 		max: ctx.map_options.max
 	});

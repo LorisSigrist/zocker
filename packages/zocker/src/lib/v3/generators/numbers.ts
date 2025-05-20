@@ -18,15 +18,15 @@ const generate_number: Generator<z.ZodNumber> = (number_schema, ctx) => {
 		const semantic_generators: {
 			[flag in SemanticFlag]?: () => number;
 		} = {
-			age: () => faker.datatype.number({ min: 0, max: 120 }),
-			year: () => faker.datatype.number({ min: 1200, max: 3000 }),
-			month: () => faker.datatype.number({ min: 1, max: 12 }),
-			"day-of-the-month": () => faker.datatype.number({ min: 1, max: 31 }),
-			hour: () => faker.datatype.number({ min: 0, max: 23 }),
-			minute: () => faker.datatype.number({ min: 0, max: 59 }),
-			second: () => faker.datatype.number({ min: 0, max: 59 }),
-			millisecond: () => faker.datatype.number({ min: 0, max: 999 }),
-			weekday: () => faker.datatype.number({ min: 0, max: 6 })
+			age: () => faker.number.int({ min: 0, max: 120 }),
+			year: () => faker.number.int({ min: 1200, max: 3000 }),
+			month: () => faker.number.int({ min: 1, max: 12 }),
+			"day-of-the-month": () => faker.number.int({ min: 1, max: 31 }),
+			hour: () => faker.number.int({ min: 0, max: 23 }),
+			minute: () => faker.number.int({ min: 0, max: 59 }),
+			second: () => faker.number.int({ min: 0, max: 59 }),
+			millisecond: () => faker.number.int({ min: 0, max: 999 }),
+			weekday: () => faker.number.int({ min: 0, max: 6 })
 		};
 
 		const generator = semantic_generators[ctx.semantic_context];
@@ -87,7 +87,7 @@ const generate_number: Generator<z.ZodNumber> = (number_schema, ctx) => {
 	let value: number;
 
 	if (is_int) {
-		value = faker.datatype.number({ min, max });
+		value = faker.number.int({ min, max });
 	} else {
 		if (is_extreme_value) {
 			const use_lower_extreme = weighted_random_boolean(0.5);
@@ -95,7 +95,7 @@ const generate_number: Generator<z.ZodNumber> = (number_schema, ctx) => {
 			else value = is_finite ? Infinity : max;
 		}
 
-		value = faker.datatype.float({ min, max });
+		value = faker.number.float({ min, max });
 	}
 
 	if (value === undefined)

@@ -9,8 +9,7 @@ const uuid_generator: Generator<z.$ZodUUID> = (schema, ctx) => {
 	const pattern = schema._zod.def.pattern ?? z.regexes.uuid(version);
 
 	const randexp = new Randexp(pattern);
-	randexp.randInt = (min: number, max: number) =>
-		faker.datatype.number({ min, max, precision: 1 });
+	randexp.randInt = (min: number, max: number) => faker.number.int({ min, max });
 	return randexp.gen();
 };
 

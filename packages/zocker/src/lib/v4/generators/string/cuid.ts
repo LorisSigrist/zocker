@@ -1,5 +1,5 @@
-import { InstanceofGeneratorDefinition } from "../../zocker.js";
-import { Generator, generate } from "../../generate.js";
+import type { InstanceofGeneratorDefinition } from "../../zocker.js";
+import type { Generator } from "../../generate.js";
 import * as z from "zod/v4/core";
 import { getLengthConstraints } from "./length-constraints.js";
 import { InvalidSchemaException } from "../../exceptions.js";
@@ -50,7 +50,7 @@ const generate_cuid: Generator<z.$ZodCUID> = (schema, generation_context) => {
 
 	const length =
 		length_constraints.exact ??
-		faker.datatype.number({
+		faker.number.int({
 			min: Math.max(length_constraints.min, CUID_MIN_LENGTH),
 			max:
 				length_constraints.max == Infinity
@@ -88,7 +88,7 @@ const generate_cuid2: Generator<z.$ZodCUID2> = (schema, generation_context) => {
 
 	const length =
 		length_constraints.exact ??
-		faker.datatype.number({
+		faker.number.int({
 			min: Math.max(length_constraints.min, CUID2_MIN_LENGTH),
 			max:
 				length_constraints.max == Infinity
@@ -121,7 +121,7 @@ function generateCUIDofLength(len: number) {
 	if (len < CUID_MIN_LENGTH)
 		throw new TypeError("CUID must be at least 9 characters long");
 
-	let cuid = "c" + faker.random.alphaNumeric(len - 1);
+	let cuid = "c" + faker.string.alphanumeric({length: len - 1});
 	return cuid;
 }
 
@@ -134,6 +134,6 @@ function generateCUIDofLength(len: number) {
 function generateCUID2ofLength(len: number) {
 	if (len < CUID2_MIN_LENGTH)
 		throw new TypeError("CUID2 must be at least 2 characters long");
-	let cuid2 = faker.random.alpha() + faker.random.alphaNumeric(len - 1);
+	let cuid2 = faker.string.alpha({ casing: "lower"}) + faker.string.alphanumeric({length: len - 1, casing: "lower"});
 	return cuid2;
 }

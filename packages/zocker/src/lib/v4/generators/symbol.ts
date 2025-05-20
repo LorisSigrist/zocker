@@ -4,7 +4,7 @@ import { faker } from "@faker-js/faker";
 import { InstanceofGeneratorDefinition } from "../zocker.js";
 
 const generate_symbol: Generator<z.$ZodSymbol> = () => {
-	const symbol_key = faker.datatype.string();
+	const symbol_key = faker.string.alphanumeric();
 	return Symbol.for(symbol_key);
 };
 

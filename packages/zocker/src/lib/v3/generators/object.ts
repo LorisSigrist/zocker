@@ -46,7 +46,7 @@ const generate_object = <T extends z.ZodRawShape>(
 
 	if (catchall_schema && ctx.object_options.generate_extra_keys) {
 		const key_schema = z.union([z.string(), z.number(), z.symbol()]);
-		const num_additional_keys = faker.datatype.number({ min: 0, max: 10 });
+		const num_additional_keys = faker.number.int({ min: 0, max: 10 });
 		try {
 			for (let i = 0; i < num_additional_keys; i++) {
 				const prev_semantic_context = ctx.semantic_context;

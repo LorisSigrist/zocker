@@ -17,7 +17,7 @@ const email_generator: Generator<z.$ZodEmail> = (schema, ctx) => {
 	// 2. As a fallback, use Randexp to generate a guaranteed valid string.
 	const randexp = new Randexp(pattern);
 	randexp.randInt = (min: number, max: number) =>
-		faker.datatype.number({ min, max, precision: 1 });
+		faker.number.int({ min, max });
 	return randexp.gen();
 };
 
