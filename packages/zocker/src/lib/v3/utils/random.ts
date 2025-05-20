@@ -7,10 +7,9 @@ import { faker } from "@faker-js/faker";
 
 export function pick<T>(array: readonly T[]): T {
 	//Generate a random index
-	const index = faker.datatype.number({
+	const index = faker.number.int({
 		min: 0,
-		max: array.length - 1,
-		precision: 1
+		max: array.length - 1
 	});
 
 	if (array.hasOwnProperty(index)) return array[index]!;
@@ -28,7 +27,7 @@ export function weighted_pick<A, B>(
 ): A | B {
 	if (probability <= 0) return option_2;
 	if (probability >= 1) return option_1;
-	const random = faker.datatype.number({ min: 0, max: 1, precision: 0.01 });
+	const random = faker.number.float({ min: 0, max: 1 });
 	if (random < probability) return option_1;
 	else return option_2;
 }

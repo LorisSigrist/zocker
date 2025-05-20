@@ -7,7 +7,7 @@ import { getContentConstraints } from "./content-constraints.js";
 
 // const ULID_REGEX =  /^[0-9A-HJKMNP-TV-Z]{26}$/;
 const ULID_LENGTH = 26; // All valid ULIDs are 26 characters long
-const ULID_CHARS = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"; // The characters allowed in an ULID
+const ULID_CHARS = [..."0123456789ABCDEFGHJKMNPQRSTVWXYZ"]; // The characters allowed in an ULID
 
 const ulid_generator: Generator<z.$ZodULID> = (schema, ctx) => {
 	const length_constraints = getLengthConstraints(schema);
@@ -43,7 +43,7 @@ const ulid_generator: Generator<z.$ZodULID> = (schema, ctx) => {
 		ULID_LENGTH - ulid.length - content_constraints.ends_with.length;
 
 	for (let i = 0; i < generated_length; i++) {
-		ulid += ULID_CHARS[faker.datatype.number(ULID_CHARS.length - 1)];
+		ulid += faker.helpers.arrayElement(ULID_CHARS);
 	}
 
 	ulid += content_constraints.ends_with;

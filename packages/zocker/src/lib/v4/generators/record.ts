@@ -59,7 +59,7 @@ function generateKeys<Z extends z.$ZodRecord>(
 	}
 
 	// otherwise, pick a random number of keys
-	const numKeys = faker.datatype.number({
+	const numKeys = faker.number.int({
 		min: ctx.record_options.min,
 		max: ctx.record_options.max
 	});

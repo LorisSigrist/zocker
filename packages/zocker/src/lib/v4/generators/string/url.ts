@@ -41,6 +41,6 @@ function generateURLSafeStringForRegex(regex: RegExp): string {
 	randexp.defaultRange.add(65, 90); // A-Z
 
 	randexp.randInt = (min: number, max: number) =>
-		faker.datatype.number({ min, max, precision: 1 });
+		faker.number.int({ min, max });
 	return randexp.gen();
 }

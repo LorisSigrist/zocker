@@ -10,7 +10,7 @@ export type SetOptions = {
 };
 
 const generate_set: Generator<z.ZodSet<any>> = (schema, ctx) => {
-	const size = faker.datatype.number({
+	const size = faker.number.int({
 		min: ctx.set_options.min,
 		max: ctx.set_options.max
 	});

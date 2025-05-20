@@ -45,7 +45,7 @@ const ipv4_generator: Generator<z.$ZodIPv4> = (schema, ctx) => {
 
 	const length =
 		length_constraints.exact ??
-		faker.datatype.number({
+		faker.number.int({
 			min: Math.max(length_constraints.min, IPV4_MIN_LENGTH),
 			max: Math.min(length_constraints.max, IPV4_MAX_LENGTH)
 		});
@@ -81,7 +81,7 @@ const ipv6_generator: Generator<z.$ZodIPv6> = (schema, ctx) => {
 
 	const length =
 		length_constraints.exact ??
-		faker.datatype.number({
+		faker.number.int({
 			min: Math.max(length_constraints.min, IPV6_MIN_LENGTH),
 			max: Math.min(length_constraints.max, IPV6_MAX_LENGTH)
 		});
@@ -163,12 +163,12 @@ function generateIPv4Segment(length: number) {
 
 	switch (length) {
 		case 1:
-			return faker.datatype.number({ min: 0, max: 9 }).toString();
+			return faker.number.int({ min: 0, max: 9 }).toString();
 		case 2:
-			return faker.datatype.number({ min: 10, max: 99 }).toString();
+			return faker.number.int({ min: 10, max: 99 }).toString();
 		case 3:
 		default:
-			return faker.datatype.number({ min: 100, max: 255 }).toString();
+			return faker.number.int({ min: 100, max: 255 }).toString();
 	}
 }
 
@@ -184,7 +184,7 @@ function generateIPv6Segment(length: number) {
 			"IPv6 segments must be between 1 and 4 characters long"
 		);
 
-	return faker.datatype.hexadecimal({ length, prefix: "", case: "lower" });
+	return faker.string.hexadecimal({ length, prefix: "", casing: "lower" });
 }
 
 /**
@@ -229,7 +229,7 @@ function choseNumberOfIPv6Segments(
 	// the minimum number of segments we have space for with the remaining characterss
 	const min_segments = Math.max(Math.ceil((length - 1) / 5), 1);
 
-	return faker.datatype.number({ min: min_segments, max: max_segments });
+	return faker.number.int({ min: min_segments, max: max_segments });
 }
 
 /**
@@ -265,7 +265,7 @@ function partition(
 
 	// while remaining > 0, pich a random partition to increase
 	while (remaining > 0) {
-		const partition_index = faker.datatype.number({
+		const partition_index = faker.number.int({
 			min: 0,
 			max: num_partitions - 1
 		});

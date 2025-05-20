@@ -34,7 +34,7 @@
 		"zod": "^3.25.3"
 	},
 	"dependencies": {
-		"@faker-js/faker": "^7.6.0",
+		"@faker-js/faker": "^9.8.0",
 		"randexp": "^0.5.3"
 	}
 }

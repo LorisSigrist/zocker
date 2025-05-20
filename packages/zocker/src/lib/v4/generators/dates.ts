@@ -31,10 +31,10 @@ const generate_date: Generator<z.$ZodDate> = (date_schema, ctx) => {
 
 	if (min && max && max < min)
 		throw new InvalidSchemaException("max date is less than min date");
-
-	return faker.datatype.datetime({
-		min: min.getTime() ?? undefined,
-		max: max.getTime() ?? undefined
+	
+	return faker.date.between({
+		from: min ?? 0,
+		to: max ?? Date.now() + 10000000
 	});
 };
 

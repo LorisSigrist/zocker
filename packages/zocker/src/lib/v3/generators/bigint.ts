@@ -28,7 +28,7 @@ const generate_bigint: Generator<z.ZodBigInt> = (bigint_schema, ctx) => {
 		return lcm(acc, check.value);
 	}, 1n);
 
-	let value = faker.datatype.bigInt({ min, max });
+	let value = faker.number.bigInt({ min, max });
 	const next_larger_multiple = value + (multipleof - (value % multipleof));
 	const next_smaller_multiple = value - (value % multipleof);
 

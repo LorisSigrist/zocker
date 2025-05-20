@@ -10,7 +10,7 @@ export type RecordOptions = {
 };
 
 const generate_record: Generator<z.ZodRecord> = (schema, ctx) => {
-	const size = faker.datatype.number({
+	const size = faker.number.int({
 		min: ctx.record_options.min,
 		max: ctx.record_options.max
 	});

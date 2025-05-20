@@ -30,10 +30,10 @@ export const Base64URLGenerator: InstanceofGeneratorDefinition<z.$ZodBase64URL> 
 	};
 
 function generateBase64String(): string {
-	const bytes = faker.datatype.number({ min: 0, max: 100000 });
+	const bytes = faker.number.int({ min: 0, max: 100000 });
 	let data = "";
 	for (let i = 0; i < bytes; i++) {
-		data += String.fromCharCode(faker.datatype.number({ min: 0, max: 255 }));
+		data += String.fromCharCode(faker.number.int({ min: 0, max: 255 }));
 	}
 	return btoa(data);
 }

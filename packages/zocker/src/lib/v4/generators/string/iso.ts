@@ -9,23 +9,23 @@ const iso_datetime_generator: Generator<z.$ZodISODateTime> = (schema, ctx) => {
 
 	const randexp = new Randexp(pattern);
 	randexp.randInt = (min: number, max: number) =>
-		faker.datatype.number({ min, max, precision: 1 });
+		faker.number.int({ min, max });
 	return randexp.gen();
 };
 
 export const ISODateTimeGenerator: InstanceofGeneratorDefinition<z.$ZodISODateTime> =
-	{
-		match: "instanceof",
-		schema: z.$ZodISODateTime as any,
-		generator: iso_datetime_generator
-	};
+{
+	match: "instanceof",
+	schema: z.$ZodISODateTime as any,
+	generator: iso_datetime_generator
+};
 
 const iso_date_generator: Generator<z.$ZodISODate> = (schema, ctx) => {
 	const pattern = schema._zod.def.pattern!;
 
 	const randexp = new Randexp(pattern);
 	randexp.randInt = (min: number, max: number) =>
-		faker.datatype.number({ min, max, precision: 1 });
+		faker.number.int({ min, max });
 	return randexp.gen();
 };
 
@@ -40,7 +40,7 @@ const iso_time_generator: Generator<z.$ZodISOTime> = (schema, ctx) => {
 
 	const randexp = new Randexp(pattern);
 	randexp.randInt = (min: number, max: number) =>
-		faker.datatype.number({ min, max, precision: 1 });
+		faker.number.int({ min, max });
 	return randexp.gen();
 };
 
@@ -57,12 +57,12 @@ const iso_duration_generator: Generator<z.$ZodISODuration> = (schema, ctx) => {
 	// Format :P3Y6M4DT12H30M5S
 
 	const parts = [
-		faker.datatype.number({ min: 0, max: 100, precision: 1 }),
-		faker.datatype.number({ min: 0, max: 11, precision: 1 }),
-		faker.datatype.number({ min: 0, max: 31, precision: 1 }),
-		faker.datatype.number({ min: 0, max: 23, precision: 1 }),
-		faker.datatype.number({ min: 0, max: 59, precision: 1 }),
-		faker.datatype.number({ min: 0, max: 59, precision: 1 })
+		faker.number.int({ min: 0, max: 100 }),
+		faker.number.int({ min: 0, max: 11 }),
+		faker.number.int({ min: 0, max: 31 }),
+		faker.number.int({ min: 0, max: 23 }),
+		faker.number.int({ min: 0, max: 59 }),
+		faker.number.int({ min: 0, max: 59 })
 	];
 
 	// TODO: Support other Duration Formats
@@ -71,8 +71,8 @@ const iso_duration_generator: Generator<z.$ZodISODuration> = (schema, ctx) => {
 };
 
 export const ISODurationGenerator: InstanceofGeneratorDefinition<z.$ZodISODuration> =
-	{
-		match: "instanceof",
-		schema: z.$ZodISODuration as any,
-		generator: iso_duration_generator
-	};
+{
+	match: "instanceof",
+	schema: z.$ZodISODuration as any,
+	generator: iso_duration_generator
+};

@@ -11,7 +11,7 @@ const generate_emoji: Generator<z.$ZodEmoji> = (schema, ctx) => {
 
 	const length =
 		lengthConstraints.exact ??
-		faker.datatype.number({
+		faker.number.int({
 			min: lengthConstraints.min,
 			max:
 				lengthConstraints.max == Infinity

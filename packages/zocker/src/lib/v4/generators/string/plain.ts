@@ -44,7 +44,7 @@ const generate_string: Generator<z.$ZodString> = (string_schema, ctx) => {
 
 		const randexp = new Randexp(regex);
 		randexp.randInt = (min: number, max: number) =>
-			faker.datatype.number({ min, max, precision: 1 });
+			faker.number.int({ min, max });
 		return randexp.gen();
 	}
 
@@ -81,7 +81,7 @@ const generate_string: Generator<z.$ZodString> = (string_schema, ctx) => {
 	// The string length to generate
 	const length =
 		lengthConstraints.exact ??
-		faker.datatype.number({
+		faker.number.int({
 			min: lengthConstraints.min,
 			max:
 				lengthConstraints.max == Infinity
@@ -99,7 +99,7 @@ const generate_string: Generator<z.$ZodString> = (string_schema, ctx) => {
 
 	return (
 		contentConstraints.starts_with +
-		faker.datatype.string(generated_length) +
+		faker.string.sample(generated_length) +
 		contentConstraints.includes.join("") +
 		contentConstraints.ends_with
 	);
@@ -131,27 +131,26 @@ function generateStringWithoutFormat(
 	const semantic_generators: {
 		[flag in SemanticFlag]?: () => string;
 	} = {
-		fullname: faker.name.fullName,
-		firstname: faker.name.firstName,
-		lastname: faker.name.lastName,
-		street: faker.address.street,
-		city: faker.address.city,
-		country: faker.address.country,
-		zip: faker.address.zipCode,
+		fullname: faker.person.fullName,
+		firstname: faker.person.firstName,
+		lastname: faker.person.lastName,
+		street: faker.location.street,
+		city: faker.location.city,
+		country: faker.location.country,
+		zip: faker.location.zipCode,
 		phoneNumber: faker.phone.number,
 		paragraph: faker.lorem.paragraph,
 		sentence: faker.lorem.sentence,
 		word: faker.lorem.word,
-		jobtitle: faker.name.jobTitle,
+		jobtitle: faker.person.jobTitle,
 		color: color,
-		gender: () => faker.name.gender(),
-		municipality: () => faker.address.cityName(),
-		"color-hex": faker.internet.color,
+		gender:faker.person.gender,
+		municipality: faker.location.city,
+		"color-hex": () => faker.color.rgb({ prefix: '#', casing: 'lower' }),
 		weekday: faker.date.weekday,
-		"unique-id": () => faker.helpers.unique(faker.datatype.uuid),
-		key: () => faker.random.word(),
-		unspecified: () =>
-			faker.lorem.paragraphs(faker.datatype.number({ min: 1, max: 5 }))
+		"unique-id": faker.string.uuid,
+		key: () => faker.lorem.word(),
+		unspecified: () => faker.lorem.paragraphs(faker.number.int({ min: 1, max: 5 }))
 	};
 
 	const generator = semantic_generators[ctx.semantic_context];
