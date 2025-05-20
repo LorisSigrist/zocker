@@ -1,6 +1,6 @@
 # see https://github.com/changesets/action#without-publishing
 
-name: versioning
+name: Versioning
 
 on:
   # trigger this workflow when the CI workflow is completed
