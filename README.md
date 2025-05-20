@@ -1,6 +1,6 @@
 # Zocker
 
-Zocker is a library that automatically generates valid data from your Zod schemas. `zod`, `zod/v4` and `zdo/v4-mini` schemas are supported.
+Zocker is a library that automatically generates valid data from your Zod schemas. `zod`, `zod/v4` and `zod/v4-mini` schemas are supported.
 
 [Try it on Stackblitz](https://stackblitz.com/github/LorisSigrist/zocker/tree/main/packages/example?file=src%2Fmain.ts)
 
