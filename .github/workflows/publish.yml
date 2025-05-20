@@ -1,35 +1,48 @@
-name: Publish
+name: Publish NPM Packages
+
+# This Workflow automatically publishes any NPM packages where the version has increased
+# This should usually happen as a response to Changeste's `Version Packages PR` being mergeed
+
 on:
+  workflow_dispatch:
+
+  # trigger this workflow when the CI workflow is completed
   workflow_run:
-    workflows: ["Test"]
+    workflows: ["Continuous Integration"]
+    branches: [main]
     types:
       - completed
-  push:
-    branches:
-      - "main"
-
-concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
   publish:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
+    environment: production
     steps:
-      - uses: actions/checkout@v3
-      - uses: pnpm/action-setup@v2
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Setup Pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v3
         with:
-          version: 9.9.0
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 20.x
+          node-version: 22
           cache: "pnpm"
 
-      - run: pnpm install
-      - name: Create Release Pull Request or Publish
-        id: changesets
-        uses: changesets/action@v1
-        with:
-          publish: pnpm run release
+        # Conditional steps based on the check
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - run: pnpm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN}}
+
+      - name: Build
+        run: pnpm build
+
+      - name: Publish packages
+        run: pnpm publish -r --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}

@@ -2,7 +2,7 @@
 
 Zocker is a library that automatically generates valid data from your Zod schemas. `zod@3.x`, `zod@4.x` and `@zod/mini` are supported.
 
-[Try it on Stackblitz](https://stackblitz.com/github/LorisSigrist/zocker/tree/main/example?file=src%2Fmain.ts)
+[Try it on Stackblitz](https://stackblitz.com/github/LorisSigrist/zocker/tree/main/packages/example?file=src%2Fmain.ts)
 
 ```typescript
 import { z } from "zod/v4";
