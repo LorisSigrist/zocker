@@ -3,8 +3,9 @@
 	"private": true,
 	"scripts": {
 		"changeset": "changeset",
-		"test": "pnpm test -r",
-		"format": "prettier --write ."
+		"format": "prettier --write .",
+		"test": "pnpm -r run test",
+		"build": "pnpm -r run build"
 	},
 	"devDependencies": {
 		"@changesets/cli": "^2.29.4",
