@@ -1,5 +1,56 @@
-<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path fill-rule="evenodd" clip-rule="evenodd"
-        d="M12.5 113L22.5102 98.2617L27.5705 91.55H56.6122L56.6029 91.5625H121L103.023 113H12.5ZM61.136 85.55H32.0942L61.5738 46.45H90.6155L61.136 85.55ZM98.155 36.45L103.215 29.7383L114.5 15H22.7029L8 36.4375H69.1227L69.1133 36.45H98.155Z"
-        fill="black" />
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="10" y="11" width="236" height="236" rx="40" fill="#3F3FFF"/>
+<rect x="10" y="11" width="236" height="236" rx="40" fill="url(#paint0_radial_1101_2)" fill-opacity="0.2"/>
+<mask id="mask0_1101_2" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="10" y="11" width="236" height="236">
+<rect x="10" y="11" width="236" height="236" rx="40" fill="#3F3FFF"/>
+<rect x="10" y="11" width="236" height="236" rx="40" fill="url(#paint1_radial_1101_2)" fill-opacity="0.2"/>
+</mask>
+<g mask="url(#mask0_1101_2)">
+<g opacity="0.4">
+<line opacity="0.4" x1="60.25" y1="11" x2="60.25" y2="247" stroke="white" stroke-width="0.5"/>
+<line opacity="0.4" x1="20.25" y1="11" x2="20.25" y2="247" stroke="white" stroke-width="0.5"/>
+<line opacity="0.4" x1="40.25" y1="11" x2="40.25" y2="247" stroke="white" stroke-width="0.5"/>
+<line opacity="0.4" x1="120.25" y1="11" x2="120.25" y2="247" stroke="white" stroke-width="0.5"/>
+<line opacity="0.4" x1="80.25" y1="11" x2="80.25" y2="247" stroke="white" stroke-width="0.5"/>
+<line opacity="0.4" x1="100.25" y1="11" x2="100.25" y2="247" stroke="white" stroke-width="0.5"/>
+<line opacity="0.4" x1="180.25" y1="11" x2="180.25" y2="247" stroke="white" stroke-width="0.5"/>
+<line opacity="0.4" x1="140.25" y1="11" x2="140.25" y2="247" stroke="white" stroke-width="0.5"/>
+<line opacity="0.4" x1="160.25" y1="11" x2="160.25" y2="247" stroke="white" stroke-width="0.5"/>
+<line opacity="0.4" x1="240.25" y1="11" x2="240.25" y2="247" stroke="white" stroke-width="0.5"/>
+<line opacity="0.4" x1="200.25" y1="11" x2="200.25" y2="247" stroke="white" stroke-width="0.5"/>
+<line opacity="0.4" x1="220.25" y1="11" x2="220.25" y2="247" stroke="white" stroke-width="0.5"/>
+</g>
+<g opacity="0.4">
+<line opacity="0.4" x1="8" y1="198.75" x2="244" y2="198.75" stroke="white" stroke-width="0.5"/>
+<line opacity="0.4" x1="8" y1="238.75" x2="244" y2="238.75" stroke="white" stroke-width="0.5"/>
+<line opacity="0.4" x1="8" y1="218.75" x2="244" y2="218.75" stroke="white" stroke-width="0.5"/>
+<line opacity="0.4" x1="8" y1="138.75" x2="244" y2="138.75" stroke="white" stroke-width="0.5"/>
+<line opacity="0.4" x1="8" y1="178.75" x2="244" y2="178.75" stroke="white" stroke-width="0.5"/>
+<line opacity="0.4" x1="8" y1="158.75" x2="244" y2="158.75" stroke="white" stroke-width="0.5"/>
+<line opacity="0.4" x1="8" y1="78.75" x2="244" y2="78.75" stroke="white" stroke-width="0.5"/>
+<line opacity="0.4" x1="8" y1="118.75" x2="244" y2="118.75" stroke="white" stroke-width="0.5"/>
+<line opacity="0.4" x1="8" y1="98.75" x2="244" y2="98.75" stroke="white" stroke-width="0.5"/>
+<line opacity="0.4" x1="8" y1="18.75" x2="244" y2="18.75" stroke="white" stroke-width="0.5"/>
+<line opacity="0.4" x1="8" y1="58.75" x2="244" y2="58.75" stroke="white" stroke-width="0.5"/>
+<line opacity="0.4" x1="8" y1="38.75" x2="244" y2="38.75" stroke="white" stroke-width="0.5"/>
+</g>
+</g>
+<path d="M142.154 217.922L227.228 143.042C233.42 137.591 235.631 128.897 232.793 121.15L210.806 61.1213C207.919 53.2403 200.419 48 192.026 48H64.1275C55.659 48 48.1085 53.3335 45.2778 61.3149L24.0461 121.182C21.3025 128.918 23.5641 137.544 29.75 142.94L115.794 217.982C123.353 224.575 134.625 224.549 142.154 217.922Z" stroke="white" stroke-width="6" stroke-dasharray="6 6"/>
+<path d="M208.5 105H48.5L57.3415 79.4578C60.1298 71.4027 67.7172 66 76.2413 66H180.098C188.456 66 195.932 71.1967 198.845 79.0302L208.5 105Z" fill="white" fill-opacity="0.4"/>
+<path d="M186.5 154H71L118.756 195.112C124.363 199.939 132.652 199.956 138.28 195.153L186.5 154Z" fill="white" fill-opacity="0.4"/>
+<path d="M208.5 105H48.5L57.3415 79.4578C60.1298 71.4027 67.7172 66 76.2413 66H180.098C188.456 66 195.932 71.1967 198.845 79.0302L208.5 105Z" stroke="white" stroke-width="6" stroke-dasharray="6 6"/>
+<path d="M186.5 154H71L118.756 195.112C124.363 199.939 132.652 199.956 138.28 195.153L186.5 154Z" stroke="white" stroke-width="6" stroke-dasharray="6 6"/>
+<line x1="69.9887" y1="152.44" x2="146.787" y2="103.5" stroke="white" stroke-width="6" stroke-dasharray="6 6"/>
+<path d="M149 154L209.276 115.192C213.628 112.39 212.131 105.684 207 105V105" stroke="white" stroke-width="6" stroke-dasharray="6 6"/>
+<line x1="143" y1="105.5" x2="144" y2="105.5" stroke="black"/>
+<defs>
+<radialGradient id="paint0_radial_1101_2" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(128 129) rotate(90) scale(118)">
+<stop stop-color="white"/>
+<stop offset="0.903846" stop-color="white" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="paint1_radial_1101_2" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(128 129) rotate(90) scale(118)">
+<stop stop-color="white"/>
+<stop offset="0.903846" stop-color="white" stop-opacity="0"/>
+</radialGradient>
+</defs>
 </svg>
