@@ -1,5 +1,11 @@
 # zocker
 
+## 2.0.1
+
+### Patch Changes
+
+- 3e12c19: Update `@faker-js/faker` dependency to version `9.8.0`
+
 ## 2.0.0
 
 ### Major Changes
