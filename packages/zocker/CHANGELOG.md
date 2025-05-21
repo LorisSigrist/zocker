@@ -1,5 +1,14 @@
 # zocker
 
+## 2.0.2
+
+### Patch Changes
+
+- c3c2496: Implemet `z.ksuid()` generator
+- f69fd6d: Fix incorrect format when generating values for `z.iso.datetime({ offset: true })`
+- 0101584: fix: Legacy string formats, such as `z.string().email()` are supported again. However, you should still upgrade to the dedicated schemas, such as `z.email()` as soon as possible.
+- 2994db4: Implement `z.guid` generator
+
 ## 2.0.1
 
 ### Patch Changes
