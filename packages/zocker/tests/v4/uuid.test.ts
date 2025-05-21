@@ -18,6 +18,10 @@ const uuidv7_schemas = {
 	"plain uuidv7": z.uuidv7()
 };
 
+const guid_schemas = {
+	"plain guid": z.guid()
+}
+
 describe("UUID generation", () => {
 	test_schema_generation(uuid_schemas);
 });
@@ -32,4 +36,8 @@ describe("UUIDv6 generation", () => {
 
 describe("UUIDv7 generation", () => {
 	test_schema_generation(uuidv7_schemas);
+});
+
+describe("GUID generation", () => {
+	test_schema_generation(guid_schemas);
 });
