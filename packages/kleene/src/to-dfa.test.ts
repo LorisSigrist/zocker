@@ -3,6 +3,7 @@ import { toDFA } from "./to-dfa";
 
 describe("toDFA", () => {
     it("works", () => {
-        const dfa = toDFA(/b((c|[a-z]*)(.?)|a)/i);
+        // const dfa = toDFA(/b((c|[a-z]*)(.?)|a)/i);
+        toDFA(/a(bb|ba)*b/);
     });
 });

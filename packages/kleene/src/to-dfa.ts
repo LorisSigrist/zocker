@@ -18,12 +18,18 @@ export function toDFA(regex: RegExp) {
     // For now we use ret to parse the regex
     const syntax_tree = ret(regex.source);
     //console.log(syntax_tree);
-    const metadata = markNullableFirstPosAndLastPos(syntax_tree);
+    const metadata = getSyntaxTreeMetadata(syntax_tree);
 }
 
+/**
+ * Represents Metadata about a Node in the Syntax Tree
+ */
 type NodeMetadata = {
+    /** If this node is _nullable_, meaning it can be satisfied by the empty string */
     nullable: boolean,
+    /** The set of literal tokens that may be matched first by this node (assuming the input isn't the empty string) */
     firstpos: Set<Tokens>,
+    /** The set of literal tokens that may be matched last by this node (assuming the input isn't the empty string) */
     lastpos: Set<Tokens>
 }
 
@@ -32,45 +38,95 @@ type NodeMetadata = {
  * All three properties can be computed by iterating over the tree bottom-up, so we calculate them together.
  * 
  */
-function markNullableFirstPosAndLastPos(syntax_tree: Root): Map<Tokens, NodeMetadata> {
+function getSyntaxTreeMetadata(syntax_tree: Root): Map<Tokens, NodeMetadata> {
     const metadata = new Map<Tokens, NodeMetadata>();
 
     for (const node of bottomUpTraversal(syntax_tree)) {
         const nullable = isNullable(node, metadata);
         const firstpos = firstPos(node, metadata);
-        metadata.set(node, { nullable, firstpos, lastpos: new Set() });
+        const lastpos = lastPos(node, metadata);
+        metadata.set(node, { nullable, firstpos, lastpos });
 
         console.log("node", reconstruct(node));
         console.debug("nullable", nullable);
         console.debug("firstpos", [...firstpos].map(reconstruct))
+        console.debug("lastpos", [...lastpos].map(reconstruct))
         console.debug("\n");
     }
 
     return metadata;
 }
 
+function lastPos(node: Tokens, metadata: Map<Tokens, NodeMetadata>): Set<Tokens> {
+
+    function getLastPosForConcatenation(concatenation: Tokens[], metadata: Map<Tokens, NodeMetadata>): Set<Tokens> {
+        let lastPos = new Set<Tokens>();
+
+        for (let i = concatenation.length - 1; i >= 0; i--) {
+            const child = concatenation[i];
+            const is_nullable = metadata.get(child)!.nullable;
+            const child_lastpos = metadata.get(child)!.lastpos;
+
+            if (is_nullable) {
+                lastPos = mergeSets(lastPos, child_lastpos);
+            } else {
+                lastPos = mergeSets(lastPos, child_lastpos);
+                break;
+            }
+        }
+
+        return lastPos;
+    }
+
+    switch (node.type) {
+        // Literals can only be themselves
+        case types.CHAR: return new Set([node]);
+        case types.SET: return new Set([node]);
+        case types.RANGE: return new Set([node]);
+
+        case types.REPETITION: {
+            return metadata.get(node.value)!.lastpos;
+        }
+
+        case types.ROOT:
+        case types.GROUP: {
+            if (node.options) {
+                // alternation 
+                // firstPos = firstpos(C1) U firstpos(C2) U ...
+                return node.options.reduce(
+                    (acc, option) => mergeSets(acc, getLastPosForConcatenation(option, metadata)),
+                    new Set<Tokens>()
+                );
+            }
+            if (node.stack) {
+                // concatenation
+                // lastpos = if nullable(c2) then firstPos(c1) U firstPos(c2) else firstPos(c2)
+                return getLastPosForConcatenation(node.stack, metadata);
+            }
+        }
+    }
+
+    throw new Error("firstPos not implemented for node type " + node.type);
+}
+
 function firstPos(node: Tokens, metadata: Map<Tokens, NodeMetadata>): Set<Tokens> {
 
     function getFirstPosForConcatenation(concatenation: Tokens[], metadata: Map<Tokens, NodeMetadata>): Set<Tokens> {
         let firstPos = new Set<Tokens>();
-        
+
         for (const child of concatenation) {
             const is_nullable = metadata.get(child)!.nullable;
             const child_firstpos = metadata.get(child)!.firstpos;
 
-            if(is_nullable) {
+            if (is_nullable) {
                 firstPos = mergeSets(firstPos, child_firstpos);
             } else {
                 firstPos = mergeSets(firstPos, child_firstpos);
                 break;
             }
         }
-        
-        return firstPos;
-    }
 
-    function mergeSets(set1: Set<Tokens>, set2: Set<Tokens>) {
-        return new Set([...set1, ...set2]);
+        return firstPos;
     }
 
     switch (node.type) {
@@ -92,14 +148,11 @@ function firstPos(node: Tokens, metadata: Map<Tokens, NodeMetadata>): Set<Tokens
                     new Set<Tokens>()
                 );
             }
-
             if (node.stack) {
                 // concatenation
                 // firstPos = if nullable(c1) then firstPos(c1) U firstPos(c2) else firstPos(c1)
                 return getFirstPosForConcatenation(node.stack, metadata);
             }
-
-            // error
         }
     }
 
@@ -192,4 +245,8 @@ function* bottomUpTraversal(node: Tokens): Generator<Tokens> {
     }
 
     yield node;
+}
+
+function mergeSets(set1: Set<Tokens>, set2: Set<Tokens>) {
+    return new Set([...set1, ...set2]);
 }
