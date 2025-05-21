@@ -25,6 +25,9 @@ export function weighted_pick<A, B>(
 	return first ? option_1 : option_2;
 }
 
+/**
+ * @deprecated Use `faker.datatype.boolean({ probability })` directly
+ */
 export function weighted_random_boolean(true_probability: number): boolean {
 	return faker.datatype.boolean({ probability: true_probability });
 }

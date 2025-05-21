@@ -5,13 +5,35 @@ import { faker } from "@faker-js/faker";
 import Randexp from "randexp";
 
 const iso_datetime_generator: Generator<z.$ZodISODateTime> = (schema, ctx) => {
-	const pattern = schema._zod.def.pattern!;
+	const offset = schema._zod.def.offset === true;
 
-	const randexp = new Randexp(pattern);
-	randexp.randInt = (min: number, max: number) =>
-		faker.number.int({ min, max });
-	return randexp.gen();
-};
+	const defined_precision = schema._zod.def.precision;
+	let precision = defined_precision != null ? defined_precision : faker.number.int({ min: 0, max: 6 });
+	let datetime = faker.date.recent().toISOString();
+
+	// remove the precision (if present).
+	const PRECISION_REGEX = /(\.\d+)?Z/;
+	datetime = datetime.replace(PRECISION_REGEX, "Z");
+
+	if (precision > 0) {
+		const number = faker.number.int({ min: 0, max: Math.pow(10, precision) - 1 });
+		const replacement = `.${number.toString().padStart(precision, "0")}Z`;
+		datetime = datetime.replace("Z", replacement);
+	}
+
+	if (offset) {
+		const hours_number = faker.number.int({ min: 0, max: 23 });
+		const minutes_number = faker.number.int({ min: 0, max: 59 });
+
+		const hours = hours_number.toString().padStart(2, "0");
+		const minutes = minutes_number.toString().padStart(2, "0");
+
+		const sign = faker.datatype.boolean({ probability: 0.5 }) ? "+" : "-";
+		datetime = datetime.replace("Z", `${sign}${hours}:${minutes}`);
+	}
+
+	return datetime;
+}
 
 export const ISODateTimeGenerator: InstanceofGeneratorDefinition<z.$ZodISODateTime> =
 {
