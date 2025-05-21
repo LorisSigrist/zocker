@@ -6,7 +6,7 @@ const formatted_string_schemas = {
     "string.date": z.string().date(),
     "string.datetime": z.string().datetime(),
     "string.duration": z.string().duration(),
-     "string.time": z.string().time(),
+    "string.time": z.string().time(),
     "string.email": z.string().email(),
     "string.guid": z.string().guid(),
     "string.uuid": z.string().uuid(),
@@ -28,8 +28,9 @@ const formatted_string_schemas = {
     "string.cidrv6": z.string().cidrv6(),
     "string.base64url": z.string().base64url(),
     "string.base64": z.string().base64(),
+    "string.jwt": z.string().jwt(),
 } as const;
 
 describe("Deprecated string formats", () => {
-	test_schema_generation(formatted_string_schemas);
+    test_schema_generation(formatted_string_schemas);
 });
