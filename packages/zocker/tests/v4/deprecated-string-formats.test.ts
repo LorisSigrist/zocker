@@ -22,7 +22,7 @@ const formatted_string_schemas = {
     "string.emoji": z.string().emoji(),
    // "string.xid": z.string().xid(),
     "string.nanoid": z.string().nanoid(),
-  //  "string.ksuid": z.string().ksuid(),
+    "string.ksuid": z.string().ksuid(),
     "string.ipv6": z.string().ipv6(),
     "string.ipv4": z.string().ipv4(),
     "string.e164": z.string().e164(),
