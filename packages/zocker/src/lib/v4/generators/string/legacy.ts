@@ -166,6 +166,27 @@ export function legacyFormatString(schema: z.$ZodString, ctx: GenerationContext<
     }
 
 
+    const jwt_checks = checks.filter((c) => c instanceof z4.ZodJWT);
+    if (jwt_checks.length > 0) {
+        const jwt_schema = z4.jwt();
+        jwt_schema._zod.def.checks = checks;
+        return generate(jwt_schema, ctx);
+    }
+
+
+    const ksuid_checks = checks.filter((c) => c instanceof z4.ZodKSUID);
+    if (ksuid_checks.length > 0) {
+        const ksuid_schema = z4.ksuid();
+        ksuid_schema._zod.def.checks = checks;
+        return generate(ksuid_schema, ctx);
+    }
+
+    const xid_checks = checks.filter((c) => c instanceof z4.ZodXID);
+    if (xid_checks.length > 0) {
+        const xid_schema = z4.xid();
+        xid_schema._zod.def.checks = checks;
+        return generate(xid_schema, ctx);
+    }
 
     return null;
 }
