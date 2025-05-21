@@ -9,7 +9,7 @@ const iso_datetime_generator: Generator<z.$ZodISODateTime> = (schema, ctx) => {
 
 	const defined_precision = schema._zod.def.precision;
 	let precision = defined_precision != null ? defined_precision : faker.number.int({ min: 0, max: 6 });
-	let datetime = faker.date.recent().toISOString();
+	let datetime = faker.date.recent({ days: 100 }).toISOString();
 
 	// remove the precision (if present).
 	const PRECISION_REGEX = /(\.\d+)?Z/;
@@ -43,12 +43,9 @@ export const ISODateTimeGenerator: InstanceofGeneratorDefinition<z.$ZodISODateTi
 };
 
 const iso_date_generator: Generator<z.$ZodISODate> = (schema, ctx) => {
-	const pattern = schema._zod.def.pattern!;
-
-	const randexp = new Randexp(pattern);
-	randexp.randInt = (min: number, max: number) =>
-		faker.number.int({ min, max });
-	return randexp.gen();
+	const date = faker.date.recent({ days: 100 }).toISOString().split("T")[0];
+	if(!date) throw new Error("INTERNAL ERROR - ISODateGenerator - `date` is undefined - Please open an issue.");
+	return date;
 };
 
 export const ISODateGenerator: InstanceofGeneratorDefinition<z.$ZodISODate> = {
@@ -63,7 +60,9 @@ const iso_time_generator: Generator<z.$ZodISOTime> = (schema, ctx) => {
 	const randexp = new Randexp(pattern);
 	randexp.randInt = (min: number, max: number) =>
 		faker.number.int({ min, max });
-	return randexp.gen();
+	const time = randexp.gen();
+
+	return time;	
 };
 
 export const ISOTimeGenerator: InstanceofGeneratorDefinition<z.$ZodISOTime> = {
