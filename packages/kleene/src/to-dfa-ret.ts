@@ -1,19 +1,26 @@
-import { AST, stringify } from "./ast.js";
+import ret, { type Root, type Tokens, types, reconstruct } from "ret";
 
 /**
  * This function takes in a regex and returns an equivalent Deterministic Finite Automaton
  * @param regex A regular expression
  * @returns A Deterministic Finite Automaton
  */
-export function toDFA(ast: AST.Node) {
+export function toDFA(regex: RegExp) {
     // We're using the algorithms from section 3.9 of the Dragon Book
     // to turn regexes into DFAs directly, without going through an NFA first.
     //
     // There are four steps
-    // 1. Compute nullable, firstpos, and lastpos for each node in the syntax tree
-    // 2. Compute follow-pos for each node in the syntax tree
-    // 3. Use the follow-pos to construct the DFA
+    // 1. Parse the regex into a syntax tree
+    // 2. Compute nullable, firstpos, and lastpos for each node in the syntax tree
+    // 3. Compute follow-pos for each node in the syntax tree
+    // 4. Use the follow-pos to construct the DFA
 
+    // For now we use ret to parse the regex
+    const syntax_tree = ret(regex.source);
+    if (regex.flags != "") throw new Error("Regex flags not yet supported");
+
+
+    //console.log(syntax_tree);
     const metadata = getSyntaxTreeMetadata(syntax_tree);
     const followpos = getFollowPos(syntax_tree, metadata);
 }
@@ -25,7 +32,7 @@ export function toDFA(ast: AST.Node) {
  * @param syntax_tree 
  * @param metadata 
  */
-function getFollowPos(syntax_tree: AST.Node, metadata: Map<AST.Node, NodeMetadata>) {
+function getFollowPos(syntax_tree: Root, metadata: Map<Tokens, NodeMetadata>) {
 
 }
 
@@ -36,9 +43,9 @@ type NodeMetadata = {
     /** If this node is _nullable_, meaning it can be satisfied by the empty string */
     nullable: boolean,
     /** The set of literal tokens that may be matched first by this node (assuming the input isn't the empty string) */
-    firstpos: Set<AST.Literal | AST.Anchor>,
+    firstpos: Set<Tokens>,
     /** The set of literal tokens that may be matched last by this node (assuming the input isn't the empty string) */
-    lastpos: Set<AST.Literal | AST.Anchor>
+    lastpos: Set<Tokens>
 }
 
 /**
@@ -46,8 +53,8 @@ type NodeMetadata = {
  * All three properties can be computed by iterating over the tree bottom-up, so we calculate them together.
  * 
  */
-function getSyntaxTreeMetadata(syntax_tree: AST.Node): Map<AST.Node, NodeMetadata> {
-    const metadata = new Map<AST.Node, NodeMetadata>();
+function getSyntaxTreeMetadata(syntax_tree: Root): Map<Tokens, NodeMetadata> {
+    const metadata = new Map<Tokens, NodeMetadata>();
 
     for (const node of bottomUpTraversal(syntax_tree)) {
         const nullable = isNullable(node, metadata);
@@ -55,10 +62,10 @@ function getSyntaxTreeMetadata(syntax_tree: AST.Node): Map<AST.Node, NodeMetadat
         const lastpos = lastPos(node, metadata);
         metadata.set(node, { nullable, firstpos, lastpos });
 
-        console.log("node", node);
+        console.log("node", reconstruct(node));
         console.debug("nullable", nullable);
-        console.debug("firstpos", [...firstpos].map(stringify))
-        console.debug("lastpos", [...lastpos].map(stringify))
+        console.debug("firstpos", [...firstpos].map(reconstruct))
+        console.debug("lastpos", [...lastpos].map(reconstruct))
         console.debug("\n");
     }
 
