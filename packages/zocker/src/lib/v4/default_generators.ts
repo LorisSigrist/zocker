@@ -45,10 +45,12 @@ import {
 	EmojiGenerator,
 	Base64Generator,
 	Base64URLGenerator,
-	GUIDGenerator
+	GUIDGenerator,
+	KSUIDGenerator
 } from "./generators/index.js";
 
 export const default_generators: InstanceofGeneratorDefinition<any>[] = [
+	KSUIDGenerator,
 	Base64Generator,
 	Base64URLGenerator,
 	EmojiGenerator,
