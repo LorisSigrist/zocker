@@ -25,8 +25,6 @@ const generate_string: Generator<z.$ZodString> = (string_schema, ctx) => {
 	const contentConstraints = getContentConstraints(string_schema);
 	const regexConstraints = getRegexConstraints(string_schema);
 
-	console.log(string_schema._zod.def);
-
 	if (regexConstraints.length > 0) {
 		if (regexConstraints.length > 1)
 			throw new NoGeneratorException(
