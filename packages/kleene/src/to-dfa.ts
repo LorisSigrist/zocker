@@ -1,4 +1,4 @@
-import ret, { type Root, type Tokens, types } from "ret";
+import ret, { type Root, type Tokens, types, reconstruct } from "ret";
 
 /**
  * This function takes in a regex and returns an equivalent Deterministic Finite Automaton
@@ -23,8 +23,8 @@ export function toDFA(regex: RegExp) {
 
 type NodeMetadata = {
     nullable: boolean,
-    firstpos: number,
-    lastpos: number
+    firstpos: Set<Tokens>,
+    lastpos: Set<Tokens>
 }
 
 /**
@@ -37,13 +37,73 @@ function markNullableFirstPosAndLastPos(syntax_tree: Root): Map<Tokens, NodeMeta
 
     for (const node of bottomUpTraversal(syntax_tree)) {
         const nullable = isNullable(node, metadata);
-        metadata.set(node, { nullable, firstpos: 0, lastpos: 0 });
-        logToken(node);
-        console.log("nullable", nullable);
-        console.log("\n");
+        const firstpos = firstPos(node, metadata);
+        metadata.set(node, { nullable, firstpos, lastpos: new Set() });
+
+        console.log("node", reconstruct(node));
+        console.debug("nullable", nullable);
+        console.debug("firstpos", [...firstpos].map(reconstruct))
+        console.debug("\n");
     }
 
     return metadata;
+}
+
+function firstPos(node: Tokens, metadata: Map<Tokens, NodeMetadata>): Set<Tokens> {
+
+    function getFirstPosForConcatenation(concatenation: Tokens[], metadata: Map<Tokens, NodeMetadata>): Set<Tokens> {
+        let firstPos = new Set<Tokens>();
+        
+        for (const child of concatenation) {
+            const is_nullable = metadata.get(child)!.nullable;
+            const child_firstpos = metadata.get(child)!.firstpos;
+
+            if(is_nullable) {
+                firstPos = mergeSets(firstPos, child_firstpos);
+            } else {
+                firstPos = mergeSets(firstPos, child_firstpos);
+                break;
+            }
+        }
+        
+        return firstPos;
+    }
+
+    function mergeSets(set1: Set<Tokens>, set2: Set<Tokens>) {
+        return new Set([...set1, ...set2]);
+    }
+
+    switch (node.type) {
+        case types.CHAR: return new Set([node]);
+        case types.SET: return new Set([node]);
+        case types.RANGE: return new Set([node]);
+
+        case types.REPETITION: {
+            return metadata.get(node.value)!.firstpos;
+        }
+
+        case types.ROOT:
+        case types.GROUP: {
+            if (node.options) {
+                // alternation 
+                // firstPos = firstpos(C1) U firstpos(C2) U ...
+                return node.options.reduce(
+                    (acc, option) => mergeSets(acc, getFirstPosForConcatenation(option, metadata)),
+                    new Set<Tokens>()
+                );
+            }
+
+            if (node.stack) {
+                // concatenation
+                // firstPos = if nullable(c1) then firstPos(c1) U firstPos(c2) else firstPos(c1)
+                return getFirstPosForConcatenation(node.stack, metadata);
+            }
+
+            // error
+        }
+    }
+
+    throw new Error("firstPos not implemented for node type " + node.type);
 }
 
 /**
@@ -61,12 +121,8 @@ function isNullable(node: Tokens, metadata: Map<Tokens, NodeMetadata>) {
             if (!child) throw new Error("Child not found");
             return child.nullable;
         }
-        case types.ROOT: {
-            if (!node.stack || node.stack.length === 0) return true;
-            const all_children_nullable = node.stack.every((child) => metadata.get(child)!.nullable);
-            return all_children_nullable;
-        }
 
+        case types.ROOT:
         case types.GROUP: {
             if (node.options) {
                 const one_option_nullable = node.options.some((option) => option.every((child) => metadata.get(child)!.nullable));
@@ -111,19 +167,12 @@ function logToken(token: Tokens) {
  */
 function* bottomUpTraversal(node: Tokens): Generator<Tokens> {
     switch (node.type) {
-        case types.ROOT: {
-            if (!node.stack) break;
-            for (const child of node.stack) {
-                yield* bottomUpTraversal(child);
-            }
-            break;
-        }
-
         case types.REPETITION: {
             yield* bottomUpTraversal(node.value);
             break;
         }
 
+        case types.ROOT:
         case types.GROUP: {
             if (node.options) {
                 for (const option of node.options) {
