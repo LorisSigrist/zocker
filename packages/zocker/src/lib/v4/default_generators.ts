@@ -44,7 +44,8 @@ import {
 	PipeGenerator,
 	EmojiGenerator,
 	Base64Generator,
-	Base64URLGenerator
+	Base64URLGenerator,
+	GUIDGenerator
 } from "./generators/index.js";
 
 export const default_generators: InstanceofGeneratorDefinition<any>[] = [
@@ -62,6 +63,7 @@ export const default_generators: InstanceofGeneratorDefinition<any>[] = [
 	ISODurationGenerator,
 	EmailGenerator,
 	E164Generator,
+	GUIDGenerator,
 	UUIDGenerator,
 	IPv4Generator,
 	IPv6Generator,
