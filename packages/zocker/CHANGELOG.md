@@ -1,5 +1,12 @@
 # zocker
 
+## 2.0.3
+
+### Patch Changes
+
+- 7a97a5a: Change `z.date` generation so that more reasonable values are generated
+- 08d099a: Implement Generator for the undocumented `z.xid()` schema
+
 ## 2.0.2
 
 ### Patch Changes
