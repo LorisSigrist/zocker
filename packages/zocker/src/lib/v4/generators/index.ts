@@ -39,3 +39,4 @@ export { PipeGenerator } from "./pipe.js";
 export { EmojiGenerator } from "./string/emoji.js";
 export { Base64Generator, Base64URLGenerator } from "./string/base64.js";
 export { KSUIDGenerator } from "./string/ksuid.js";
+export { XIDGenerator } from "./string/xid.js";
