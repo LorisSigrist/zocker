@@ -20,7 +20,7 @@ const formatted_string_schemas = {
     "string.cuid2": z.string().cuid2(),
     "string.ulid": z.string().ulid(),
     "string.emoji": z.string().emoji(),
-   // "string.xid": z.string().xid(),
+    "string.xid": z.string().xid(),
     "string.nanoid": z.string().nanoid(),
     "string.ksuid": z.string().ksuid(),
     "string.ipv6": z.string().ipv6(),
