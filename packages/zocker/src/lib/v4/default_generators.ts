@@ -44,10 +44,15 @@ import {
 	PipeGenerator,
 	EmojiGenerator,
 	Base64Generator,
-	Base64URLGenerator
+	Base64URLGenerator,
+	GUIDGenerator,
+	KSUIDGenerator,
+	XIDGenerator
 } from "./generators/index.js";
 
 export const default_generators: InstanceofGeneratorDefinition<any>[] = [
+	XIDGenerator,
+	KSUIDGenerator,
 	Base64Generator,
 	Base64URLGenerator,
 	EmojiGenerator,
@@ -62,6 +67,7 @@ export const default_generators: InstanceofGeneratorDefinition<any>[] = [
 	ISODurationGenerator,
 	EmailGenerator,
 	E164Generator,
+	GUIDGenerator,
 	UUIDGenerator,
 	IPv4Generator,
 	IPv6Generator,

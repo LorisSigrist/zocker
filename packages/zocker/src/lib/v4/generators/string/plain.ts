@@ -14,8 +14,13 @@ import {
 import Randexp from "randexp";
 import { pick } from "../../utils/random.js";
 import { SemanticFlag } from "../../semantics.js";
+import z4 from "zod/v4";
+import { legacyFormatString } from "./legacy.js";
 
 const generate_string: Generator<z.$ZodString> = (string_schema, ctx) => {
+	const legacy = legacyFormatString(string_schema, ctx);
+	if (legacy !== null) return legacy;
+	
 	const lengthConstraints = getLengthConstraints(string_schema);
 	const contentConstraints = getContentConstraints(string_schema);
 	const regexConstraints = getRegexConstraints(string_schema);
@@ -144,7 +149,7 @@ function generateStringWithoutFormat(
 		word: faker.lorem.word,
 		jobtitle: faker.person.jobTitle,
 		color: color,
-		gender:faker.person.gender,
+		gender: faker.person.gender,
 		municipality: faker.location.city,
 		"color-hex": () => faker.color.rgb({ prefix: '#', casing: 'lower' }),
 		weekday: faker.date.weekday,
@@ -184,3 +189,5 @@ function stringMatchesConstraints(
 
 	return true;
 }
+
+
