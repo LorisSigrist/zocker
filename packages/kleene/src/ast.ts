@@ -10,8 +10,10 @@ import * as ret from "ret";
 export namespace AST {
     /** Represents any Node in the Syntax Tree */
     export type Node = Concatenation | Alternation | KleeneStar | Literal | Anchor | Optional;
+    /** Represents a Node that doesn't have any children */
+    export type LeafNode = Literal | Anchor;
 
-    // Namespaces like this are better for bundling than an enum
+    // Namespaces like this are better for bundling than an enum because the values can be inlined
     export namespace Types {
         // TODO: Change these to numbers for production
         export const LITERAL = "literal";
@@ -60,6 +62,15 @@ export namespace AST {
      * The Literal may be given as a char, a set, or a range of chars, but it always matches a single character
      */
     export type Literal = {
+        /**
+         * A bigint with a single bit set. 
+         * If this is the n-th leaf node, the n-th bit is set.
+         * 
+         * This makes Sets of Leaf Nodes very efficient to create, merge and compare.
+         * 
+         * The IDs are NOT guaranteed to be sequential, but they are guaranteed to be unique.
+         */
+        id: bigint;
         type: Types.LITERAL;
         value: ret.Char | ret.Range | ret.Set;
     }
@@ -68,6 +79,15 @@ export namespace AST {
      * Represents an zero-wiedth Positional Anchor (eg `^`, `$`)
      */
     export type Anchor = {
+        /**
+         * A bigint with a single bit set. 
+         * If this is the n-th leaf node, the n-th bit is set.
+         * 
+         * This makes Sets of Leaf Nodes very efficient to create, merge and compare.
+         * 
+         * The IDs are NOT guaranteed to be sequential, but they are guaranteed to be unique.
+         */
+        id: bigint;
         type: Types.ANCHOR;
         value: "^" | "$";
     }
@@ -94,14 +114,17 @@ export function parse(regex: RegExp): AST.Node {
     if (regex.flags != "") throw new TypeError("Regex flags not yet supported");
 
     const ret_ast = ret.default(regex.source);
-    const raw_ast = toKleeneAST(ret_ast);
-    return preprocessAST(raw_ast);
+
+    const idGenerator = createIdGenerator();
+
+    const raw_ast = toKleeneAST(ret_ast, idGenerator);
+    return preprocessAST(raw_ast, idGenerator);
 }
 
 /**
  * Stringifies the AST into a regular expression.
  */
-export function stringify(node: AST.Node) : string {
+export function stringify(node: AST.Node): string {
     switch (node.type) {
         case AST.Types.LITERAL:
             return ret.reconstruct(node.value);
@@ -110,38 +133,87 @@ export function stringify(node: AST.Node) : string {
         case AST.Types.CONCATENATION:
             return node.values.map(value => stringify(value)).join("");
         case AST.Types.KLEENE_STAR:
-            return `${stringify(node.value)}*`;
+            return `(${stringify(node.value)})*`;
         case AST.Types.ANCHOR:
             return node.value;
         case AST.Types.OPTIONAL:
-            return `${stringify(node.value)}?`;
+            return `(${stringify(node.value)})?`;
+    }
+}
+
+/**
+ * Stringifies the AST into a regular expression.
+ */
+export function stringifyWithHighlight(node: AST.Node, highlight: AST.Node): string {
+
+    if (node === highlight) {
+        return `~${stringify(node)}~`;
+    }
+
+    switch (node.type) {
+        case AST.Types.LITERAL:
+            return ret.reconstruct(node.value);
+        case AST.Types.ALTERNATION:
+            return `(${node.options.map(option => stringifyWithHighlight(option, highlight)).join("|")})`;
+        case AST.Types.CONCATENATION:
+            return node.values.map(value => stringifyWithHighlight(value, highlight)).join("");
+        case AST.Types.KLEENE_STAR:
+            return `(${stringifyWithHighlight(node.value, highlight)})*`;
+        case AST.Types.ANCHOR:
+            return node.value;
+        case AST.Types.OPTIONAL:
+            return `(${stringifyWithHighlight(node.value, highlight)})?`;
+    }
+}
+
+type IDGenerator = Generator<bigint, never>;
+
+/**
+ * A generator that yields unique IDs for leaf nodes.
+ * 
+ * The n-th id will alawys be a bigint with the n-th bit set.
+ */
+function* createIdGenerator(): IDGenerator {
+    let id = 1n;
+    while (true) {
+        yield id;
+        id <<= 1n; // Shift left by 1 to set the next bit
     }
 }
 
 /**
  * Turns `ret`s AST into our AST
  * @param ret_node 
+ * @param leafNodeCount How many leaf nodes have been created so far. This is used to assign unique IDs to the leaf nodes.
  */
-function toKleeneAST(ret_node: ret.Tokens): AST.Node {
+function toKleeneAST(ret_node: ret.Tokens, idGenerator: IDGenerator): AST.Node {
     switch (ret_node.type) {
         case ret.types.SET:
         case ret.types.RANGE:
         case ret.types.CHAR:
-            return { type: AST.Types.LITERAL, value: ret_node };
+            return {
+                id: idGenerator.next().value,
+                type: AST.Types.LITERAL,
+                value: ret_node
+            };
 
         case ret.types.GROUP:
         case ret.types.ROOT: {
             if (ret_node.options) {
                 return {
                     type: AST.Types.ALTERNATION,
-                    options: ret_node.options.map(option => ({ type: AST.Types.CONCATENATION, values: option.map(toKleeneAST) }))
+                    options: ret_node.options.map(option => ({
+                        type: AST.Types.CONCATENATION, values: option.map(
+                            value => toKleeneAST(value, idGenerator)
+                        )
+                    }))
                 }
             }
 
             if (ret_node.stack) {
                 return {
                     type: AST.Types.CONCATENATION,
-                    values: ret_node.stack.map(toKleeneAST)
+                    values: ret_node.stack.map(value => toKleeneAST(value, idGenerator))
                 }
             }
 
@@ -158,12 +230,12 @@ function toKleeneAST(ret_node: ret.Tokens): AST.Node {
             if (ret_node.min == 0 && ret_node.max == Infinity) {
                 return {
                     type: AST.Types.KLEENE_STAR,
-                    value: toKleeneAST(ret_node.value)
+                    value: toKleeneAST(ret_node.value, idGenerator)
                 }
             }
 
             if (ret_node.min == 0 && ret_node.max != Infinity) {
-                const value = toKleeneAST(ret_node.value);
+                const value = toKleeneAST(ret_node.value, idGenerator);
                 const values = Array(ret_node.max).fill({ type: AST.Types.OPTIONAL, value })
 
                 return {
@@ -173,7 +245,7 @@ function toKleeneAST(ret_node: ret.Tokens): AST.Node {
             }
 
             if (ret_node.min != 0 && ret_node.max == Infinity) {
-                const value = toKleeneAST(ret_node.value);
+                const value = toKleeneAST(ret_node.value, idGenerator);
                 const values = Array(ret_node.min).fill(value);
                 values.push({ type: AST.Types.KLEENE_STAR, value });
 
@@ -184,7 +256,7 @@ function toKleeneAST(ret_node: ret.Tokens): AST.Node {
             }
 
             if (ret_node.min != 0 && ret_node.max != Infinity) {
-                const value = toKleeneAST(ret_node.value);
+                const value = toKleeneAST(ret_node.value, idGenerator);
 
                 // min Required + (max-min) Optional
                 const required_values = Array(ret_node.min).fill(value);
@@ -202,7 +274,7 @@ function toKleeneAST(ret_node: ret.Tokens): AST.Node {
             switch (ret_node.value) {
                 case "$":
                 case "^":
-                    return { type: AST.Types.ANCHOR, value: ret_node.value };
+                    return { id: idGenerator.next().value, type: AST.Types.ANCHOR, value: ret_node.value };
                 default:
                     throw new Error(`Unexpected Anchor type - ${ret_node.value}`);
             }
@@ -222,7 +294,7 @@ function toKleeneAST(ret_node: ret.Tokens): AST.Node {
  * @param ast 
  * @returns 
  */
-function preprocessAST(ast: AST.Node): AST.Node {
+function preprocessAST(ast: AST.Node, idGenerator: IDGenerator): AST.Node {
 
     /** Represents a Wildcard character (eg `.`) */
     const RET_WILDCARD: ret.Set = {
@@ -244,12 +316,14 @@ function preprocessAST(ast: AST.Node): AST.Node {
         type: AST.Types.CONCATENATION,
         values: [
             {
+                id: idGenerator.next().value,
                 type: AST.Types.ANCHOR,
                 value: "^"
             },
             {
                 type: AST.Types.KLEENE_STAR,
                 value: {
+                    id: idGenerator.next().value,
                     type: AST.Types.LITERAL,
                     value: structuredClone(RET_WILDCARD)
                 }
@@ -258,11 +332,13 @@ function preprocessAST(ast: AST.Node): AST.Node {
             {
                 type: AST.Types.KLEENE_STAR,
                 value: {
+                    id: idGenerator.next().value,
                     type: AST.Types.LITERAL,
                     value: structuredClone(RET_WILDCARD)
                 }
             },
             {
+                id: idGenerator.next().value,
                 type: AST.Types.ANCHOR,
                 value: "$"
             }

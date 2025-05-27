@@ -2,15 +2,14 @@
     "name": "kleene",
     "private": true,
     "type": "module",
-
     "scripts": {
         "test": "vitest --run"
     },
-
     "devDependencies": {
         "vitest": "^0.30.1"
     },
     "dependencies": {
+        "drange": "^2.0.1",
         "ret": "^0.5.0"
     }
 }

@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { toDFA } from "./to-dfa";
+import { parse } from "./ast";
 
 describe("toDFA", () => {
     it("works", () => {
-        // const dfa = toDFA(/b((c|[a-z]*)(.?)|a)/i);
-        toDFA(/a(bb|ba)*b/);
+        const ast = parse(/^a(bb|ba)*b$/);
+        toDFA(ast);
     });
 });

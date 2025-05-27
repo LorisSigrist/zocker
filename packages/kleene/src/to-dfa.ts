@@ -1,4 +1,4 @@
-import { AST, stringify } from "./ast.js";
+import { AST, stringifyWithHighlight } from "./ast.js";
 
 /**
  * This function takes in a regex and returns an equivalent Deterministic Finite Automaton
@@ -14,10 +14,80 @@ export function toDFA(ast: AST.Node) {
     // 2. Compute follow-pos for each node in the syntax tree
     // 3. Use the follow-pos to construct the DFA
 
-    const metadata = getSyntaxTreeMetadata(syntax_tree);
-    const followpos = getFollowPos(syntax_tree, metadata);
+    const metadata = getSyntaxTreeMetadata(ast);
+    const followpos = getFollowPos(ast, metadata);
+    const dfa = constructDFAFromFollowPos(ast, metadata, followpos);
+    return dfa;
 }
 
+type DFA = {
+    states: Map<bigint, DFAState>, // Maps state id to DFAState
+    startState: bigint, // The id of the start state
+}
+
+type DFAState = {
+    /** 
+     * A bitmask representing the set of leaf nodes in this state.
+     * @exampel nodes: [a, b, c] -> a.id | b.id | c.id
+     */
+    id: bigint,
+
+    /**
+     * If this state is an accepting state.
+     * An accepting state is a state that can appear as the last state in a successful match.
+     */
+    accepting: boolean,
+
+    /**
+     * The transitions from this state to other states.
+     * The key is the character that triggers the transition, and the value is the id of the target state.
+     */
+    transitions: Map<string, bigint>,
+}
+
+/**
+ * Constructs a DFA from the followpos map.
+ */
+function constructDFAFromFollowPos(
+    syntax_tree: AST.Node,
+    metadata: Map<AST.Node, NodeMetadata>,
+    followpos: FollowPosMap,
+): void {
+    // A node is reachable from the start state if it is in the firstpos of the root node.
+    // A node is accepting if it is in the lastpos of the root node.
+
+    const start_state = {
+        id: 0n, // The start state represents no nodes, so its id is 0
+        accepting: metadata.get(syntax_tree)!.lastpos.size > 0,
+        transitions: new Map<string, bigint>(),
+    }
+
+    const states = new Map<bigint, DFAState>();
+    states.set(start_state.id, start_state);
+
+    // for each node that is reachable, explore it
+    console.assert(metadata.has(syntax_tree), "Metadata for the root node is missing");
+    const reachableNodes = metadata.get(syntax_tree)!.firstpos;
+
+    const alphabet = new Set<number>();
+    for (const node of reachableNodes) {
+
+    }
+
+    for (const node of reachableNodes) {
+        switch (node.type) {
+            case AST.Types.LITERAL: {
+
+            }
+            case AST.Types.ANCHOR: {
+            }
+        }
+    }
+
+}
+
+
+type FollowPosMap = Map<AST.LeafNode, Set<AST.LeafNode>>
 
 /**
  * Given a syntax tree + first/lastpos metadata, compute followpos for each literal in the regex.
@@ -25,8 +95,91 @@ export function toDFA(ast: AST.Node) {
  * @param syntax_tree 
  * @param metadata 
  */
-function getFollowPos(syntax_tree: AST.Node, metadata: Map<AST.Node, NodeMetadata>) {
+function getFollowPos(syntax_tree: AST.Node, metadata: Map<AST.Node, NodeMetadata>): FollowPosMap {
+    // 1. For each concat node: 
+    //   - If i is in the second child's firstpos, then i is in the followpos for each of the first child's lastpos.
+    // 2. For each kleene star node:
+    //   - If i is in the firstpos of the child, then i is in the followpos for each of the child's lastpos.
+    // 3. For Start-Anchors:
+    //  - The Start Anchor is never in the followpos of any literal. It is only reachable from the start state of the DFA.
+    // 4. For End-Anchors:
+    //  - The End Anchor never has a followpos, because it is the end of the regex.
 
+    function addFollowPos(node: AST.LeafNode, newFollowPos: AST.LeafNode) {
+
+        // Start anchors are never in the followpos of any other node.
+        if (newFollowPos.type === AST.Types.ANCHOR && newFollowPos.value === "^") return;
+
+        // End anchors never have a followpos
+        if (node.type === AST.Types.ANCHOR && node.value === "$") return;
+
+
+        if (!followpos.has(node)) {
+            followpos.set(node, new Set());
+        }
+        followpos.get(node)!.add(newFollowPos);
+    }
+
+    const followpos: FollowPosMap = new Map();
+    for (const node of topDownTraversal(syntax_tree)) {
+        switch (node.type) {
+            case AST.Types.CONCATENATION: {
+                // For each child, we add the firstpos of the next non-nullable child, 
+                // and the firstpos of all nullable children in between
+                // to the followpos of each leaf in the lastpos of the current child.
+
+                for (let i = 0; i < node.values.length; i++) {
+                    const child = node.values[i]!;
+                    console.assert(child, "Concatenation node has undefined index %d", i);
+
+                    const child_metadata = metadata.get(child)!;
+                    console.assert(child_metadata, "Metadata is missing for %s", stringifyWithHighlight(syntax_tree, child));
+
+
+                    // loop over the following children
+                    for (let j = i + 1; j < node.values.length; j++) {
+                        const following_child = node.values[j]!;
+                        const is_nullable = metadata.get(following_child)!.nullable;
+                        // if it is nullable, add the following child's firstpos 
+                        // to the followpos of each lastpos of the current child
+                        for (const lastpos of child_metadata.lastpos) {
+                            for (const firstpos of metadata.get(following_child)!.firstpos) {
+                                addFollowPos(lastpos, firstpos);
+                            }
+                        }
+
+                        if (!is_nullable) {
+                            // This was the first non-nullable following child, so we can stop here
+                            break;
+                        }
+                    }
+
+                }
+
+                break;
+            }
+            case AST.Types.KLEENE_STAR: {
+
+                // add every firstpos of the node to the followpos of each lastpos of the node
+                const node_metadata = metadata.get(node.value)!;
+                console.assert(node_metadata, "Metadata is missing for %s", stringifyWithHighlight(syntax_tree, node));
+
+                for (const child_lastpos of node_metadata.lastpos) {
+                    const child_metadata = metadata.get(node.value)!;
+                    console.assert(child_metadata, "Metadata is missing for %s", stringifyWithHighlight(syntax_tree, node.value));
+
+                    for (const firstpos of child_metadata.firstpos) {
+                        addFollowPos(child_lastpos, firstpos);
+                    }
+                }
+                break;
+            }
+
+            default: continue; // We only care about concatenation and kleene star nodes for followpos
+        }
+    }
+
+    return followpos;
 }
 
 /**
@@ -54,31 +207,26 @@ function getSyntaxTreeMetadata(syntax_tree: AST.Node): Map<AST.Node, NodeMetadat
         const firstpos = firstPos(node, metadata);
         const lastpos = lastPos(node, metadata);
         metadata.set(node, { nullable, firstpos, lastpos });
-
-        console.log("node", node);
-        console.debug("nullable", nullable);
-        console.debug("firstpos", [...firstpos].map(stringify))
-        console.debug("lastpos", [...lastpos].map(stringify))
-        console.debug("\n");
     }
 
     return metadata;
 }
 
-function lastPos(node: Tokens, metadata: Map<Tokens, NodeMetadata>): Set<Tokens> {
+function lastPos(node: AST.Node, metadata: Map<AST.Node, NodeMetadata>): Set<AST.LeafNode> {
 
-    function getLastPosForConcatenation(concatenation: Tokens[], metadata: Map<Tokens, NodeMetadata>): Set<Tokens> {
-        let lastPos = new Set<Tokens>();
+    function getLastPosForConcatenation(concatenation: AST.Node[], metadata: Map<AST.Node, NodeMetadata>): Set<AST.LeafNode> {
+        let lastPos = new Set<AST.LeafNode>();
 
         for (let i = concatenation.length - 1; i >= 0; i--) {
-            const child = concatenation[i];
-            const is_nullable = metadata.get(child)!.nullable;
-            const child_lastpos = metadata.get(child)!.lastpos;
+            const child = concatenation[i]!;
 
-            if (is_nullable) {
-                lastPos = mergeSets(lastPos, child_lastpos);
+            const child_metadata = metadata.get(child)!;
+            console.assert(child_metadata, "Metadata is missing for %s", stringifyWithHighlight(node, child));
+
+            if (child_metadata.nullable) {
+                lastPos = mergeSets(lastPos,  child_metadata.lastpos);
             } else {
-                lastPos = mergeSets(lastPos, child_lastpos);
+                lastPos = mergeSets(lastPos,  child_metadata.lastpos);
                 break;
             }
         }
@@ -88,39 +236,38 @@ function lastPos(node: Tokens, metadata: Map<Tokens, NodeMetadata>): Set<Tokens>
 
     switch (node.type) {
         // Literals can only be themselves
-        case types.CHAR: return new Set([node]);
-        case types.SET: return new Set([node]);
-        case types.RANGE: return new Set([node]);
+        case AST.Types.LITERAL:
+        case AST.Types.ANCHOR: return new Set([node]);
 
-        case types.REPETITION: {
-            return metadata.get(node.value)!.lastpos;
+        case AST.Types.OPTIONAL:
+        case AST.Types.KLEENE_STAR: {
+            const child_metadata = metadata.get(node.value)!;
+            console.assert(child_metadata, "Metadata is missing for %s", stringifyWithHighlight(node, node.value));
+            return child_metadata.lastpos;
         }
 
-        case types.ROOT:
-        case types.GROUP: {
-            if (node.options) {
-                // alternation 
-                // firstPos = firstpos(C1) U firstpos(C2) U ...
-                return node.options.reduce(
-                    (acc, option) => mergeSets(acc, getLastPosForConcatenation(option, metadata)),
-                    new Set<Tokens>()
-                );
-            }
-            if (node.stack) {
-                // concatenation
-                // lastpos = if nullable(c2) then firstPos(c1) U firstPos(c2) else firstPos(c2)
-                return getLastPosForConcatenation(node.stack, metadata);
-            }
+        case AST.Types.ALTERNATION: {
+            // The LastPos of an alternation is the union of the LastPos of all its options
+            return node.options.map(opt => {
+                const option_metadata = metadata.get(opt)!;
+                console.assert(option_metadata, "Metadata is missing for %s", stringifyWithHighlight(node, opt));
+                return option_metadata;
+            }).reduce(
+                (acc, option) => mergeSets(acc, option.lastpos),
+                new Set<AST.LeafNode>()
+            )
         }
+
+        // The LastPos of a concatenation is the LastPos of the last non-nullable child
+        // unioned with the LastPos of all nullable children after it.
+        case AST.Types.CONCATENATION: return getLastPosForConcatenation(node.values, metadata);
     }
-
-    throw new Error("firstPos not implemented for node type " + node.type);
 }
 
-function firstPos(node: Tokens, metadata: Map<Tokens, NodeMetadata>): Set<Tokens> {
+function firstPos(node: AST.Node, metadata: Map<AST.Node, NodeMetadata>): Set<AST.Literal | AST.Anchor> {
 
-    function getFirstPosForConcatenation(concatenation: Tokens[], metadata: Map<Tokens, NodeMetadata>): Set<Tokens> {
-        let firstPos = new Set<Tokens>();
+    function getFirstPosForConcatenation(concatenation: AST.Node[], metadata: Map<AST.Node, NodeMetadata>): Set<AST.Literal | AST.Anchor> {
+        let firstPos = new Set<AST.Literal | AST.Anchor>();
 
         for (const child of concatenation) {
             const is_nullable = metadata.get(child)!.nullable;
@@ -138,72 +285,53 @@ function firstPos(node: Tokens, metadata: Map<Tokens, NodeMetadata>): Set<Tokens
     }
 
     switch (node.type) {
-        case types.CHAR: return new Set([node]);
-        case types.SET: return new Set([node]);
-        case types.RANGE: return new Set([node]);
+        case AST.Types.LITERAL:
+        case AST.Types.ANCHOR: return new Set([node]);
 
-        case types.REPETITION: {
-            return metadata.get(node.value)!.firstpos;
+        case AST.Types.KLEENE_STAR:
+        case AST.Types.OPTIONAL: return metadata.get(node.value)!.firstpos;
+
+        case AST.Types.ALTERNATION: {
+            // firstPos = firstpos(C1) U firstpos(C2) U ...
+            return node.options.reduce(
+                (acc, option) => mergeSets(acc, metadata.get(option)!.firstpos),
+                new Set<AST.Literal | AST.Anchor>()
+            );
         }
 
-        case types.ROOT:
-        case types.GROUP: {
-            if (node.options) {
-                // alternation 
-                // firstPos = firstpos(C1) U firstpos(C2) U ...
-                return node.options.reduce(
-                    (acc, option) => mergeSets(acc, getFirstPosForConcatenation(option, metadata)),
-                    new Set<Tokens>()
-                );
-            }
-            if (node.stack) {
-                // concatenation
-                // firstPos = if nullable(c1) then firstPos(c1) U firstPos(c2) else firstPos(c1)
-                return getFirstPosForConcatenation(node.stack, metadata);
-            }
+        case AST.Types.CONCATENATION: {
+            // firstPos = if nullable(c1) then firstPos(c1) U firstPos(c2) else firstPos(c1)
+            return getFirstPosForConcatenation(node.values, metadata);
         }
+
     }
-
-    throw new Error("firstPos not implemented for node type " + node.type);
 }
 
 /**
  * A node is nullable if it can match the empty string (it doesnt have to ONLY match the empty string).
  * This function checks if a node is nullable. It assumes that the metadata of the children is already computed.
  */
-function isNullable(node: Tokens, metadata: Map<Tokens, NodeMetadata>) {
+function isNullable(node: AST.Node, metadata: Map<AST.Node, NodeMetadata>): boolean {
     switch (node.type) {
-        case types.CHAR: return false;
-        case types.SET: return false;
+        case AST.Types.LITERAL: return false;  // Literals are never nullable
+        case AST.Types.KLEENE_STAR: return true;   // Kleene star is always nullable
+        case AST.Types.OPTIONAL: return true; // Optional is always nullable
 
-        case types.REPETITION: {
-            if (node.min === 0) return true;
-            const child = metadata.get(node.value);
-            if (!child) throw new Error("Child not found");
-            return child.nullable;
+        case AST.Types.ALTERNATION: {
+            // An Alternation is nullable if at least one of its options is nullable
+            return node.options.some(option => metadata.get(option)!.nullable);
         }
 
-        case types.ROOT:
-        case types.GROUP: {
-            if (node.options) {
-                const one_option_nullable = node.options.some((option) => option.every((child) => metadata.get(child)!.nullable));
-                return one_option_nullable;
-            }
+        case AST.Types.CONCATENATION: {
+            // A Concatenation is nullable if all of its children are nullable
+            return node.values.every(value => metadata.get(value)!.nullable);
+        }
 
-            if (node.stack) {
-                if (node.stack.length === 0) return true;
-                const all_children_nullable = node.stack.every((child) => metadata.get(child)!.nullable);
-                return all_children_nullable;
-            }
-        }
-        case types.RANGE: {
-            return false;
-        }
+
+        // We need Anchors to mark anchors as nullable so that
+        // a concatenation like `^$` is considered nullable.
+        case AST.Types.ANCHOR: return true;
     }
-
-
-    // TODO
-    return false;
 }
 
 /**
@@ -211,27 +339,19 @@ function isNullable(node: Tokens, metadata: Map<Tokens, NodeMetadata>) {
  * @param node The Node to start from (usually the root-node)
  * @yields The nodes in bottom-up order
  */
-function* bottomUpTraversal(node: Tokens): Generator<Tokens> {
+function* bottomUpTraversal(node: AST.Node): Generator<AST.Node> {
     switch (node.type) {
-        case types.REPETITION: {
-            yield* bottomUpTraversal(node.value);
+        case AST.Types.OPTIONAL: { yield* bottomUpTraversal(node.value); break; }
+        case AST.Types.KLEENE_STAR: { yield* bottomUpTraversal(node.value); break; }
+        case AST.Types.ALTERNATION: {
+            for (const option of node.options) {
+                yield* bottomUpTraversal(option);
+            }
             break;
         }
-
-        case types.ROOT:
-        case types.GROUP: {
-            if (node.options) {
-                for (const option of node.options) {
-                    for (const child of option) {
-                        yield* bottomUpTraversal(child);
-                    }
-                }
-            }
-
-            if (node.stack) {
-                for (const child of node.stack) {
-                    yield* bottomUpTraversal(child);
-                }
+        case AST.Types.CONCATENATION: {
+            for (const value of node.values) {
+                yield* bottomUpTraversal(value);
             }
             break;
         }
@@ -244,28 +364,20 @@ function* bottomUpTraversal(node: Tokens): Generator<Tokens> {
  * Traverses through the syntax tree from the top. 
  * @param node 
  */
-function* topDownTraversal(node: Tokens): Generator<Tokens> {
+function* topDownTraversal(node: AST.Node): Generator<AST.Node> {
     yield node;
     switch (node.type) {
-        case types.REPETITION: {
-            yield* bottomUpTraversal(node.value);
+        case AST.Types.OPTIONAL: { yield* bottomUpTraversal(node.value); break; }
+        case AST.Types.KLEENE_STAR: { yield* bottomUpTraversal(node.value); break; }
+        case AST.Types.ALTERNATION: {
+            for (const option of node.options) {
+                yield* bottomUpTraversal(option);
+            }
             break;
         }
-
-        case types.ROOT:
-        case types.GROUP: {
-            if (node.options) {
-                for (const option of node.options) {
-                    for (const child of option) {
-                        yield* bottomUpTraversal(child);
-                    }
-                }
-            }
-
-            if (node.stack) {
-                for (const child of node.stack) {
-                    yield* bottomUpTraversal(child);
-                }
+        case AST.Types.CONCATENATION: {
+            for (const value of node.values) {
+                yield* bottomUpTraversal(value);
             }
             break;
         }
@@ -273,6 +385,29 @@ function* topDownTraversal(node: Tokens): Generator<Tokens> {
 }
 
 
-function mergeSets(set1: Set<Tokens>, set2: Set<Tokens>) {
+/**
+ * Returns a new set that is the union of the two sets.
+ * 
+ * @param set1 firstSet
+ * @param set2 secondSet
+ * @returns firstSet ∪ secondSet
+ */
+function mergeSets<T>(set1: Set<T>, set2: Set<T>): Set<T> {
     return new Set([...set1, ...set2]);
+}
+
+/**
+ * Turns a set of leaf nodes into a bitmask.
+ * 
+ * This lets us use sets as keys in a map, which is useful for the DFA construction.
+ * 
+ * @param set 
+ * @returns 
+ */
+function leafNodeSetToMask(set: Set<AST.LeafNode>): bigint {
+    let mask = BigInt(0);
+    for (const node of set) {
+        mask |= node.id;
+    }
+    return mask;
 }
