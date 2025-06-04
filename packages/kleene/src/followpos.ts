@@ -1,4 +1,5 @@
 import { AST, stringifyWithHighlight } from "./ast.js";
+import { bottomUpTraversal, topDownTraversal } from "ast-traversal.js";
 
 /**
  * This function takes in a regex and returns an equivalent Deterministic Finite Automaton
@@ -14,7 +15,7 @@ export function toDFA(ast: AST.Node) {
     // 2. Compute follow-pos for each node in the syntax tree
     // 3. Use the follow-pos to construct the DFA
 
-    const metadata = getSyntaxTreeMetadata(ast);
+    const metadata = generateASTMetadata(ast);
     const followpos = getFollowPos(ast, metadata);
     const dfa = constructDFAFromFollowPos(ast, metadata, followpos);
     return dfa;
@@ -71,7 +72,7 @@ function constructDFAFromFollowPos(
 
     const alphabet = new Set<number>();
     for (const node of reachableNodes) {
-
+        console.log(node);
     }
 
     for (const node of reachableNodes) {
@@ -83,9 +84,7 @@ function constructDFAFromFollowPos(
             }
         }
     }
-
 }
-
 
 type FollowPosMap = Map<AST.LeafNode, Set<AST.LeafNode>>
 
@@ -107,10 +106,13 @@ function getFollowPos(syntax_tree: AST.Node, metadata: Map<AST.Node, NodeMetadat
 
     function addFollowPos(node: AST.LeafNode, newFollowPos: AST.LeafNode) {
 
-        // Start anchors are never in the followpos of any other node.
-        if (newFollowPos.type === AST.Types.ANCHOR && newFollowPos.value === "^") return;
+        // Start anchors are never in the followpos of any node that isn't itself a start anchor
+        if (
+            newFollowPos.type === AST.Types.ANCHOR && newFollowPos.value === "^"
+            && (node.type !== AST.Types.ANCHOR || node.value !== "^")
+        ) return;
 
-        // End anchors never have a followpos
+        // End anchors never have a followpos, unless it is itself an end anchor
         if (node.type === AST.Types.ANCHOR && node.value === "$") return;
 
 
@@ -199,7 +201,7 @@ type NodeMetadata = {
  * All three properties can be computed by iterating over the tree bottom-up, so we calculate them together.
  * 
  */
-function getSyntaxTreeMetadata(syntax_tree: AST.Node): Map<AST.Node, NodeMetadata> {
+function generateASTMetadata(syntax_tree: AST.Node): Map<AST.Node, NodeMetadata> {
     const metadata = new Map<AST.Node, NodeMetadata>();
 
     for (const node of bottomUpTraversal(syntax_tree)) {
@@ -327,60 +329,8 @@ function isNullable(node: AST.Node, metadata: Map<AST.Node, NodeMetadata>): bool
             return node.values.every(value => metadata.get(value)!.nullable);
         }
 
-
-        // We need Anchors to mark anchors as nullable so that
-        // a concatenation like `^$` is considered nullable.
-        case AST.Types.ANCHOR: return true;
-    }
-}
-
-/**
- * Yields all nodes in the syntax tree in bottom-up order. It starts at the leaves and works its way up to the start-node.
- * @param node The Node to start from (usually the root-node)
- * @yields The nodes in bottom-up order
- */
-function* bottomUpTraversal(node: AST.Node): Generator<AST.Node> {
-    switch (node.type) {
-        case AST.Types.OPTIONAL: { yield* bottomUpTraversal(node.value); break; }
-        case AST.Types.KLEENE_STAR: { yield* bottomUpTraversal(node.value); break; }
-        case AST.Types.ALTERNATION: {
-            for (const option of node.options) {
-                yield* bottomUpTraversal(option);
-            }
-            break;
-        }
-        case AST.Types.CONCATENATION: {
-            for (const value of node.values) {
-                yield* bottomUpTraversal(value);
-            }
-            break;
-        }
-    }
-
-    yield node;
-}
-
-/**
- * Traverses through the syntax tree from the top. 
- * @param node 
- */
-function* topDownTraversal(node: AST.Node): Generator<AST.Node> {
-    yield node;
-    switch (node.type) {
-        case AST.Types.OPTIONAL: { yield* bottomUpTraversal(node.value); break; }
-        case AST.Types.KLEENE_STAR: { yield* bottomUpTraversal(node.value); break; }
-        case AST.Types.ALTERNATION: {
-            for (const option of node.options) {
-                yield* bottomUpTraversal(option);
-            }
-            break;
-        }
-        case AST.Types.CONCATENATION: {
-            for (const value of node.values) {
-                yield* bottomUpTraversal(value);
-            }
-            break;
-        }
+        // Anchors should not be nullable
+        case AST.Types.ANCHOR: return false;
     }
 }
 

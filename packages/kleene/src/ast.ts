@@ -1,4 +1,7 @@
 import * as ret from "ret";
+import DRange from "drange";
+import { fromDRange, Ranges, toDRange } from "./range.js";
+
 
 // I don't want to reimplement regex parsing, so we use `ret` as a starting point.
 // Ret's AST is not a good fit for our purposes, because it uses arbitrary Repetition & Position nodes,
@@ -72,7 +75,7 @@ export namespace AST {
          */
         id: bigint;
         type: Types.LITERAL;
-        value: ret.Char | ret.Range | ret.Set;
+        value: Ranges;
     }
 
     /**
@@ -126,8 +129,26 @@ export function parse(regex: RegExp): AST.Node {
  */
 export function stringify(node: AST.Node): string {
     switch (node.type) {
-        case AST.Types.LITERAL:
-            return ret.reconstruct(node.value);
+        case AST.Types.LITERAL: {
+            const asDrange = toDRange(node.value);
+            if (asDrange.length === 1) {
+                return String.fromCharCode(asDrange.numbers()[0]!);
+            }
+
+            const subranges = asDrange.subranges();
+            if (subranges.length === 1) {
+                // Group
+                const subrange = subranges[0]!;
+                return `[${String.fromCharCode(subrange.low)}-${String.fromCharCode(subrange.high)}]`;
+            }
+
+            // Set 
+            return `[${subranges.map(subrange => {
+                return `${String.fromCharCode(subrange.low)}-${String.fromCharCode(subrange.high)}`;
+            }).join("")}]`;
+        
+        }
+
         case AST.Types.ALTERNATION:
             return `(${node.options.map(option => stringify(option)).join("|")})`;
         case AST.Types.CONCATENATION:
@@ -152,7 +173,7 @@ export function stringifyWithHighlight(node: AST.Node, highlight: AST.Node): str
 
     switch (node.type) {
         case AST.Types.LITERAL:
-            return ret.reconstruct(node.value);
+            return stringify(node);
         case AST.Types.ALTERNATION:
             return `(${node.options.map(option => stringifyWithHighlight(option, highlight)).join("|")})`;
         case AST.Types.CONCATENATION:
@@ -194,7 +215,7 @@ function toKleeneAST(ret_node: ret.Tokens, idGenerator: IDGenerator): AST.Node {
             return {
                 id: idGenerator.next().value,
                 type: AST.Types.LITERAL,
-                value: ret_node
+                value: fromDRange(expandRETLiteral(ret_node))
             };
 
         case ret.types.GROUP:
@@ -286,6 +307,40 @@ function toKleeneAST(ret_node: ret.Tokens, idGenerator: IDGenerator): AST.Node {
     }
 }
 
+const DEFAULT_RANGE = new DRange(32, 126) // same as RandExp
+
+function expandRETLiteral(token: ret.Range | ret.Char | ret.Set) {
+
+    if (token.type === ret.types.CHAR) {
+        return new DRange(token.value);
+    } else if (token.type === ret.types.RANGE) {
+        return new DRange(token.from, token.to);
+    } else {
+        let drange = new DRange();
+        for (let i = 0; i < token.set.length; i++) {
+            let subrange = expandRETLiteral(token.set[i]!);
+            drange.add(subrange);
+        }
+        if (token.not) {
+            return DEFAULT_RANGE.clone().subtract(drange);
+        } else {
+            return DEFAULT_RANGE.clone().intersect(drange);
+        }
+
+    }
+}
+
+
+/** Represents a Wildcard character (eg `.`) */
+const WILDCARD_LITERAL_VALUE = expandRETLiteral({
+    type: ret.types.SET, set: [
+        { type: ret.types.CHAR, value: 10 },
+        { type: ret.types.CHAR, value: 13 },
+        { type: ret.types.CHAR, value: 8232 },
+        { type: ret.types.CHAR, value: 8233 },
+    ], not: true
+});
+
 
 /**
  * Our AST is suppossed to represent a regex that matches the entire string. However, JS's regex engine 
@@ -296,17 +351,7 @@ function toKleeneAST(ret_node: ret.Tokens, idGenerator: IDGenerator): AST.Node {
  */
 function preprocessAST(ast: AST.Node, idGenerator: IDGenerator): AST.Node {
 
-    /** Represents a Wildcard character (eg `.`) */
-    const RET_WILDCARD: ret.Set = {
-        "type": ret.types.SET,
-        "set": [
-            { "type": ret.types.CHAR, "value": 10 },
-            { "type": ret.types.CHAR, "value": 13 },
-            { "type": ret.types.CHAR, "value": 8232 },
-            { "type": ret.types.CHAR, "value": 8233 }
-        ],
-        "not": true
-    };
+
 
     // Note: If the Regex Has Anchors, like `^` or `$` the added wildcars will be removed 
     // during DFA construction.
@@ -325,7 +370,7 @@ function preprocessAST(ast: AST.Node, idGenerator: IDGenerator): AST.Node {
                 value: {
                     id: idGenerator.next().value,
                     type: AST.Types.LITERAL,
-                    value: structuredClone(RET_WILDCARD)
+                    value: fromDRange(WILDCARD_LITERAL_VALUE.clone())
                 }
             },
             ast,
@@ -334,7 +379,7 @@ function preprocessAST(ast: AST.Node, idGenerator: IDGenerator): AST.Node {
                 value: {
                     id: idGenerator.next().value,
                     type: AST.Types.LITERAL,
-                    value: structuredClone(RET_WILDCARD)
+                    value: fromDRange(WILDCARD_LITERAL_VALUE.clone())
                 }
             },
             {
