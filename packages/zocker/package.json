@@ -9,7 +9,7 @@
 		"zod"
 	],
 	"type": "module",
-	"main": "dist/index.js",
+	"main": "dist/index.cjs",
 	"module": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"repository": {
@@ -18,12 +18,13 @@
 	},
 	"homepage": "https://zocker.sigrist.dev",
 	"scripts": {
-		"build": "tsc",
+		"build": "tsdown --dts --format cjs --format esm",
 		"test": "vitest --run --passWithNoTests",
 		"check": "tsc --noEmit",
 		"format": "prettier --write ."
 	},
 	"devDependencies": {
+		"tsdown": "^0.12.8",
 		"typescript": "^5.8.3",
 		"vitest": "^0.30.1"
 	},
