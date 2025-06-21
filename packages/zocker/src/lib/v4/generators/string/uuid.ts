@@ -6,6 +6,8 @@ import Randexp from "randexp";
 
 const uuid_generator: Generator<z.$ZodUUID> = (schema, ctx) => {
 	const version = Number.parseInt(schema._zod.def.version?.slice(1) ?? "4");
+	if (version == 4 || !version) return faker.string.uuid(); // faker always returns v4
+	
 	const pattern = schema._zod.def.pattern ?? z.regexes.uuid(version);
 
 	const randexp = new Randexp(pattern);
