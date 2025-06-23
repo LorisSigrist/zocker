@@ -1,5 +1,11 @@
 # zocker
 
+## 2.1.0
+
+### Minor Changes
+
+- c716f28: Zocker now distributes both ESM and CJS builds - Closes [#46](https://github.com/LorisSigrist/zocker/issues/46)
+
 ## 2.0.4
 
 ### Patch Changes
