@@ -10,4 +10,5 @@ const schema = z.object({
 });
 
 const data = zocker(schema).generate();
+if(!data) throw new Error("Data generation failed");
 console.log("CJS Generated Data:", data);
