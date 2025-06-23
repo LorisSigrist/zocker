@@ -4,6 +4,12 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    zod:
+      specifier: ^3.25.3
+      version: 3.25.67
+
 importers:
 
   .:
@@ -23,7 +29,7 @@ importers:
         specifier: workspace:*
         version: link:../zocker
       zod:
-        specifier: ^3.25.3
+        specifier: 'catalog:'
         version: 3.25.67
 
   packages/example:
@@ -51,8 +57,8 @@ importers:
         specifier: ^0.5.3
         version: 0.5.3
       zod:
-        specifier: ^3.25.3
-        version: 3.25.7
+        specifier: 'catalog:'
+        version: 3.25.67
     devDependencies:
       tsdown:
         specifier: ^0.12.8
@@ -1443,9 +1449,6 @@ packages:
   zod@3.25.67:
     resolution: {integrity: sha512-idA2YXwpCdqUSKRCACDE6ItZD9TZzy3OZMtpfLoh6oPR47lipysRrJfjzMqFxQ3uJuUPyUeWe1r9vLH33xO/Qw==}
 
-  zod@3.25.7:
-    resolution: {integrity: sha512-YGdT1cVRmKkOg6Sq7vY7IkxdphySKnXhaUmFI4r4FcuFVNgpCb9tZfNwXbT6BPjD5oz0nubFsoo9pIqKrDcCvg==}
-
 snapshots:
 
   '@babel/generator@7.27.5':
@@ -2684,5 +2687,3 @@ snapshots:
       zod: 3.25.67
 
   zod@3.25.67: {}
-
-  zod@3.25.7: {}

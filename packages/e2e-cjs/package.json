@@ -9,6 +9,6 @@
     },
     "dependencies": {
         "zocker": "workspace:*",
-        "zod": "^3.25.3"
+        "zod": "catalog:"
     }
 }

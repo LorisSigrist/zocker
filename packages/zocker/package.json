@@ -32,7 +32,7 @@
 		"dist"
 	],
 	"peerDependencies": {
-		"zod": "^3.25.3"
+		"zod": "catalog:"
 	},
 	"dependencies": {
 		"@faker-js/faker": "^9.8.0",
