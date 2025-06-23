@@ -17,6 +17,15 @@ importers:
 
   packages/docs: {}
 
+  packages/e2e-cjs:
+    dependencies:
+      zocker:
+        specifier: workspace:*
+        version: link:../zocker
+      zod:
+        specifier: ^3.25.3
+        version: 3.25.67
+
   packages/example:
     dependencies:
       zocker:
