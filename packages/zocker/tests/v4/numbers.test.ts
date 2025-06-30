@@ -43,6 +43,10 @@ const number_schemas = {
 		.multipleOf(2.3e-14)
 		.min(55)
 		.max(100),
+	"number with very large multipleof": z
+		.number()
+		.multipleOf(1e14)
+		.min(1), // disallow 0 
 	"number with multiple mins and maxs": z
 		.number()
 		.min(10)
