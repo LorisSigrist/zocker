@@ -121,7 +121,7 @@ function generateCUIDofLength(len: number) {
 	if (len < CUID_MIN_LENGTH)
 		throw new TypeError("CUID must be at least 9 characters long");
 
-	let cuid = "c" + faker.string.alphanumeric({length: len - 1});
+	let cuid = "c" + faker.string.alphanumeric({ length: len - 1 });
 	return cuid;
 }
 
@@ -134,6 +134,8 @@ function generateCUIDofLength(len: number) {
 function generateCUID2ofLength(len: number) {
 	if (len < CUID2_MIN_LENGTH)
 		throw new TypeError("CUID2 must be at least 2 characters long");
-	let cuid2 = faker.string.alpha({ casing: "lower"}) + faker.string.alphanumeric({length: len - 1, casing: "lower"});
+	let cuid2 =
+		faker.string.alpha({ casing: "lower" }) +
+		faker.string.alphanumeric({ length: len - 1, casing: "lower" });
 	return cuid2;
 }

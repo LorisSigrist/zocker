@@ -20,7 +20,7 @@ import { legacyFormatString } from "./legacy.js";
 const generate_string: Generator<z.$ZodString> = (string_schema, ctx) => {
 	const legacy = legacyFormatString(string_schema, ctx);
 	if (legacy !== null) return legacy;
-	
+
 	const lengthConstraints = getLengthConstraints(string_schema);
 	const contentConstraints = getContentConstraints(string_schema);
 	const regexConstraints = getRegexConstraints(string_schema);
@@ -151,11 +151,12 @@ function generateStringWithoutFormat(
 		color: color,
 		gender: faker.person.gender,
 		municipality: faker.location.city,
-		"color-hex": () => faker.color.rgb({ prefix: '#', casing: 'lower' }),
+		"color-hex": () => faker.color.rgb({ prefix: "#", casing: "lower" }),
 		weekday: faker.date.weekday,
 		"unique-id": faker.string.uuid,
 		key: () => faker.lorem.word(),
-		unspecified: () => faker.lorem.paragraphs(faker.number.int({ min: 1, max: 5 }))
+		unspecified: () =>
+			faker.lorem.paragraphs(faker.number.int({ min: 1, max: 5 }))
 	};
 
 	const generator = semantic_generators[ctx.semantic_context];
@@ -189,5 +190,3 @@ function stringMatchesConstraints(
 
 	return true;
 }
-
-

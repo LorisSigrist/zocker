@@ -1,14 +1,14 @@
 {
-    "name": "zocker-e2e-cjs",
-    "description": "Runs Zocker from CJS to validate it works",
-    "private": true,
-    "type": "commonjs",
-    "version": "0.0.2",
-    "scripts": {
-        "test": "node ./index.js"
-    },
-    "dependencies": {
-        "zocker": "workspace:*",
-        "zod": "catalog:"
-    }
+	"name": "zocker-e2e-cjs",
+	"description": "Runs Zocker from CJS to validate it works",
+	"private": true,
+	"type": "commonjs",
+	"version": "0.0.2",
+	"scripts": {
+		"test": "node ./index.js"
+	},
+	"dependencies": {
+		"zocker": "workspace:*",
+		"zod": "catalog:"
+	}
 }

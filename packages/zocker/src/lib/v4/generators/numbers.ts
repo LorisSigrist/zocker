@@ -50,9 +50,11 @@ const generate_number: Generator<z.$ZodNumber> = (number_schema, ctx) => {
 		if ("then" in result) throw new Error();
 		if (result.issues) throw new Error();
 		return result.value;
-	} catch (e) { }
+	} catch (e) {}
 
-	let is_extreme_value = faker.datatype.boolean({ probability: ctx.number_options.extreme_value_chance });
+	let is_extreme_value = faker.datatype.boolean({
+		probability: ctx.number_options.extreme_value_chance
+	});
 
 	const formatChecks: z.$ZodCheckNumberFormat[] =
 		number_schema._zod.def.checks?.filter(
@@ -128,7 +130,7 @@ const generate_number: Generator<z.$ZodNumber> = (number_schema, ctx) => {
 		value = faker.number.int({ min, max });
 	} else {
 		if (is_extreme_value) {
-			const use_lower_extreme = faker.datatype.boolean({ probability: 0.5});
+			const use_lower_extreme = faker.datatype.boolean({ probability: 0.5 });
 			if (use_lower_extreme) value = is_finite ? -Infinity : min;
 			else value = is_finite ? Infinity : max;
 		}
@@ -152,16 +154,24 @@ const generate_number: Generator<z.$ZodNumber> = (number_schema, ctx) => {
 	}, Number(multipleof_checks[0]?._zod.def.value ?? Number.MIN_VALUE));
 
 	if (multipleof !== Number.MIN_VALUE) {
-		value = is_int ?
-			faker.number.int({ min, max, multipleOf: multipleof !== Number.MIN_VALUE ? multipleof : undefined }) :
-			faker.number.float({ min, max, multipleOf: multipleof !== Number.MIN_VALUE ? multipleof : undefined });
-		
+		value = is_int
+			? faker.number.int({
+					min,
+					max,
+					multipleOf: multipleof !== Number.MIN_VALUE ? multipleof : undefined
+			  })
+			: faker.number.float({
+					min,
+					max,
+					multipleOf: multipleof !== Number.MIN_VALUE ? multipleof : undefined
+			  });
+
 		// Due to floating point precision issues the generated number might not symbolically be a multiple of the given value.
 		// Eg: 2.30000000000000004 is not a multiple of 0.1, and zod won't accept it.
 		// We have to check that the generated value is actually a multiple of the given value.
 		// otherwise, try again.
 		const result = z4.number().multipleOf(multipleof).safeParse(value);
-		if(!result.success) return generate_number(number_schema, ctx);
+		if (!result.success) return generate_number(number_schema, ctx);
 	}
 
 	return value;

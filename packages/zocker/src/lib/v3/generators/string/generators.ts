@@ -135,7 +135,7 @@ export const any: StringKindGenerator = (ctx, lc, cc, td) => {
 			word: faker.lorem.word,
 			jobtitle: faker.person.jobTitle,
 			color: color,
-			"color-hex": ()=> faker.color.rgb({ prefix: '#', casing: 'lower' }),
+			"color-hex": () => faker.color.rgb({ prefix: "#", casing: "lower" }),
 			weekday: faker.date.weekday,
 			"unique-id": () => faker.string.uuid(),
 			key: () => faker.lorem.word(),
@@ -219,7 +219,6 @@ function matches_constraints(
 
 function generate_regex(regex: RegExp): string {
 	const randexp = new Randexp(regex);
-	randexp.randInt = (min, max) =>
-		faker.number.int({ min, max });
+	randexp.randInt = (min, max) => faker.number.int({ min, max });
 	return randexp.gen();
 }
