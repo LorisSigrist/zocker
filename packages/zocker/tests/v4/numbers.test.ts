@@ -46,7 +46,9 @@ const number_schemas = {
 	"number with very large multipleof": z
 		.number()
 		.multipleOf(1e14)
-		.min(1), // disallow 0 
+		.multipleOf(1e15)
+		.min(1)
+		.max(1e16),
 	"number with multiple mins and maxs": z
 		.number()
 		.min(10)
