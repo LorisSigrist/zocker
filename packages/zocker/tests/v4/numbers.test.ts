@@ -18,8 +18,8 @@ const number_schemas = {
 	"number gt": z.number().gt(10),
 	"integer lte": z.number().int().lte(10),
 	"integer gte": z.number().int().gte(10),
-	"integer lt": z.number().int().lt(10),
-	"integer gt": z.number().int().gt(10),
+	"integer lt": z.number().int().lt(0),
+	"integer gt": z.number().int().gt(10.6),
 	"number multipleof": z.number().multipleOf(10),
 	"integer multipleof": z.number().int().multipleOf(10),
 	"interger mutliple multipleof": z
@@ -28,6 +28,27 @@ const number_schemas = {
 		.multipleOf(10)
 		.multipleOf(5)
 		.multipleOf(3),
+	"non-integer multipleof": z.number().multipleOf(0.01).multipleOf(0.1),
+	"integer with multipleof and min and max": z.number()
+		.int()
+		.multipleOf(10)
+		.min(10_000)
+		.max(20_000),
+	"non-integer multipleof with min and max": z.number()
+		.multipleOf(0.1)
+			.min(1.5)
+		.max(2.5),
+	"number with small multipleof": z
+		.number()
+		.multipleOf(2.3e-14)
+		.min(55)
+		.max(100),
+	"number with very large multipleof": z
+		.number()
+		.multipleOf(1e14)
+		.multipleOf(1e15)
+		.min(1)
+		.max(1e16),
 	"number with multiple mins and maxs": z
 		.number()
 		.min(10)
