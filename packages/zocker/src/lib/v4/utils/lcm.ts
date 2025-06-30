@@ -39,6 +39,31 @@ function bigintLCM(a: bigint, b: bigint) {
  * @example "0.75" -> [3n, 4n]
  */
 function decimalToFraction(decimalStr: string): [bigint, bigint] {
+
+    // Handle e-notation
+    if (decimalStr.includes('e')) {
+        const [base, exponent] = decimalStr.split('e');
+        if(!base || !exponent) throw new Error(`Invalid number string: ${decimalStr}`);
+        console.log(`Base: ${base}, Exponent: ${exponent}`);
+        
+        // get the fractional representation of the base
+        const baseFraction = decimalToFraction(base);
+        
+        // the part after the 'e' is the exponent.
+        // may be negative or positive
+        const exponentValue = BigInt(exponent); 
+        
+        // if the exponent is negative we scale the denominator up
+        // if the exponent is positive we scale the numerator up
+        if (exponentValue < 0n) {
+            baseFraction[1] *= 10n ** -exponentValue; // Scale denominator
+        } else {
+            baseFraction[0] *= 10n ** exponentValue; // Scale numerator
+        }
+        
+        return baseFraction;
+    }
+
     // handle integers directly
     if (!decimalStr.includes('.')) return [BigInt(decimalStr), 1n];
 

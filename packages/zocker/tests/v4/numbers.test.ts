@@ -37,7 +37,12 @@ const number_schemas = {
 	"non-integer multipleof with min and max": z.number()
 		.multipleOf(0.1)
 			.min(1.5)
-			.max(2.5),
+		.max(2.5),
+	"number with small multipleof": z
+		.number()
+		.multipleOf(2.3e-14)
+		.min(55)
+		.max(100),
 	"number with multiple mins and maxs": z
 		.number()
 		.min(10)

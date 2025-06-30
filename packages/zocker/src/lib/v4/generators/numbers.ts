@@ -3,7 +3,6 @@ import { z as z4 } from "zod/v4";
 import { faker } from "@faker-js/faker";
 import { InstanceofGeneratorDefinition } from "../zocker.js";
 import { Generator } from "../generate.js";
-import { weighted_random_boolean } from "../utils/random.js";
 import { lcm } from "../utils/lcm.js";
 import { InvalidSchemaException } from "../exceptions.js";
 import { SemanticFlag } from "../semantics.js";
@@ -53,9 +52,7 @@ const generate_number: Generator<z.$ZodNumber> = (number_schema, ctx) => {
 		return result.value;
 	} catch (e) { }
 
-	let is_extreme_value = weighted_random_boolean(
-		ctx.number_options.extreme_value_chance
-	);
+	let is_extreme_value = faker.datatype.boolean({ probability: ctx.number_options.extreme_value_chance });
 
 	const formatChecks: z.$ZodCheckNumberFormat[] =
 		number_schema._zod.def.checks?.filter(
@@ -131,7 +128,7 @@ const generate_number: Generator<z.$ZodNumber> = (number_schema, ctx) => {
 		value = faker.number.int({ min, max });
 	} else {
 		if (is_extreme_value) {
-			const use_lower_extreme = weighted_random_boolean(0.5);
+			const use_lower_extreme = faker.datatype.boolean({ probability: 0.5});
 			if (use_lower_extreme) value = is_finite ? -Infinity : min;
 			else value = is_finite ? Infinity : max;
 		}
