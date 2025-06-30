@@ -40,7 +40,7 @@ if (strictConsoleMode) {
         const stack = new Error().stack?.split('\n').slice(2).join('\n') || ''
         
         throw new Error(
-          `console.${methodName}() usage detected in tests. This is not allowed in CI environments.\n\n` +
+          `console.${methodName}() usage detected in tests.\n\n` +
           `Logged message: ${message}\n\n` +
           `Called from:\n${stack}\n\n` +
           `Please remove console.${methodName} statements from your tests or use proper testing assertions instead.\n` +
