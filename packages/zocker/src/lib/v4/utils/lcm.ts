@@ -44,7 +44,6 @@ function decimalToFraction(decimalStr: string): [bigint, bigint] {
     if (decimalStr.includes('e')) {
         const [base, exponent] = decimalStr.split('e');
         if(!base || !exponent) throw new Error(`Invalid number string: ${decimalStr}`);
-        console.log(`Base: ${base}, Exponent: ${exponent}`);
         
         // get the fractional representation of the base
         const baseFraction = decimalToFraction(base);
