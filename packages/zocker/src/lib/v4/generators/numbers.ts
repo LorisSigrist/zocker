@@ -1,8 +1,10 @@
 import * as z from "zod/v4/core";
+import { z as z4 } from "zod/v4";
 import { faker } from "@faker-js/faker";
 import { InstanceofGeneratorDefinition } from "../zocker.js";
 import { Generator } from "../generate.js";
 import { weighted_random_boolean } from "../utils/random.js";
+import { lcm } from "../utils/lcm.js";
 import { InvalidSchemaException } from "../exceptions.js";
 import { SemanticFlag } from "../semantics.js";
 
@@ -49,7 +51,7 @@ const generate_number: Generator<z.$ZodNumber> = (number_schema, ctx) => {
 		if ("then" in result) throw new Error();
 		if (result.issues) throw new Error();
 		return result.value;
-	} catch (e) {}
+	} catch (e) { }
 
 	let is_extreme_value = weighted_random_boolean(
 		ctx.number_options.extreme_value_chance
@@ -146,21 +148,23 @@ const generate_number: Generator<z.$ZodNumber> = (number_schema, ctx) => {
 		number_schema._zod.def.checks?.filter(
 			(c) => c instanceof z.$ZodCheckMultipleOf
 		) ?? [];
+
 	const multipleof = multipleof_checks.reduce((acc, check) => {
 		const multipleOf = check._zod.def.value as number;
 		return lcm(acc, multipleOf);
-	}, Number.MIN_VALUE);
+	}, Number(multipleof_checks[0]?._zod.def.value ?? Number.MIN_VALUE));
 
-	if (multipleof_checks.length > 0) {
-		const next_higher = value + (multipleof - (value % multipleof));
-		const next_lower = value - (value % multipleof);
-
-		if (next_higher <= max) value = next_higher;
-		else if (next_lower >= min) value = next_lower;
-		else
-			throw new InvalidSchemaException(
-				`There exists no valid multiple of ${multipleof} between ${min} and ${max}.`
-			);
+	if (multipleof !== Number.MIN_VALUE) {
+		value = is_int ?
+			faker.number.int({ min, max, multipleOf: multipleof !== Number.MIN_VALUE ? multipleof : undefined }) :
+			faker.number.float({ min, max, multipleOf: multipleof !== Number.MIN_VALUE ? multipleof : undefined });
+		
+		// Due to floating point precision issues the generated number might not symbolically be a multiple of the given value.
+		// Eg: 2.30000000000000004 is not a multiple of 0.1, and zod won't accept it.
+		// We have to check that the generated value is actually a multiple of the given value.
+		// otherwise, try again.
+		const result = z4.number().multipleOf(multipleof).safeParse(value);
+		if(!result.success) return generate_number(number_schema, ctx);
 	}
 
 	return value;
@@ -172,15 +176,6 @@ function float_step_size(n: number) {
 		Number.MIN_VALUE,
 		2 ** Math.floor(Math.log2(n)) * Number.EPSILON
 	);
-}
-
-function lcm<N extends bigint | number>(a: N, b: N): N {
-	return ((a * b) / gcd<N>(a, b)) as N;
-}
-
-function gcd<N extends bigint | number>(a: N, b: N): N {
-	if (b === 0n || b === 0) return a;
-	return gcd<N>(b, (a % b) as N);
 }
 
 export const NumberGenerator: InstanceofGeneratorDefinition<z.$ZodNumber> = {
