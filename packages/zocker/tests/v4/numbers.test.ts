@@ -29,14 +29,16 @@ const number_schemas = {
 		.multipleOf(5)
 		.multipleOf(3),
 	"non-integer multipleof": z.number().multipleOf(0.01).multipleOf(0.1),
-	"integer with multipleof and min and max": z.number()
+	"integer with multipleof and min and max": z
+		.number()
 		.int()
 		.multipleOf(10)
 		.min(10_000)
 		.max(20_000),
-	"non-integer multipleof with min and max": z.number()
+	"non-integer multipleof with min and max": z
+		.number()
 		.multipleOf(0.1)
-			.min(1.5)
+		.min(1.5)
 		.max(2.5),
 	"number with small multipleof": z
 		.number()

@@ -7,11 +7,14 @@ const iso_datetime_schemas = {
 	"iso datetime with offset": z.iso.datetime({ offset: true }),
 	"iso datetime with precision": z.iso.datetime({ precision: 2 }),
 	"iso datetime with precision 0": z.iso.datetime({ precision: 0 }),
-	"iso datetime with precision and offset": z.iso.datetime({ precision: 2, offset: true })
+	"iso datetime with precision and offset": z.iso.datetime({
+		precision: 2,
+		offset: true
+	})
 };
 
 const iso_date_schemas = {
-	"iso date": z.iso.date(),
+	"iso date": z.iso.date()
 };
 
 const iso_time_schemas = {
@@ -22,7 +25,7 @@ const iso_time_schemas = {
 
 const iso_duration_schemas = {
 	"iso duration": z.iso.duration(),
-	"iso duration with pattern": z.iso.duration({ pattern: z.regexes.duration }),
+	"iso duration with pattern": z.iso.duration({ pattern: z.regexes.duration })
 };
 
 describe("ISO Datetime generation", () => {

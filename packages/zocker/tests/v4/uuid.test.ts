@@ -20,7 +20,7 @@ const uuidv7_schemas = {
 
 const guid_schemas = {
 	"plain guid": z.guid()
-}
+};
 
 describe("UUID generation", () => {
 	test_schema_generation(uuid_schemas);

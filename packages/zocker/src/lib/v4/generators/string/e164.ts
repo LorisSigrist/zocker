@@ -10,7 +10,7 @@ const e164_generator: Generator<z.$ZodE164> = (schema, ctx) => {
 
 	const randexp = new Randexp(pattern);
 	randexp.randInt = (min: number, max: number) =>
-		faker.number.int({ min, max  });
+		faker.number.int({ min, max });
 	return randexp.gen();
 };
 

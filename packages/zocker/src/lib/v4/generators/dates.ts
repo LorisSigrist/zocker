@@ -32,18 +32,17 @@ const generate_date: Generator<z.$ZodDate> = (date_schema, ctx) => {
 	if (min && max && max < min)
 		throw new InvalidSchemaException("max date is less than min date");
 
-
 	// if min & max are not explicitly set, choose a recent date
 	if (min === MIN_DATE && max === MAX_DATE) {
 		return faker.date.recent({ days: 100 });
 	}
 
 	// If only the min date is set, choose a future date
-	if(min !== MIN_DATE && max === MAX_DATE) {
-		return faker.date.future({ refDate: min});
+	if (min !== MIN_DATE && max === MAX_DATE) {
+		return faker.date.future({ refDate: min });
 	}
 
-	if(min === MIN_DATE && max !== MAX_DATE) {
+	if (min === MIN_DATE && max !== MAX_DATE) {
 		return faker.date.past({ refDate: max });
 	}
 
