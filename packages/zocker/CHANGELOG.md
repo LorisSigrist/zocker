@@ -1,5 +1,11 @@
 # zocker
 
+## 2.1.1
+
+### Patch Changes
+
+- 5942247: Correctly handle `multipleOf` constraints on numbers with non-integer multiples- Closes [#50](https://github.com/LorisSigrist/zocker/issues/50)
+
 ## 2.1.0
 
 ### Minor Changes
