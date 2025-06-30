@@ -1,5 +1,23 @@
 # zocker
 
+## 2.1.1
+
+### Patch Changes
+
+- 5942247: Correctly handle `multipleOf` constraints on numbers with non-integer multiples- Closes [#50](https://github.com/LorisSigrist/zocker/issues/50)
+
+## 2.1.0
+
+### Minor Changes
+
+- c716f28: Zocker now distributes both ESM and CJS builds - Closes [#46](https://github.com/LorisSigrist/zocker/issues/46)
+
+## 2.0.4
+
+### Patch Changes
+
+- f58e1ac: Fix [#42](https://github.com/LorisSigrist/zocker/issues/42) - `z.uuid()` no longer generates `00000000-0000-0000-0000-000000000000` as often
+
 ## 2.0.3
 
 ### Patch Changes
