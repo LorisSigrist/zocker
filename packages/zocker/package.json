@@ -24,7 +24,7 @@
 		"format": "prettier --write ."
 	},
 	"devDependencies": {
-		"tsdown": "^0.12.8",
+		"tsdown": "^0.12.9",
 		"typescript": "catalog:",
 		"vitest": "catalog:"
 	},
