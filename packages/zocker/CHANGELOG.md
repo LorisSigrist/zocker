@@ -1,5 +1,11 @@
 # zocker
 
+## 2.1.2
+
+### Patch Changes
+
+- 8181d12: fix types being incorrectly generated
+
 ## 2.1.1
 
 ### Patch Changes

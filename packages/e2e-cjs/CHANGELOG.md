@@ -1,5 +1,12 @@
 # zocker-e2e-cjs
 
+## 0.0.3
+
+### Patch Changes
+
+- Updated dependencies [8181d12]
+  - zocker@2.1.2
+
 ## 0.0.2
 
 ### Patch Changes
