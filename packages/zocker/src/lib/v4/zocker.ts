@@ -129,8 +129,8 @@ export class Zocker<Z extends z.$ZodType> {
 	override<S extends z.$ZodTypes | KNOWN_OVERRIDE_NAMES | z.$constructor<any>>(
 		schema: S,
 		generator:
-			| Generator<S extends KNOWN_OVERRIDE_NAMES ? OVERRIDE<S> : S extends z.$constructor<infer T> ? T : S extends z.$ZodType ? S : z.$ZodType>
-			| z.infer<S extends KNOWN_OVERRIDE_NAMES ? OVERRIDE<S> : S extends z.$constructor<infer T> ? T : S extends z.$ZodType ? S : z.$ZodType>
+			| Generator<S extends KNOWN_OVERRIDE_NAMES ? OVERRIDE<S> : S extends z.$constructor<infer T> ? T : S>
+			| z.infer<S extends KNOWN_OVERRIDE_NAMES ? OVERRIDE<S> : S extends z.$constructor<infer T> ? T : S>
 	) {
 		const next = this.clone();
 		const generator_function =
