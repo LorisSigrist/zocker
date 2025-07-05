@@ -126,19 +126,19 @@ export class Zocker<Z extends z.$ZodType> {
 	 * @param schema - Which schema to override. E.g: `z.ZodNumber`.
 	 * @param generator - A value, or a function that generates a value that matches the schema
 	 */
-	override<S extends z.$ZodTypes | KNOWN_OVERRIDE_NAMES>(
+	override<S extends z.$ZodTypes | KNOWN_OVERRIDE_NAMES | z.$constructor<any>>(
 		schema: S,
 		generator:
-			| Generator<S extends KNOWN_OVERRIDE_NAMES ? OVERRIDE<S> : S>
-			| z.infer<S extends KNOWN_OVERRIDE_NAMES ? OVERRIDE<S> : S>
+			| Generator<S extends KNOWN_OVERRIDE_NAMES ? OVERRIDE<S> : S extends z.$ZodType ? S : z.$ZodAny>
+			| z.infer<S extends KNOWN_OVERRIDE_NAMES ? OVERRIDE<S> : S extends z.$ZodType ? S : z.$ZodAny>
 	) {
 		const next = this.clone();
 		const generator_function =
 			typeof generator === "function" ? generator : () => generator;
 
-		const resolved_schema: z.$ZodTypes =
+		const resolved_schema =
 			typeof schema !== "string"
-				? schema
+				? schema as z.$ZodTypes
 				: OVERRIDE_NAMES[schema as KNOWN_OVERRIDE_NAMES]!;
 		next.instanceof_generators = [
 			{
