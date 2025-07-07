@@ -1,5 +1,11 @@
 # zocker
 
+## 2.1.3
+
+### Patch Changes
+
+- 62988dc: `.override()` now accepts zod core-schemas as arguments. This closes a longstanding known issue. Fix implemented by [@ikoamu](https://github.com/ikoamu) 👏
+
 ## 2.1.2
 
 ### Patch Changes
