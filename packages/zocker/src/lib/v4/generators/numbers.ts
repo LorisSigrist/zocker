@@ -61,6 +61,11 @@ const generate_number: Generator<z.$ZodNumber> = (number_schema, ctx) => {
 			(c) => c instanceof z.$ZodCheckNumberFormat
 		) ?? [];
 
+	// z.$ZodCheckNumberFormatDef
+	if (Object.hasOwn(number_schema._zod.def, "format")) {
+		formatChecks.push(number_schema as unknown as z.$ZodCheckNumberFormat);
+	}
+
 	let is_int = formatChecks.reduce(
 		(acc, check) =>
 			acc ||
