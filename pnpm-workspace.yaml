@@ -1,6 +1,6 @@
 packages:
   - packages/*
 catalog:
-  zod: ^3.25.3
+  zod: ^3.25.3 || ^4.0.0
   vitest: ^3.2.4
   typescript: ^5.8.3
