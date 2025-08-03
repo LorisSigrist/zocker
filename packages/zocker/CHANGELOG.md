@@ -1,5 +1,11 @@
 # zocker
 
+## 2.2.0
+
+### Minor Changes
+
+- b30503c: add support for zod ^4.0.0 - Closes [#60](https://github.com/LorisSigrist/zocker/issues/60)
+
 ## 2.1.3
 
 ### Patch Changes
