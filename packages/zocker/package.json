@@ -26,7 +26,8 @@
 	"devDependencies": {
 		"tsdown": "^0.12.9",
 		"typescript": "catalog:",
-		"vitest": "catalog:"
+		"vitest": "catalog:",
+		"zod": "^3.25.3"
 	},
 	"files": [
 		"dist"
