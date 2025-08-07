@@ -170,7 +170,7 @@ function generateStringWithoutFormat(
 }
 
 function color(): string {
-	const generators = [faker.color.human, faker.internet.color];
+	const generators = [faker.color.human, faker.color.rgb];
 	return pick(generators)();
 }
 
