@@ -1,5 +1,11 @@
 # zocker
 
+## 2.2.1
+
+### Patch Changes
+
+- e25ef92: fix(devDependencies): specify zod v3 for tests
+
 ## 2.2.0
 
 ### Minor Changes
