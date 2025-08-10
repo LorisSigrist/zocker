@@ -1,5 +1,11 @@
 # zocker
 
+## 2.2.2
+
+### Patch Changes
+
+- 9133c2b: Fix support for legacy zod 3 schemas - [#57](https://github.com/LorisSigrist/zocker/issues/57)
+
 ## 2.2.1
 
 ### Patch Changes
