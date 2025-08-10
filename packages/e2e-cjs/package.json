@@ -3,7 +3,7 @@
 	"description": "Runs Zocker from CJS to validate it works",
 	"private": true,
 	"type": "commonjs",
-	"version": "0.0.5",
+	"version": "0.0.6",
 	"scripts": {
 		"test": "node ./index.js"
 	},
