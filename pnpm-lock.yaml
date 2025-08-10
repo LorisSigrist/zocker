@@ -62,9 +62,6 @@ importers:
       randexp:
         specifier: ^0.5.3
         version: 0.5.3
-      zod:
-        specifier: 'catalog:'
-        version: 4.0.14
     devDependencies:
       tsdown:
         specifier: ^0.12.9
@@ -75,6 +72,9 @@ importers:
       vitest:
         specifier: 'catalog:'
         version: 3.2.4(@types/node@22.15.19)(jiti@2.4.2)
+      zod:
+        specifier: ^3.25.3
+        version: 3.25.76
 
 packages:
 
@@ -1214,6 +1214,9 @@ packages:
     peerDependencies:
       zod: ^3.25.3
 
+  zod@3.25.76:
+    resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
+
   zod@4.0.14:
     resolution: {integrity: sha512-nGFJTnJN6cM2v9kXL+SOBq3AtjQby3Mv5ySGFof5UGRHrRioSJ5iG680cYNjE/yWk671nROcpPj4hAS8nyLhSw==}
 
@@ -2292,5 +2295,7 @@ snapshots:
       '@faker-js/faker': 9.8.0
       randexp: 0.5.3
       zod: 4.0.14
+
+  zod@3.25.76: {}
 
   zod@4.0.14: {}
