@@ -1,5 +1,5 @@
 import { Generator, generate } from "../generate.js";
-import { z } from "zod";
+import { z } from "zod/v3";
 import { InstanceofGeneratorDefinition } from "../zocker.js";
 
 const generate_promise: Generator<z.ZodPromise<any>> = (

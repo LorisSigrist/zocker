@@ -1,4 +1,4 @@
-const { z } = require("zod");
+const { z } = require("zod/v3");
 const { zocker } = require("zocker");
 
 const schema = z.object({

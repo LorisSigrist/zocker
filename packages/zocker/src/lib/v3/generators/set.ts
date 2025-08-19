@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v3";
 import { faker } from "@faker-js/faker";
 import { generate, Generator } from "../generate.js";
 import { RecursionLimitReachedException } from "../exceptions.js";

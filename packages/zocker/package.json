@@ -27,7 +27,7 @@
 		"tsdown": "^0.12.9",
 		"typescript": "catalog:",
 		"vitest": "catalog:",
-		"zod": "^3.25.3"
+		"zod": "^4.0.0"
 	},
 	"files": [
 		"dist"

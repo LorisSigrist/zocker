@@ -1,5 +1,5 @@
 import { describe } from "vitest";
-import { z } from "zod";
+import { z } from "zod/v3";
 import { test_schema_generation } from "../utils";
 
 //This is a real schema from a real project

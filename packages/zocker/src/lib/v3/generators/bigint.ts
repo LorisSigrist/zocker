@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker";
 import { Generator } from "../generate.js";
-import { z } from "zod";
+import { z } from "zod/v3";
 import { InstanceofGeneratorDefinition } from "../zocker.js";
 import { InvalidSchemaException } from "../exceptions.js";
 

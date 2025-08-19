@@ -1,6 +1,6 @@
 import { InstanceofGeneratorDefinition } from "../zocker.js";
 import { generate, Generator } from "../generate.js";
-import { z } from "zod";
+import { z } from "zod/v3";
 
 const generate_tuple: Generator<z.ZodTuple> = (schema, generation_context) => {
 	const tuple = schema._def.items.map(<Z extends z.ZodSchema>(item: Z) =>

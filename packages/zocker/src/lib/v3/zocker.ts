@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v3";
 import { GenerationContext, generate, Generator } from "./generate.js";
 import { faker } from "@faker-js/faker";
 import { default_generators } from "./default_generators.js";

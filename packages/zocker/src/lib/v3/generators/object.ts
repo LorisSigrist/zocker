@@ -1,7 +1,7 @@
 import { get_semantic_flag } from "../semantics.js";
 import { GenerationContext, generate } from "../generate.js";
 import { InstanceofGeneratorDefinition } from "../zocker.js";
-import { z } from "zod";
+import { z } from "zod/v3";
 import { faker } from "@faker-js/faker";
 
 export type ObjectOptions = {

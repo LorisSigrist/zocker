@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker";
 import { InvalidSchemaException } from "../exceptions.js";
 import { Generator } from "../generate.js";
 import { InstanceofGeneratorDefinition } from "../zocker.js";
-import { z } from "zod";
+import { z } from "zod/v3";
 
 const generate_date: Generator<z.ZodDate> = (date_schema, ctx) => {
 	const min = get_date_check(date_schema, "min")?.value ?? null;
