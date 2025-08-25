@@ -1,5 +1,11 @@
 # zocker
 
+## 2.3.0
+
+### Minor Changes
+
+- d239dfd: Better support for zod v4
+
 ## 2.2.2
 
 ### Patch Changes

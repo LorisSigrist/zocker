@@ -1,6 +1,6 @@
 {
 	"name": "e2e-zod3",
-	"version": "0.0.2",
+	"version": "0.1.0",
 	"private": true,
 	"description": "End-to-end tests for Zod 3",
 	"main": "index.js",
@@ -12,4 +12,3 @@
 		"zod": "3.25.3"
 	}
 }
-
