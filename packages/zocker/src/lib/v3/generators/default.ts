@@ -1,5 +1,5 @@
 import { Generator, generate } from "../generate.js";
-import { z } from "zod";
+import { z } from "zod/v3";
 import { weighted_random_boolean } from "../utils/random.js";
 import { InstanceofGeneratorDefinition } from "../zocker.js";
 

@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v3";
 import { generate, Generator } from "../generate.js";
 import { pick } from "../utils/random.js";
 import { InstanceofGeneratorDefinition } from "../zocker.js";

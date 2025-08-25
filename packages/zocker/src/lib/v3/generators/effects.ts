@@ -1,6 +1,6 @@
 import { InstanceofGeneratorDefinition } from "../zocker.js";
 import { Generator, generate } from "../generate.js";
-import { z } from "zod";
+import { z } from "zod/v3";
 import { NoGeneratorException } from "../exceptions.js";
 
 const generate_effects: Generator<z.ZodEffects<any>> = (

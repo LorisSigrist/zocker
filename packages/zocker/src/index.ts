@@ -6,7 +6,7 @@ import { zocker as zockerV4, Zocker as ZockerV4 } from "./lib/v4/zocker.js";
 import { zocker as zockerV3, Zocker as ZockerV3 } from "./lib/v3/zocker.js";
 
 import * as zCore from "zod/v4/core";
-import { z as z3 } from "zod";
+import { z as z3 } from "zod/v3";
 
 export function zocker<Z extends zCore.$ZodType | z3.ZodSchema>(
 	schema: Z

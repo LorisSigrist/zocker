@@ -1,6 +1,6 @@
 import { Generator, generate } from "../generate.js";
 import { InstanceofGeneratorDefinition } from "../zocker.js";
-import { z } from "zod";
+import { z } from "zod/v3";
 
 const generate_readonly: Generator<z.ZodReadonly<any>> = (
 	readonly_schema,

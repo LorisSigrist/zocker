@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v3";
 import {
 	NoGeneratorException,
 	RecursionLimitReachedException
@@ -83,23 +83,22 @@ const generate_value: Generator<z.ZodSchema> = (schema, generation_context) => {
 
 	//Check if an instanceof generator is available for this schema
 	const instanceof_generator = generation_context.instanceof_generators.find(
-		generator => {
+		(generator) => {
 			// If the schema is a class, we can check if it is an instance of the generator's schema
 			if (schema instanceof generator.schema) return true;
 
 			// For some reason, zod3 schemas from zod4 do not have the same instance.
 			// In this case we check if the schema's typeName matches the generator's schema name.
 
-			const generatorSchemaName : string | undefined = generator.schema.name;
+			const generatorSchemaName: string | undefined = generator.schema.name;
 			const schemaTypeName: string | undefined = (schema._def as any)?.typeName;
-			
+
 			if (generatorSchemaName && schemaTypeName) {
 				return generatorSchemaName === schemaTypeName;
 			}
 
 			// Failed
 			return false;
-
 		}
 	);
 	if (instanceof_generator)

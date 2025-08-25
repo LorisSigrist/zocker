@@ -1,14 +1,15 @@
 {
-    "name": "e2e-zod3",
-    "version": "0.0.2",
-    "private": true,
-    "description": "End-to-end tests for Zod 3",
-    "main": "index.js",
-    "scripts": {
-        "test": "node ./index.js"
-    },
-    "dependencies": {
-        "zocker": "workspace:*",
-        "zod": "3.25.3"
-    }
+	"name": "e2e-zod3",
+	"version": "0.0.2",
+	"private": true,
+	"description": "End-to-end tests for Zod 3",
+	"main": "index.js",
+	"scripts": {
+		"test": "node ./index.js"
+	},
+	"dependencies": {
+		"zocker": "workspace:*",
+		"zod": "3.25.3"
+	}
 }
+
